@@ -1,0 +1,25 @@
+# Secrets
+public_html/SAFEAPP/.env
+
+# Composer dependencies (run `composer install` to regenerate)
+public_html/SAFEAPP/vendor/
+
+# Runtime-generated logs
+error_log
+**/error_log
+
+# Runtime-generated exports
+public_html/SAFEAPP/procesos/tmp_excel/
+
+# NetBeans IDE project metadata
+public_html/SAFEAPP/nbproject/
+
+# Hosting artifact, unclear origin, not part of the app
+/DO_NOT_UPLOAD_HERE
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
