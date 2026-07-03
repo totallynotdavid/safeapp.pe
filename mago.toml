@@ -8,7 +8,6 @@ includes   = ["public_html/SAFEAPP/vendor"]
 excludes   = [
     "public_html/SAFEAPP/vendor/**",
     "public_html/SAFEAPP/nbproject/**",
-    "public_html/SAFEAPP/util/PHPExcel/**",
 ]
 
 [formatter]
