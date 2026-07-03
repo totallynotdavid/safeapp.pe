@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help setup dev db-up db-down db-restore db-dump db-reset db-status
+.PHONY: help setup dev db-up db-down db-restore db-dump db-reset db-status fmt fmt-check lint
 
 MISE := mise exec --
 DB := ./scripts/db.sh
@@ -29,6 +29,15 @@ db-dump: ## Snapshot the local DB to a .sql file (FILE=path, default dev-dump.sq
 
 db-reset: ## Wipe the local DB and reseed from 127_0_0_1.sql (FILE=path to override)
 	$(DB) reset $(FILE)
+
+fmt: ## Format PHP code with Mago
+	$(MISE) mago format
+
+fmt-check: ## Check PHP formatting without modifying files (for CI)
+	$(MISE) mago format --check
+
+lint: ## Lint PHP code with Mago
+	$(MISE) mago lint
 
 db-status: ## Show whether the local MariaDB instance is running
 	$(DB) status

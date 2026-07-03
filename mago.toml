@@ -1,0 +1,15 @@
+#:schema https://mago.carthage.software/1.42.0/schema.json
+
+php-version = "8.2"
+
+[source]
+paths      = ["public_html/SAFEAPP"]
+includes   = ["public_html/SAFEAPP/vendor"]
+excludes   = [
+    "public_html/SAFEAPP/vendor/**",
+    "public_html/SAFEAPP/nbproject/**",
+    "public_html/SAFEAPP/util/PHPExcel/**",
+]
+
+[formatter]
+print-width = 120
