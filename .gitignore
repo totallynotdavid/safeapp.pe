@@ -1,11 +1,18 @@
 # Secrets
 public_html/SAFEAPP/.env
 
+# Database backups/dumps
+*.sql
+*.sql.gz
+
 # Composer dependencies (run `composer install` to regenerate)
 public_html/SAFEAPP/vendor/
 
 # Personal mise overrides (not shared config)
 .mise.local.toml
+
+# Local MariaDB instance (downloaded binaries + datadir; see scripts/db.sh)
+/.mariadb/
 
 # Runtime-generated logs
 error_log
