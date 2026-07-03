@@ -12,8 +12,8 @@ setup: ## Install PHP deps, start the local DB, and seed it from 127_0_0_1.sql
 	$(MISE) composer install --working-dir=public_html/SAFEAPP
 	$(DB) restore $(FILE)
 
-dev: db-up ## Start the local DB and PHP's built-in server on 127.0.0.1:8000
-	$(MISE) php -S 127.0.0.1:8000 -t public_html/SAFEAPP
+dev: db-up ## Start the local DB and PHP's built-in server at http://127.0.0.1:8000/SAFEAPP/
+	$(MISE) php -S 127.0.0.1:8000 -t public_html
 
 db-up: ## Start the local MariaDB instance (installs/initializes on first run)
 	$(DB) start
