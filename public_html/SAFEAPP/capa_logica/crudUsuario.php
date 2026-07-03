@@ -1,30 +1,44 @@
 <?php
 
+require_once "clave.php";
+
 class crudusuario
 {
 
     public function agregarUsuario($datos)
     {
 
-        $clave = md5($datos[2]);
+        $clave = hashearClave($datos[2]);
         $personal = strtoupper($datos[0]);
         $obj = new conectar();
         $conexion = $obj->conexion();
 
-        $sqlvalidar = "SELECT count(*) FROM usuario WHERE usuario='$datos[1]'";
-        $result = mysqli_query($conexion, $sqlvalidar);
-        $usuario = mysqli_fetch_array($result);
+        $sqlvalidar = "SELECT count(*) FROM usuario WHERE usuario = ?";
+        $stmt = mysqli_prepare($conexion, $sqlvalidar);
+        mysqli_stmt_bind_param($stmt, "s", $datos[1]);
+        mysqli_stmt_execute($stmt);
+        $usuario = mysqli_fetch_array(mysqli_stmt_get_result($stmt));
 
-        if ($usuario[0] == 0) {
-
-            $sql = "INSERT into usuario (usuario, clave, id_rol, personal, estado,sexo,id_supervisor) 
-            values ('$datos[1]', '$clave',  '$datos[3]'  , '$personal','$datos[7]' ,'$datos[6]' ,
-            '$datos[5]')";
-
-            return mysqli_query($conexion, $sql);
-        } else {
+        if ($usuario[0] != 0) {
             return 1;
         }
+
+        $sql = "INSERT into usuario (usuario, clave, id_rol, personal, estado, sexo, id_supervisor)
+            values (?, ?, ?, ?, ?, ?, ?)";
+        $stmt = mysqli_prepare($conexion, $sql);
+        mysqli_stmt_bind_param(
+            $stmt,
+            "sssssss",
+            $datos[1],
+            $clave,
+            $datos[3],
+            $personal,
+            $datos[7],
+            $datos[6],
+            $datos[5]
+        );
+
+        return mysqli_stmt_execute($stmt);
     }
 
 
@@ -200,15 +214,18 @@ class crudusuario
         $obj = new conectar();
         $conexion = $obj->conexion();
 
-        $clave = md5($datos[2]);
+        $clave = hashearClave($datos[2]);
 
-        $sql = "UPDATE usuario set  
-        clave='$clave', 
-        personal='$datos[1]', 
-        estado='$datos[4]',
-        id_supervisor='$datos[3]' 
-        where id_usuario='$datos[0]'";
-        return mysqli_query($conexion, $sql);
+        $sql = "UPDATE usuario set
+        clave = ?,
+        personal = ?,
+        estado = ?,
+        id_supervisor = ?
+        where id_usuario = ?";
+        $stmt = mysqli_prepare($conexion, $sql);
+        mysqli_stmt_bind_param($stmt, "sssss", $clave, $datos[1], $datos[4], $datos[3], $datos[0]);
+
+        return mysqli_stmt_execute($stmt);
     }
 
     public function actualizarPersonal($datos)
