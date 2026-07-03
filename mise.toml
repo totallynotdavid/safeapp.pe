@@ -1,2 +1,5 @@
 [tools]
-"vfox:mise-plugins/vfox-php" = "7.2.34"
+php = "8.2.31"
+
+[env]
+_.php = { prebuilt_static = true }
