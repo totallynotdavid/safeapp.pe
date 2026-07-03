@@ -1,19 +1,20 @@
 <?php
+
 session_start();
-$idusu = $_SESSION["idusu"];
-require_once "../capa_conexion/conexion.php";
+$idusu = $_SESSION['idusu'];
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-header("Content-Type: application/xls");
-header("Content-Disposition: attachment; filename= ReporteHistorico.xls");
+header('Content-Type: application/xls');
+header('Content-Disposition: attachment; filename= ReporteHistorico.xls');
 
-$supervisor = $_POST["supervisor"];
-$idusu = $_POST["idusu"];
+$supervisor = $_POST['supervisor'];
+$idusu = $_POST['idusu'];
 
-$desde = $_POST["desde"];
-$hasta = $_POST["hasta"];
+$desde = $_POST['desde'];
+$hasta = $_POST['hasta'];
 $date_hasta = strtotime('+1 day', strtotime($hasta));
 $date_hasta = date('Y-m-d', $date_hasta);
 
@@ -58,8 +59,8 @@ $resultEXCEL = mysqli_query($conexion, $sqlEXCEL);
 
     <tbody>
         <?php
-        while ($mostrar = mysqli_fetch_array($resultEXCEL)) {
-            ?>
+
+        while ($mostrar = mysqli_fetch_array($resultEXCEL)) { ?>
             <tr>
                 <td><?php echo utf8_decode($mostrar[0]) ?></td>
                 <td><?php echo utf8_decode($mostrar[1]) ?></td>
@@ -74,8 +75,7 @@ $resultEXCEL = mysqli_query($conexion, $sqlEXCEL);
                 <td><?php echo utf8_decode($mostrar[10]) ?></td>
 
             </tr>
-            <?php
-        }
+            <?php }
         ?>
     </tbody>
 </table>

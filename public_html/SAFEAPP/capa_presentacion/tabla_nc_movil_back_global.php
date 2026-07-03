@@ -1,27 +1,31 @@
 <?php
 
-require_once "../capa_conexion/conexion.php";
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-$ano = $_GET["ano"];
-$periodo = $_GET["periodo"];
-$ncestado = $_GET["ncestadof"];
-$tienda = $_GET["tienda"];
+$ano = $_GET['ano'];
+$periodo = $_GET['periodo'];
+$ncestado = $_GET['ncestadof'];
+$tienda = $_GET['tienda'];
 
 if (
-    $ncestado === 'INGRESADO' || $ncestado === 'PROCESANDO' || $ncestado === 'PENDIENTE' || $ncestado === 'DELIVERY' || $ncestado === 'BOLSA'
-    || $ncestado === 'SALIDAANTICIPADA' || $ncestado === 'LIQUIDADO' || $ncestado === 'ADR'
+    $ncestado === 'INGRESADO'
+    || $ncestado === 'PROCESANDO'
+    || $ncestado === 'PENDIENTE'
+    || $ncestado === 'DELIVERY'
+    || $ncestado === 'BOLSA'
+    || $ncestado === 'SALIDAANTICIPADA'
+    || $ncestado === 'LIQUIDADO'
+    || $ncestado === 'ADR'
 ) {
-
     $sqlncMovil = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
   ncf.cargo_fijo, ncf.estado,ncf.validacion,ncf.oportunidad,ncf.ejecutivo_telefonica,q_lineas,car.propietario, usu.personal,ncf.nodo, ncf.casofwa
  from nc_movil as ncf left join cartera as car on car.id_cartera=ncf.id_cartera left join usuario as usu on usu.id_usuario=ncf.id_usuario
 where month(ncf.fecha_ingreso)='$periodo' and year(ncf.fecha_ingreso)='$ano'  and ncf.estado='$ncestado' and ncf.validacion='PROCEDE' 
 ORDER BY ncf.fecha_ingreso DESC";
 } else {
-
     if ($ncestado === 'ACTIVADO') {
         $sqlncMovil = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
   ncf.cargo_fijo, ncf.estado,ncf.validacion,ncf.oportunidad,ncf.ejecutivo_telefonica,q_lineas,car.propietario, usu.personal,ncf.nodo, ncf.casofwa
@@ -29,16 +33,13 @@ ORDER BY ncf.fecha_ingreso DESC";
 where month(ncf.fecha_actualizacion)='$periodo' and year(ncf.fecha_actualizacion)='$ano'  and ncf.estado='$ncestado' and ncf.validacion='PROCEDE' 
 ORDER BY ncf.fecha_ingreso DESC";
     } else {
-
         if ($ncestado === 'CAIDA') {
-
             $sqlncMovil = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
   ncf.cargo_fijo, ncf.estado,ncf.validacion,ncf.oportunidad,ncf.ejecutivo_telefonica,q_lineas,car.propietario, usu.personal,ncf.nodo, ncf.casofwa
  from nc_movil as ncf left join cartera as car on car.id_cartera=ncf.id_cartera left join usuario as usu on usu.id_usuario=ncf.id_usuario
 where month(ncf.fecha_ingreso)='$periodo' and year(ncf.fecha_ingreso)='$ano'  and ncf.estado='$ncestado' and ncf.validacion='PROCEDE'
 ORDER BY ncf.fecha_ingreso DESC";
         } else {
-
             $sqlncMovil = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
 ncf.cargo_fijo, ncf.estado,ncf.validacion,ncf.oportunidad,ncf.ejecutivo_telefonica,q_lineas,car.propietario, usu.personal,ncf.nodo, ncf.casofwa
 from nc_movil as ncf left join cartera as car on car.id_cartera=ncf.id_cartera left join usuario as usu on usu.id_usuario=ncf.id_usuario
@@ -63,10 +64,7 @@ where month(ncf.fecha_ingreso)='$periodo' and year(ncf.fecha_ingreso)='$ano'  an
     }
 }
 
-
-
 $resultncMovil = mysqli_query($conexion, $sqlncMovil);
-
 
 ?>
 
@@ -93,8 +91,8 @@ $resultncMovil = mysqli_query($conexion, $sqlncMovil);
                     </thead>
                     <tbody>
                         <?php
-                        while ($mostrar = mysqli_fetch_array($resultncMovil)) {
-                            ?>
+
+                        while ($mostrar = mysqli_fetch_array($resultncMovil)) { ?>
                             <tr>
                                 <td><?php echo $mostrar[1] ?></td>
                                 <td><?php echo $mostrar[2] ?></td>
@@ -118,8 +116,7 @@ $resultncMovil = mysqli_query($conexion, $sqlncMovil);
 
 
                             </tr>
-                            <?php
-                        }
+                            <?php }
                         ?>
 
 

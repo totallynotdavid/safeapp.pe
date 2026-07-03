@@ -1,11 +1,12 @@
 <?php
+
 session_start();
-$idusu = $_SESSION["idusu"];
-require_once "../capa_conexion/conexion.php";
+$idusu = $_SESSION['idusu'];
+require_once '../capa_conexion/conexion.php';
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-$sql = "SELECT  u.id_usuario,  
+$sql = 'SELECT  u.id_usuario,  
                 u.personal,
                 r.nombre_rol, 
                 s.nombre,
@@ -15,7 +16,7 @@ $sql = "SELECT  u.id_usuario,
                 from usuario as u
                 inner join rol as r on r.id_rol=u.id_rol 
                 inner join supervisor as s on s.id_supervisor=u.id_supervisor 
-                where u.estado=1 ";
+                where u.estado=1 ';
 
 $result = mysqli_query($conexion, $sql);
 
@@ -40,8 +41,8 @@ $result = mysqli_query($conexion, $sql);
 
                     <tbody>
                         <?php
-                        while ($mostrar = mysqli_fetch_array($result)) {
-                        ?>
+
+                        while ($mostrar = mysqli_fetch_array($result)) { ?>
                             <tr>
                                 <td><?php echo $mostrar[0] ?></td>
                                 <td><?php echo $mostrar[1] ?></td>
@@ -51,15 +52,16 @@ $result = mysqli_query($conexion, $sql);
                                 <td><?php echo $mostrar[5] ?></td>
                                 <td><?php echo $mostrar[6] ?></td>
                                 <td style="text-align: center;">
-                                    <span class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="FrmActualizar('<?php echo $mostrar[0] ?>')">
+                                    <span class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="FrmActualizar('<?php echo
+                                        $mostrar[0]
+                                    ?>')">
                                         <span class="fa fa-pencil-square-o"></span>
                                     </span>
 
                                 </td>
 
                             </tr>
-                        <?php
-                        }
+                        <?php }
                         ?>
                     </tbody>
                 </table>

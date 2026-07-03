@@ -1,25 +1,30 @@
 <?php
+
 session_start();
-$idusu = $_SESSION["idusu"];
-require_once "../capa_conexion/conexion.php";
+$idusu = $_SESSION['idusu'];
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-header("Content-Type: application/xls");
-header("Content-Disposition: attachment; filename= reporteseguimientoFT.xls");
+header('Content-Type: application/xls');
+header('Content-Disposition: attachment; filename= reporteseguimientoFT.xls');
 
-$ano = $_POST["ncano"];
-$periodo = $_POST["ncperiodo"];
-$ncestado = $_POST["ncestadof"];
-$tienda = $_POST["ncregionf"];
+$ano = $_POST['ncano'];
+$periodo = $_POST['ncperiodo'];
+$ncestado = $_POST['ncestadof'];
+$tienda = $_POST['ncregionf'];
 
 if ($tienda === 'TODO') {
-
     if (
-        $ncestado === 'PENDIENTE' || $ncestado === 'AGENDADO' || $ncestado === 'OBSERVADO' ||
-        $ncestado === 'INICIADO' || $ncestado === 'XINGRESAR' || $ncestado === 'BOLSA'
-        || $ncestado === 'ARBITRAJE' || $ncestado === 'ADR'
+        $ncestado === 'PENDIENTE'
+        || $ncestado === 'AGENDADO'
+        || $ncestado === 'OBSERVADO'
+        || $ncestado === 'INICIADO'
+        || $ncestado === 'XINGRESAR'
+        || $ncestado === 'BOLSA'
+        || $ncestado === 'ARBITRAJE'
+        || $ncestado === 'ADR'
     ) {
         $sqlEXCEL = " SELECT    usu.personal, 
                                 sup.nombre, 
@@ -67,9 +72,7 @@ if ($tienda === 'TODO') {
                                 where  year(nc.fecha_validacion)<='$ano' and nc.estado='$ncestado' and nc.validacion='PROCEDE'  
                                 ORDER BY nc.fecha_ingreso DESC";
     } else {
-
         if ($ncestado === 'COMPLETADO') {
-
             $sqlEXCEL = " SELECT    usu.personal, 
                                     sup.nombre, 
                                     nc.fecha_ingreso, 
@@ -117,9 +120,7 @@ if ($tienda === 'TODO') {
                                     and nc.estado= '$ncestado' and nc.validacion='PROCEDE'  
                                     ORDER BY nc.fecha_ingreso DESC";
         } else {
-
             if ($ncestado === 'CANCELADO') {
-
                 $sqlEXCEL = " SELECT    usu.personal, 
                                         sup.nombre, 
                                         nc.fecha_ingreso, 
@@ -168,7 +169,6 @@ if ($tienda === 'TODO') {
                                         and nc.validacion='PROCEDE'  
                                         ORDER BY nc.fecha_ingreso DESC";
             } else {
-
                 $sqlEXCEL = " SELECT    usu.personal, 
                                         sup.nombre, 
                                         nc.fecha_ingreso, 
@@ -311,11 +311,15 @@ UNION
         }
     }
 } else {
-
     if (
-        $ncestado === 'PENDIENTE' || $ncestado === 'AGENDADO' || $ncestado === 'OBSERVADO' ||
-        $ncestado === 'INICIADO' || $ncestado === 'XINGRESAR' || $ncestado === 'BOLSA'
-        || $ncestado === 'ARBITRAJE' || $ncestado === 'ADR'
+        $ncestado === 'PENDIENTE'
+        || $ncestado === 'AGENDADO'
+        || $ncestado === 'OBSERVADO'
+        || $ncestado === 'INICIADO'
+        || $ncestado === 'XINGRESAR'
+        || $ncestado === 'BOLSA'
+        || $ncestado === 'ARBITRAJE'
+        || $ncestado === 'ADR'
     ) {
         $sqlEXCEL = " SELECT    usu.personal, 
                                 sup.nombre, 
@@ -365,9 +369,7 @@ UNION
                                 and nc.zonal='$tienda'
                                 ORDER BY nc.fecha_ingreso DESC";
     } else {
-
         if ($ncestado === 'COMPLETADO') {
-
             $sqlEXCEL = " SELECT    usu.personal, 
                                     sup.nombre, 
                                     nc.fecha_ingreso, 
@@ -417,9 +419,7 @@ UNION
                                     and nc.zonal='$tienda'
                                     ORDER BY nc.fecha_ingreso DESC";
         } else {
-
             if ($ncestado === 'CANCELADO') {
-
                 $sqlEXCEL = " SELECT    usu.personal, 
                                         sup.nombre, 
                                         nc.fecha_ingreso, 
@@ -469,7 +469,6 @@ UNION
                                         and nc.zonal='$tienda'
                                         ORDER BY nc.fecha_ingreso DESC";
             } else {
-
                 $sqlEXCEL = " SELECT    usu.personal, 
                                         sup.nombre, 
                                         nc.fecha_ingreso,
@@ -664,8 +663,8 @@ $resultEXCEL = mysqli_query($conexion, $sqlEXCEL);
 
     <tbody>
         <?php
-        while ($mostrar = mysqli_fetch_array($resultEXCEL)) {
-        ?>
+
+        while ($mostrar = mysqli_fetch_array($resultEXCEL)) { ?>
             <tr>
                 <td><?php echo utf8_decode($mostrar[0]) ?></td>
                 <td><?php echo utf8_decode($mostrar[1]) ?></td>
@@ -704,8 +703,7 @@ $resultEXCEL = mysqli_query($conexion, $sqlEXCEL);
                 <td><?php echo utf8_decode($mostrar[35]) ?></td>
                 <td><?php echo utf8_decode($mostrar[36]) ?></td>
             </tr>
-        <?php
-        }
+        <?php }
         ?>
     </tbody>
 </table>

@@ -1,21 +1,24 @@
 <?php
 
-require_once "../capa_conexion/conexion.php";
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-$ano = $_GET["ano"];
-$periodo = $_GET["periodo"];
-$estado = $_GET["estado"];
-$idusu = $_GET["idusu"];
+$ano = $_GET['ano'];
+$periodo = $_GET['periodo'];
+$estado = $_GET['estado'];
+$idusu = $_GET['idusu'];
 
 if (
-    $estado === 'OBSERVADO' || $estado === 'PENDIENTE' || $estado === 'XINGRESAR' || $estado === 'AGENDADO' ||
-    $estado === 'INICIADO' || $estado === 'BOLSA' || $estado === 'ADR'
+    $estado === 'OBSERVADO'
+    || $estado === 'PENDIENTE'
+    || $estado === 'XINGRESAR'
+    || $estado === 'AGENDADO'
+    || $estado === 'INICIADO'
+    || $estado === 'BOLSA'
+    || $estado === 'ADR'
 ) {
-
-
     $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , ncf.cargo_fijo, ncf.estado,ncf.validacion
  from nc_fija as ncf 
@@ -23,7 +26,6 @@ where  year(ncf.fecha_ingreso)='$ano' and
 ncf.id_usuario='$idusu' and ncf.estado='$estado'
 ORDER BY ncf.fecha_ingreso DESC";
 } else {
-
     if ($estado === 'COMPLETADO') {
         $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , ncf.cargo_fijo, ncf.estado,ncf.validacion
@@ -32,9 +34,7 @@ where month(ncf.fecha_liquidacion)='$periodo' and year(ncf.fecha_liquidacion)='$
 ncf.id_usuario='$idusu' and ncf.estado='$estado'
 ORDER BY ncf.fecha_ingreso DESC";
     } else {
-
         if ($estado === 'CANCELADO') {
-
             $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , ncf.cargo_fijo, ncf.estado,ncf.validacion
  from nc_fija as ncf 
@@ -42,7 +42,6 @@ where month(ncf.fecha_ingreso)='$periodo' and year(ncf.fecha_ingreso)='$ano' and
 ncf.id_usuario='$idusu' and ncf.estado='$estado'
 ORDER BY ncf.fecha_ingreso DESC";
         } else {
-
             $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , ncf.cargo_fijo, ncf.estado,ncf.validacion
  from nc_fija as ncf 
@@ -69,9 +68,7 @@ ncf.id_usuario='$idusu' and ncf.estado='CANCELADO'
     }
 }
 
-
 $resultncFija = mysqli_query($conexion, $sqlncFija);
-
 
 ?>
 
@@ -96,8 +93,8 @@ $resultncFija = mysqli_query($conexion, $sqlncFija);
                     </thead>
                     <tbody>
                         <?php
-                        while ($mostrar = mysqli_fetch_array($resultncFija)) {
-                        ?>
+
+                        while ($mostrar = mysqli_fetch_array($resultncFija)) { ?>
                         <tr>
                             <td><?php echo $mostrar[1] ?></td>
                             <td><?php echo $mostrar[2] ?></td>
@@ -116,8 +113,7 @@ $resultncFija = mysqli_query($conexion, $sqlncFija);
                             </td>
 
                         </tr>
-                        <?php
-                        }
+                        <?php }
                         ?>
 
 

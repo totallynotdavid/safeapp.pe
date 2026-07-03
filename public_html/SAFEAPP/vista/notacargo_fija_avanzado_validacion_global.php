@@ -1,16 +1,14 @@
 <?php
+
 session_start();
 
- if(isset( $_SESSION ["idusu"])){
+if (isset($_SESSION['idusu'])) {
+    $idusu = $_SESSION['idusu'];
+    require_once '../capa_conexion/conexion.php';
+    $obj = new conectar();
+    $conexion = $obj->conexion();
 
-$idusu = $_SESSION ["idusu"];
-require_once "../capa_conexion/conexion.php";
-$obj = new conectar();
-$conexion = $obj->conexion();
-
-
-
-?>
+    ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
@@ -20,8 +18,9 @@ $conexion = $obj->conexion();
     <title>LLAMADA | Dashboard</title>
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <?php
-include 'scriptsup.php';
-?>
+
+    include 'scriptsup.php';
+    ?>
     <link rel="stylesheet" type="text/css"
         href="../capa_presentacion/librerias/datatable/dataTables.bootstrap4.min.css">
 
@@ -39,8 +38,9 @@ include 'scriptsup.php';
     <div class="wrapper">
 
         <?php
-include 'cabecera.php';
-?>
+
+        include 'cabecera.php';
+        ?>
 
         <!-- =============================================== -->
 
@@ -48,8 +48,9 @@ include 'cabecera.php';
         <aside class="main-sidebar">
             <!-- sidebar: style can be found in sidebar.less -->
             <?php
-include 'menu.php';
-?>
+
+            include 'menu.php';
+            ?>
             <!-- /.sidebar -->
         </aside>
 
@@ -201,9 +202,10 @@ include 'menu.php';
                                             <label>Fecha Validacion:</label>
                                             <input type="date" disabled="" class="form-control input-sm" id="fechahoy"
                                                 name="fechahoy" value="<?php
-            date_default_timezone_set("America/Lima");
-            $hoy = date("Y-m-d");
-            echo $hoy ?>">
+
+                                                date_default_timezone_set('America/Lima');
+                                                $hoy = date('Y-m-d');
+                                                echo $hoy ?>">
                                         </div>
 
                                         <div class="col-xs-4">
@@ -490,10 +492,7 @@ include 'menu.php';
 </body>
 
 </html>
-<?php } else {
-
-
-header('Location: /SAFEAPP/vista/login.php');
-
-    
-    }?>
+<?php
+} else {
+    header('Location: /SAFEAPP/vista/login.php');
+}

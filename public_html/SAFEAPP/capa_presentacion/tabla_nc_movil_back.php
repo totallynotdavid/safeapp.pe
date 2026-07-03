@@ -1,18 +1,24 @@
 <?php
 
-require_once "../capa_conexion/conexion.php";
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-$ano = $_GET["ano"];
-$periodo = $_GET["periodo"];
-$ncestado = $_GET["ncestadof"];
-$tienda = $_GET["tienda"];
+$ano = $_GET['ano'];
+$periodo = $_GET['periodo'];
+$ncestado = $_GET['ncestadof'];
+$tienda = $_GET['tienda'];
 
-if ($ncestado === 'INGRESADO' || $ncestado === 'PROCESANDO' || $ncestado === 'PENDIENTE' || $ncestado === 'DELIVERY' || $ncestado === 'BOLSA' || 
-    $ncestado === 'SALIDAANTICIPADA' || $ncestado === 'ADR') {
-
+if (
+    $ncestado === 'INGRESADO'
+    || $ncestado === 'PROCESANDO'
+    || $ncestado === 'PENDIENTE'
+    || $ncestado === 'DELIVERY'
+    || $ncestado === 'BOLSA'
+    || $ncestado === 'SALIDAANTICIPADA'
+    || $ncestado === 'ADR'
+) {
     $sqlncMovil = " SELECT  ncf.id_cargo,
                             ncf.fecha_ingreso, 
                             ncf.ruc,
@@ -36,7 +42,6 @@ if ($ncestado === 'INGRESADO' || $ncestado === 'PROCESANDO' || $ncestado === 'PE
                             and ncf.zonal='$tienda'
                             ORDER BY ncf.fecha_ingreso DESC";
 } else {
-
     if ($ncestado === 'ACTIVADO') {
         $sqlncMovil = " SELECT  ncf.id_cargo,
                                 ncf.fecha_ingreso, 
@@ -62,9 +67,7 @@ if ($ncestado === 'INGRESADO' || $ncestado === 'PROCESANDO' || $ncestado === 'PE
                                 and ncf.zonal='$tienda'
                                 ORDER BY ncf.fecha_ingreso DESC";
     } else {
-
         if ($ncestado === 'CAIDA') {
-
             $sqlncMovil = " SELECT  ncf.id_cargo,
                                     ncf.fecha_ingreso, 
                                     ncf.ruc,
@@ -89,7 +92,6 @@ if ($ncestado === 'INGRESADO' || $ncestado === 'PROCESANDO' || $ncestado === 'PE
                                     and ncf.zonal='$tienda'
                                     ORDER BY ncf.fecha_ingreso DESC";
         } else {
-
             $sqlncMovil = " SELECT  ncf.id_cargo,
                                     ncf.fecha_ingreso, 
                                     ncf.ruc,
@@ -164,10 +166,7 @@ if ($ncestado === 'INGRESADO' || $ncestado === 'PROCESANDO' || $ncestado === 'PE
     }
 }
 
-
-
 $resultncMovil = mysqli_query($conexion, $sqlncMovil);
-
 
 ?>
 
@@ -194,8 +193,8 @@ $resultncMovil = mysqli_query($conexion, $sqlncMovil);
                     </thead>
                     <tbody>
                         <?php
-                        while ($mostrar = mysqli_fetch_array($resultncMovil)) {
-                        ?>
+
+                        while ($mostrar = mysqli_fetch_array($resultncMovil)) { ?>
                             <tr>
                                 <td><?php echo $mostrar[1] ?></td>
                                 <td><?php echo $mostrar[2] ?></td>
@@ -210,12 +209,13 @@ $resultncMovil = mysqli_query($conexion, $sqlncMovil);
                                 <td><?php echo $mostrar[6] ?></td>
 
                                 <td style="text-align: center;">
-                                    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="TraerDatosTabla('<?php echo $mostrar[0] ?>')"> <span class="fa fa-check-circle"></span>
+                                    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="TraerDatosTabla('<?php echo
+                                        $mostrar[0]
+                                    ?>')"> <span class="fa fa-check-circle"></span>
                                     </span>
                                 </td>
                             </tr>
-                        <?php
-                        }
+                        <?php }
                         ?>
                     </tbody>
                 </table>

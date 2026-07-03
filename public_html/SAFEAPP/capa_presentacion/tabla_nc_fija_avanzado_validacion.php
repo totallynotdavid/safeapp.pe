@@ -1,17 +1,16 @@
 <?php
 
-require_once "../capa_conexion/conexion.php";
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-$ano = $_GET["ano"];
-$periodo = $_GET["periodo"];
-$validacionf = $_GET["validacionf"];
-$tienda = $_GET["tienda"];
+$ano = $_GET['ano'];
+$periodo = $_GET['periodo'];
+$validacionf = $_GET['validacionf'];
+$tienda = $_GET['tienda'];
 
 if ($tienda === 'TODO') {
-
     if ($validacionf === 'PENDIENTE') {
         $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , s.nombre, ncf.estado,ncf.validacion,s.nombre,ncf.back
@@ -20,9 +19,7 @@ where  year(ncf.fecha_ingreso)<='$ano'
 and ncf.validacion='$validacionf' and ncf.estado='PENDIENTE'
 ORDER BY ncf.fecha_ingreso DESC";
     } else {
-
         if ($validacionf === 'PROCEDE') {
-
             $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , s.nombre, ncf.estado,ncf.validacion,s.nombre,ncf.back
  from nc_avanzado as ncf left join supervisor as s on s.id_supervisor=ncf.id_supervisor
@@ -30,9 +27,7 @@ where month(ncf.fecha_validacion)='$periodo' and year(ncf.fecha_validacion)='$an
 and ncf.validacion='$validacionf' and ncf.estado='PENDIENTE'
 ORDER BY ncf.fecha_ingreso DESC";
         } else {
-
             if ($validacionf === 'RECHAZADO') {
-
                 $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , s.nombre, ncf.estado,ncf.validacion,s.nombre,ncf.back
  from nc_avanzado as ncf left join supervisor as s on s.id_supervisor=ncf.id_supervisor
@@ -40,9 +35,7 @@ where month(ncf.fecha_ingreso)='$periodo' and year(ncf.fecha_ingreso)='$ano'
 and ncf.validacion='$validacionf'  and ncf.estado='PENDIENTE'
 ORDER BY ncf.fecha_ingreso DESC";
             } else {
-
                 if ($validacionf === 'CONOTE') {
-
                     $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , s.nombre, ncf.estado,ncf.validacion,s.nombre,ncf.back
  from nc_avanzado as ncf left join supervisor as s on s.id_supervisor=ncf.id_supervisor
@@ -51,7 +44,6 @@ and ncf.validacion='$validacionf' and ncf.estado='PENDIENTE'
 ORDER BY ncf.fecha_ingreso DESC";
                 } else {
                     if ($validacionf === 'SISEGO') {
-
                         $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , s.nombre, ncf.estado,ncf.validacion,s.nombre,ncf.back
  from nc_avanzado as ncf left join supervisor as s on s.id_supervisor=ncf.id_supervisor
@@ -60,7 +52,6 @@ and ncf.validacion='$validacionf' and ncf.estado='PENDIENTE'
 ORDER BY ncf.fecha_ingreso DESC";
                     } else {
                         if ($validacionf === 'OPORTUNIDAD') {
-
                             $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , s.nombre, ncf.estado,ncf.validacion,s.nombre,ncf.back
  from nc_avanzado as ncf left join supervisor as s on s.id_supervisor=ncf.id_supervisor
@@ -68,8 +59,6 @@ where month(ncf.fecha_validacion)='$periodo' and year(ncf.fecha_validacion)='$an
 and ncf.validacion='$validacionf' and ncf.estado='PENDIENTE'
 ORDER BY ncf.fecha_ingreso DESC";
                         }
-
-
 
                         $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , s.nombre, ncf.estado,ncf.validacion,s.nombre,ncf.back
@@ -124,7 +113,6 @@ and ncf.validacion='OPORTUNIDAD' and ncf.estado='PENDIENTE'
         }
     }
 } else {
-
     if ($validacionf === 'PENDIENTE') {
         $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , s.nombre, ncf.estado,ncf.validacion,s.nombre,ncf.back
@@ -133,9 +121,7 @@ where  year(ncf.fecha_ingreso)<='$ano'
 and ncf.validacion='$validacionf' and ncf.zonal='$tienda' and ncf.estado='PENDIENTE'
 ORDER BY ncf.fecha_ingreso DESC";
     } else {
-
         if ($validacionf === 'PROCEDE') {
-
             $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , s.nombre, ncf.estado,ncf.validacion,s.nombre,ncf.back
  from nc_avanzado as ncf left join supervisor as s on s.id_supervisor=ncf.id_supervisor
@@ -143,9 +129,7 @@ where month(ncf.fecha_validacion)='$periodo' and year(ncf.fecha_validacion)='$an
 and ncf.validacion='$validacionf' and ncf.zonal='$tienda' and ncf.estado='PENDIENTE'
 ORDER BY ncf.fecha_ingreso DESC";
         } else {
-
             if ($validacionf === 'RECHAZADO') {
-
                 $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , s.nombre, ncf.estado,ncf.validacion,s.nombre,ncf.back
  from nc_avanzado as ncf left join supervisor as s on s.id_supervisor=ncf.id_supervisor
@@ -153,7 +137,6 @@ where month(ncf.fecha_ingreso)='$periodo' and year(ncf.fecha_ingreso)='$ano'
 and ncf.validacion='$validacionf'  and ncf.zonal='$tienda' and ncf.estado='PENDIENTE'
 ORDER BY ncf.fecha_ingreso DESC";
             } else {
-
                 $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , s.nombre, ncf.estado,ncf.validacion,s.nombre,ncf.back
  from nc_avanzado as ncf left join supervisor as s on s.id_supervisor=ncf.id_supervisor
@@ -206,10 +189,7 @@ and ncf.validacion='OPORTUNIDAD' and ncf.zonal='$tienda' and ncf.estado='PENDIEN
     }
 }
 
-
-
 $resultncFija = mysqli_query($conexion, $sqlncFija);
-
 
 ?>
 
@@ -237,8 +217,8 @@ $resultncFija = mysqli_query($conexion, $sqlncFija);
                     </thead>
                     <tbody>
                         <?php
-                        while ($mostrar = mysqli_fetch_array($resultncFija)) {
-                        ?>
+
+                        while ($mostrar = mysqli_fetch_array($resultncFija)) { ?>
                             <tr>
                                 <td><?php echo $mostrar[1] ?></td>
                                 <td><?php echo $mostrar[2] ?></td>
@@ -251,14 +231,15 @@ $resultncFija = mysqli_query($conexion, $sqlncFija);
                                 <td><?php echo $mostrar[9] ?></td>
                                 <td><?php echo $mostrar[11] ?></td>
                                 <td style="text-align: center;">
-                                    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="TraerDatosTabla('<?php echo $mostrar[0] ?>')"> <span class="fa fa-check-circle"></span>
+                                    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="TraerDatosTabla('<?php echo
+                                        $mostrar[0]
+                                    ?>')"> <span class="fa fa-check-circle"></span>
                                     </span>
                                 </td>
 
 
                             </tr>
-                        <?php
-                        }
+                        <?php }
                         ?>
 
 

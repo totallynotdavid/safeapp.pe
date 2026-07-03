@@ -1,25 +1,22 @@
 <?php
+
 session_start();
 
- if(isset( $_SESSION ["idusu"])){
+if (isset($_SESSION['idusu'])) {
+    $idusu = $_SESSION['idusu'];
+    require_once '../capa_conexion/conexion.php';
+    $obj = new conectar();
+    $conexion = $obj->conexion();
 
-$idusu = $_SESSION ["idusu"];
-require_once "../capa_conexion/conexion.php";
-$obj = new conectar();
-$conexion = $obj->conexion();
+    $sqlsup = "SELECT id_supervisor from usuario where id_usuario='$idusu'";
 
+    $resultsup = mysqli_query($conexion, $sqlsup);
 
+    $versup = mysqli_fetch_array($resultsup);
 
-$sqlsup = "SELECT id_supervisor from usuario where id_usuario='$idusu'";
+    $idsupervisor = $versup[0];
 
-$resultsup = mysqli_query($conexion, $sqlsup);
-
-$versup = mysqli_fetch_array($resultsup);
-
-$idsupervisor=$versup[0];
-
-
-?>
+    ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
@@ -28,8 +25,9 @@ $idsupervisor=$versup[0];
         <title>LLAMADA | Dashboard</title>
         <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 <?php
-include 'scriptsup.php';
-?>
+
+    include 'scriptsup.php';
+    ?>
             <link rel="stylesheet" type="text/css" href="../capa_presentacion/librerias/datatable/dataTables.bootstrap4.min.css">
 
 
@@ -45,8 +43,9 @@ include 'scriptsup.php';
 <div class="wrapper">
 
 <?php
-include 'cabecera.php';
-?>
+
+    include 'cabecera.php';
+    ?>
 
 <!-- =============================================== -->
 
@@ -54,8 +53,9 @@ include 'cabecera.php';
 <aside class="main-sidebar">
 <!-- sidebar: style can be found in sidebar.less -->
 <?php
-include 'menu.php';
-?>
+
+    include 'menu.php';
+    ?>
 <!-- /.sidebar -->
 </aside>
 
@@ -193,7 +193,9 @@ include 'menu.php';
 <div class="row"> <!--- div para elegir el tipo de respuesta-->
             <div class="col-xs-4">
             <input type="hidden"  class="form-control input-sm" id="idusu" name="idusu" value="<?php echo $idusu ?>">
-             <input type="hidden"  class="form-control input-sm" id="idsupervisor" name="idsupervisor" value="<?php echo $idsupervisor ?>">
+             <input type="hidden"  class="form-control input-sm" id="idsupervisor" name="idsupervisor" value="<?php echo
+                 $idsupervisor
+             ?>">
 
              <input type="hidden"  class="form-control input-sm" id="ncfqlineas" name="ncfqlineas" >
                 <input type="hidden"  class="form-control input-sm" id="ncfruc" name="ncfruc" >
@@ -202,8 +204,9 @@ include 'menu.php';
 
             <label>Fecha:</label>
             <input type="date" disabled="" class="form-control input-sm" id="fechahoy" name="fechahoy" value="<?php
-            date_default_timezone_set("America/Lima");
-            $hoy = date("Y-m-d");
+
+            date_default_timezone_set('America/Lima');
+            $hoy = date('Y-m-d');
             echo $hoy ?>"><br>
             </div>
 
@@ -762,7 +765,9 @@ include 'menu.php';
                                             <div class="pull-right hidden-xs">
                                                 <b>Version</b> 1.0
                                             </div>
-                                            <strong>Copyright &copy; <?php echo date('Y'); ?> <a href="#">Sistema Complementario</a>.</strong>
+                                            <strong>Copyright &copy; <?php echo
+                                                date('Y')
+                                            ; ?> <a href="#">Sistema Complementario</a>.</strong>
                                         </footer>
                                         </div><!-- ./wrapper -->
 
@@ -787,10 +792,7 @@ include 'menu.php';
 
                                         </body>
                                         </html>
-<?php } else {
-
-
-header('Location: /SAFEAPP/vista/login.php');
-
-    
-    }?>
+<?php
+} else {
+    header('Location: /SAFEAPP/vista/login.php');
+}

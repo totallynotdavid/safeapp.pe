@@ -1,11 +1,11 @@
 <?php
 
-require_once "../capa_conexion/conexion.php";
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-$ruc = $_GET["ruc"];
+$ruc = $_GET['ruc'];
 
 $sqltelefono = "SELECT t.telefono,t.origen,t.comentario
  from telefono as t 
@@ -13,7 +13,6 @@ where t.ruc='$ruc'
   ";
 
 $resultelefono = mysqli_query($conexion, $sqltelefono);
-
 
 ?>
 
@@ -31,8 +30,8 @@ $resultelefono = mysqli_query($conexion, $sqltelefono);
                     </thead>
                     <tbody>
                         <?php
-                        while ($mostrar = mysqli_fetch_array($resultelefono)) {
-                        ?>
+
+                        while ($mostrar = mysqli_fetch_array($resultelefono)) { ?>
                             <tr>
                                 <td><?php echo $mostrar[0] ?></td>
                                 <td><?php echo $mostrar[1] ?></td>
@@ -41,8 +40,7 @@ $resultelefono = mysqli_query($conexion, $sqltelefono);
 
 
                             </tr>
-                        <?php
-                        }
+                        <?php }
                         ?>
 
 

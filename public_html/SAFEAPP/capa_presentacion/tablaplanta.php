@@ -1,20 +1,17 @@
 <?php
 
-require_once "../capa_conexion/conexion.php";
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-$param=$_GET["ruc"];
+$param = $_GET['ruc'];
 
 $sqlplanta = " SELECT d.cliente_movistar, d.q_movistar,d.q_entel,d.q_claro, d.q_bitel
  from datos as d where d.ruc='$param'
 ";
 
-
-
 $resultplanta = mysqli_query($conexion, $sqlplanta);
-
 
 ?>
 
@@ -36,8 +33,8 @@ $resultplanta = mysqli_query($conexion, $sqlplanta);
                     </thead>
                      <tbody >
                        <?php
-                        while ($mostrar = mysqli_fetch_array($resultplanta)) {
-                            ?>
+
+                       while ($mostrar = mysqli_fetch_array($resultplanta)) { ?>
                             <tr >
                                 <td><?php echo $mostrar[0] ?></td>
                                 <td><?php echo $mostrar[1] ?></td>
@@ -48,9 +45,8 @@ $resultplanta = mysqli_query($conexion, $sqlplanta);
                                
                         
                             </tr>
-                            <?php
-                        }
-                        ?>  
+                            <?php }
+                       ?>  
 
 
                      </tbody>

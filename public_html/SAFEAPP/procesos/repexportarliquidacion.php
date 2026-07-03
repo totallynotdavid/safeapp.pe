@@ -1,21 +1,21 @@
 <?php
+
 session_start();
-$idusu = $_SESSION["idusu"];
-require_once "../capa_conexion/conexion.php";
+$idusu = $_SESSION['idusu'];
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-header("Content-Type: application/xls");
-header("Content-Disposition: attachment; filename= reporteliquidacionM.xls");
+header('Content-Type: application/xls');
+header('Content-Disposition: attachment; filename= reporteliquidacionM.xls');
 
-$ano = $_POST["ncano"];
-$periodo = $_POST["ncperiodo"];
-$ncestado = $_POST["ncestadof"];
-$tienda = $_POST["tienda"];
+$ano = $_POST['ncano'];
+$periodo = $_POST['ncperiodo'];
+$ncestado = $_POST['ncestadof'];
+$tienda = $_POST['tienda'];
 
 if ($ncestado === 'ACTIVADO' || $ncestado === 'BOLSA') {
-
     $sqlEXCEL = " SELECT    usu.personal, 
                             sup.nombre, 
                             nc.fecha_ingreso, 
@@ -62,7 +62,6 @@ if ($ncestado === 'ACTIVADO' || $ncestado === 'BOLSA') {
                             and nc.validacion='PROCEDE' 
                             ORDER BY nc.fecha_ingreso DESC";
 } else {
-
     if ($ncestado === 'BOLSA') {
         $sqlEXCEL = "  SELECT    
                             usu.personal, 
@@ -112,9 +111,7 @@ if ($ncestado === 'ACTIVADO' || $ncestado === 'BOLSA') {
                             and nc.validacion='PROCEDE'
                             ORDER BY nc.fecha_ingreso DESC";
     } else {
-
         if ($ncestado === 'CAIDA') {
-
             $sqlEXCEL = "   SELECT      usu.personal, 
                             sup.nombre, 
                             nc.fecha_ingreso, 
@@ -162,7 +159,6 @@ if ($ncestado === 'ACTIVADO' || $ncestado === 'BOLSA') {
                             and nc.validacion='PROCEDE' 
                             ORDER BY nc.fecha_ingreso DESC";
         } else {
-
             $sqlEXCEL = "   SELECT      usu.personal, 
                             sup.nombre, 
                             nc.fecha_ingreso, 
@@ -306,7 +302,6 @@ UNION
     }
 }
 
-
 $resultEXCEL = mysqli_query($conexion, $sqlEXCEL);
 
 ?>
@@ -357,8 +352,8 @@ $resultEXCEL = mysqli_query($conexion, $sqlEXCEL);
 
     <tbody>
         <?php
-        while ($mostrar = mysqli_fetch_array($resultEXCEL)) {
-        ?>
+
+        while ($mostrar = mysqli_fetch_array($resultEXCEL)) { ?>
             <tr>
                 <td><?php echo utf8_decode($mostrar[0]) ?></td>
                 <td><?php echo utf8_decode($mostrar[1]) ?></td>
@@ -398,8 +393,7 @@ $resultEXCEL = mysqli_query($conexion, $sqlEXCEL);
                 <td><?php echo utf8_decode($mostrar[34]) ?></td>
                 <td><?php echo utf8_decode($mostrar[35]) ?></td>
             </tr>
-        <?php
-        }
+        <?php }
         ?>
     </tbody>
 </table>

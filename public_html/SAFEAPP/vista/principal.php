@@ -1,36 +1,34 @@
 <?php
+
 session_start();
- if(isset( $_SESSION ["idusu"])){
+if (isset($_SESSION['idusu'])) {
+    $idusu = $_SESSION['idusu'];
+    require_once '../capa_conexion/conexion.php';
+    $obj = new conectar();
+    $conexion = $obj->conexion();
 
-$idusu = $_SESSION ["idusu"];
-require_once "../capa_conexion/conexion.php";
-$obj = new conectar();
-$conexion = $obj->conexion();
+    // $sql = "SELECT u.id_usuario, u.personal, r.nombre_rol, u.id_rol from usuario u inner join rol r on (r.id_rol = u.id_rol) where u.id_usuario='$idusu'";
+    // $result = sqlsrv_query($conexion, $sql);
+    // if ($result === false) {
+    //     die(print_r(sqlsrv_errors(), true));
+    // }
+    // while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
+    //     $personal = $row['personal'];
+    //     $rol = $row['nombre_rol'];
+    //     $idrol = $row['id_rol'];
+    // }
 
-// $sql = "SELECT u.id_usuario, u.personal, r.nombre_rol, u.id_rol from usuario u inner join rol r on (r.id_rol = u.id_rol) where u.id_usuario='$idusu'";
-// $result = sqlsrv_query($conexion, $sql);
-// if ($result === false) {
-//     die(print_r(sqlsrv_errors(), true));
-// }
-// while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
-//     $personal = $row['personal'];
-//     $rol = $row['nombre_rol'];
-//     $idrol = $row['id_rol'];
-// }
-
-$sql = "SELECT a.id_tienda,t.nombre from asigna as a left join tienda as t on t.id_tienda=a.id_tienda
+    $sql = "SELECT a.id_tienda,t.nombre from asigna as a left join tienda as t on t.id_tienda=a.id_tienda
  where  a.estado='0' and id_usuario='$idusu'";
 
-$result = mysqli_query($conexion, $sql);
+    $result = mysqli_query($conexion, $sql);
 
-$ver = mysqli_fetch_array($result);
+    $ver = mysqli_fetch_array($result);
 
-$tienda=$ver[0];
-$nombretienda=$ver[1];
+    $tienda = $ver[0];
+    $nombretienda = $ver[1];
 
-
-
-?>
+    ?>
 
 <!DOCTYPE html>
 <html>
@@ -39,6 +37,7 @@ $nombretienda=$ver[1];
         <title>Administrador|Dashboard</title>
         <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
         <?php
+
         include 'scriptsup.php';
         ?>
     </head>
@@ -46,15 +45,16 @@ $nombretienda=$ver[1];
         <!-- Site wrapper -->
         <div class="wrapper">
         <?php
+
         include 'cabecera.php';
         ?>
 
             <aside class="main-sidebar">
                 <!-- sidebar: style can be found in sidebar.less -->
             <?php
-           
-                include 'menu.php';
-          
+
+            include 'menu.php';
+
             ?>
                 <!-- /.sidebar -->
             </aside>
@@ -75,22 +75,30 @@ $nombretienda=$ver[1];
                          
                             <ol class="breadcrumb" >
                                 <li class="active">
-                                    USUARIO: &nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-user-circle"></i><?php echo $personal; ?>
+                                    USUARIO: &nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-user-circle"></i><?php echo
+                                        $personal
+                                    ; ?>
                                 </li>
                             </ol>
                             <ol class="breadcrumb">
                                 <li class="active">
-                                    CARGO:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i class="fa fa-id-card"></i><?php echo $rol; ?>
+                                    CARGO:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i class="fa fa-id-card"></i><?php echo
+                                        $rol
+                                    ; ?>
                                 </li>
                             </ol>
                               <ol class="breadcrumb">
                                 <li class="active">
-                                    SUPERVISOR:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i class="fa fa-id-card"></i><?php echo $supervisor; ?>
+                                    SUPERVISOR:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i class="fa fa-id-card"></i><?php echo
+                                        $supervisor
+                                    ; ?>
                                 </li>
                             </ol>
                             <ol class="breadcrumb">
                                 <li class="active">
-                                    REGION: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="cambiartie()"><i class="fa fa-bank"></i><?php echo $nombretienda; ?></a> 
+                                    REGION: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="cambiartie()"><i class="fa fa-bank"></i><?php echo
+                                        $nombretienda
+                                    ; ?></a> 
                                 </li>
                             </ol>
 
@@ -140,7 +148,9 @@ $nombretienda=$ver[1];
            <label>Tienda Actual</label>
               <input type="text" name="tiendaact" id="tiendaact" class="form-control input-sm" disabled=""
               value="<?php echo $nombretienda ?>">
-              <input type="hidden"  class="form-control input-sm" id="idtiendaact" name="idtiendaact" value="<?php echo $tienda ?>">
+              <input type="hidden"  class="form-control input-sm" id="idtiendaact" name="idtiendaact" value="<?php echo
+                  $tienda
+              ?>">
            
           </div>
             </div>
@@ -195,10 +205,7 @@ $nombretienda=$ver[1];
          <script type="text/javascript" src="js/principal.js"></script>
     </body>
 </html>
-<?php } else {
-
-
-header('Location: /SAFEAPP/vista/login.php');
-
-    
-    }?>
+<?php
+} else {
+    header('Location: /SAFEAPP/vista/login.php');
+}

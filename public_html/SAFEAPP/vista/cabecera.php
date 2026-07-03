@@ -1,4 +1,5 @@
 <?php
+
 $sql = "SELECT u.id_usuario, u.personal, r.nombre_rol, u.id_rol,u.sexo,s.nombre from usuario u 
 inner join rol r on (r.id_rol = u.id_rol) inner join supervisor as s on 
 (s.id_supervisor=u.id_supervisor)
@@ -13,9 +14,8 @@ while ($row = mysqli_fetch_array($result)) {
     $rol = $row['nombre_rol'];
     $idrol = $row['id_rol'];
     $sexo = $row['sexo'];
-      $supervisor = $row[5];
+    $supervisor = $row[5];
 }
-
 
 ?>
 <header class="main-header">
@@ -39,13 +39,13 @@ while ($row = mysqli_fetch_array($result)) {
                 <!-- User Account: style can be found in dropdown.less -->
                 <li class="dropdown user user-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                   <?php if( $sexo==='M'){ ?> 
+                   <?php if ($sexo === 'M') { ?> 
                         <img src="../capa_presentacion/img/1.png" class="user-image" alt="User Image"/>
 
-                        <?php }else{ ?>
+                        <?php } else { ?>
 
                         <img src="../capa_presentacion/img/2.png" class="user-image" alt="User Image"/>
-                        <?php }  ?>
+                        <?php } ?>
                         <span class="hidden-xs"><?php echo $personal ?></span>
                     </a>
                     <ul class="dropdown-menu">
@@ -54,13 +54,13 @@ while ($row = mysqli_fetch_array($result)) {
 
 
 
-                         <?php if( $sexo==='M'){ ?> 
+                         <?php if ($sexo === 'M') { ?> 
                         <img src="../capa_presentacion/img/1.png" class="img-circle" alt="User Image" />
 
-                        <?php }else{ ?>
+                        <?php } else { ?>
 
                           <img src="../capa_presentacion/img/2.png" class="img-circle" alt="User Image" />
-                        <?php }  ?>
+                        <?php } ?>
                      
 
                             <p>

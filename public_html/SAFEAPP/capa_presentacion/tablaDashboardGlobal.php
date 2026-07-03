@@ -1,13 +1,14 @@
 <?php
+
 session_start();
-$idusu = $_SESSION ["idusu"];
-require_once "../capa_conexion/conexion.php";
+$idusu = $_SESSION['idusu'];
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-$ano=$_GET["ano"];
-$periodo=$_GET["periodo"];
+$ano = $_GET['ano'];
+$periodo = $_GET['periodo'];
 
 $sqldatos = "SELECT us.personal,sup.nombre,
 CASE WHEN us.id_usuario=AVANZADO.usu THEN ROUND(AVANZADO.suma,2) ELSE 0 END as 'AVANZADO' ,
@@ -55,15 +56,11 @@ $resultdatos = mysqli_query($conexion, $sqldatos);
                     <tbody >
                         <?php
 
-                        
-
                         while ($mostrar = mysqli_fetch_array($resultdatos)) {
-                            
-                        $total=  $mostrar[2] +$mostrar[3]+$mostrar[4] ;
-                        if ( $total == 0) {
-                            +1;
-                        }else{
-                            ?>
+                            $total = $mostrar[2] + $mostrar[3] + $mostrar[4];
+                            if ($total == 0) {
+                                +1;
+                            } else { ?>
                             <tr >
                                 <td><?php echo $mostrar[1] ?></td>
 
@@ -81,8 +78,8 @@ $resultdatos = mysqli_query($conexion, $sqldatos);
 
                             
                             </tr>
-                            <?php
-                        }}
+                            <?php }
+                        }
                         ?>								
                     </tbody>
                 </table>

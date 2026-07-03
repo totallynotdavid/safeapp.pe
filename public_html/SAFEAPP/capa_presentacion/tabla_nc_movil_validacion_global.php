@@ -1,17 +1,16 @@
 <?php
 
-require_once "../capa_conexion/conexion.php";
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-$ano=$_GET["ano"];
-$periodo=$_GET["periodo"];
-$validacionf=$_GET["validacionf"];
-$tienda=$_GET["tienda"];
+$ano = $_GET['ano'];
+$periodo = $_GET['periodo'];
+$validacionf = $_GET['validacionf'];
+$tienda = $_GET['tienda'];
 
-
-if ($validacionf==='PENDIENTE') {
+if ($validacionf === 'PENDIENTE') {
     $sqlncMovil = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.cargo_fijo, ncf.estado,ncf.validacion,s.nombre,u.personal
  from nc_movil as ncf left join supervisor as s on ncf.id_supervisor=s.id_supervisor
@@ -19,35 +18,26 @@ if ($validacionf==='PENDIENTE') {
 where  year(ncf.fecha_ingreso)<='$ano' 
 and ncf.validacion='$validacionf' 
 ORDER BY ncf.fecha_ingreso DESC";
-}else{
-
-if ($validacionf==='PROCEDE') {
-
- $sqlncMovil = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
+} else {
+    if ($validacionf === 'PROCEDE') {
+        $sqlncMovil = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.cargo_fijo, ncf.estado,ncf.validacion,s.nombre,u.personal
  from nc_movil as ncf left join supervisor as s on ncf.id_supervisor=s.id_supervisor
   left join usuario as u on u.id_usuario=ncf.id_usuario
 where month(ncf.fecha_validacion)='$periodo' and year(ncf.fecha_validacion)='$ano' 
 and ncf.validacion='$validacionf' 
 ORDER BY ncf.fecha_ingreso DESC";
-
-
-}else{
-
-    if ($validacionf==='RECHAZADO') {
-        
- $sqlncMovil = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
+    } else {
+        if ($validacionf === 'RECHAZADO') {
+            $sqlncMovil = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.cargo_fijo, ncf.estado,ncf.validacion,s.nombre,u.personal
  from nc_movil as ncf left join supervisor as s on ncf.id_supervisor=s.id_supervisor
   left join usuario as u on u.id_usuario=ncf.id_usuario
 where month(ncf.fecha_ingreso)='$periodo' and year(ncf.fecha_ingreso)='$ano' 
 and ncf.validacion='$validacionf' 
 ORDER BY ncf.fecha_ingreso DESC";
-
-
-            }else{
-
- $sqlncMovil = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
+        } else {
+            $sqlncMovil = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.cargo_fijo, ncf.estado,ncf.validacion,s.nombre,u.personal
  from nc_movil as ncf left join supervisor as s on ncf.id_supervisor=s.id_supervisor
   left join usuario as u on u.id_usuario=ncf.id_usuario
@@ -73,19 +63,11 @@ where month(ncf.fecha_ingreso)='$periodo' and year(ncf.fecha_ingreso)='$ano'
 and ncf.validacion='RECHAZADO' 
 
 ";
-
-
+        }
     }
-
 }
-
-
-
-}
-
 
 $resultncMovil = mysqli_query($conexion, $sqlncMovil);
-
 
 ?>
 
@@ -112,8 +94,8 @@ $resultncMovil = mysqli_query($conexion, $sqlncMovil);
                     </thead>
                      <tbody >
                        <?php
-                        while ($mostrar = mysqli_fetch_array($resultncMovil)) {
-                            ?>
+
+                       while ($mostrar = mysqli_fetch_array($resultncMovil)) { ?>
                             <tr >
                                 <td><?php echo $mostrar[1] ?></td>
                                 <td><?php echo $mostrar[2] ?></td>
@@ -124,15 +106,16 @@ $resultncMovil = mysqli_query($conexion, $sqlncMovil);
                                 <td><?php echo $mostrar[6] ?></td>
                                 <td><?php echo $mostrar[7] ?></td>
         <td style="text-align: center;">
-    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="TraerDatosTabla('<?php echo $mostrar[0] ?>')"> <span class="fa fa-check-circle"></span>
+    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="TraerDatosTabla('<?php echo
+        $mostrar[0]
+    ?>')"> <span class="fa fa-check-circle"></span>
                                     </span>
                                 </td>
 
 
                             </tr>
-                            <?php
-                        }
-                        ?>  
+                            <?php }
+                       ?>  
 
 
                      </tbody>

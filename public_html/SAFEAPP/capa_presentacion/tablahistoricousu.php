@@ -1,15 +1,15 @@
 <?php
+
 session_start();
-$idusu = $_SESSION["idusu"];
-require_once "../capa_conexion/conexion.php";
+$idusu = $_SESSION['idusu'];
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-$desde = $_GET["desde"];
+$desde = $_GET['desde'];
 
-
-$hasta = $_GET["hasta"];
+$hasta = $_GET['hasta'];
 $date_hasta = strtotime('+1 day', strtotime($hasta));
 $date_hasta = date('Y-m-d', $date_hasta);
 
@@ -23,7 +23,6 @@ and ll.fecha>='$desde' and ll.fecha<'$date_hasta'
 ORDER BY ll.fecha ASC";
 
 $resultdatos = mysqli_query($conexion, $sqldatos);
-
 
 ?>
 <form class="form form-horizontal">
@@ -49,8 +48,8 @@ $resultdatos = mysqli_query($conexion, $sqldatos);
 
                     <tbody>
                         <?php
-                        while ($mostrar = mysqli_fetch_array($resultdatos)) {
-                        ?>
+
+                        while ($mostrar = mysqli_fetch_array($resultdatos)) { ?>
                             <tr>
                                 <td><?php echo $mostrar[0] ?></td>
                                 <td><?php echo $mostrar[1] ?></td>
@@ -62,13 +61,14 @@ $resultdatos = mysqli_query($conexion, $sqldatos);
                                 <td><?php echo $mostrar[8] ?></td>
 
                                 <td style="text-align: center;">
-                                    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="TraerDatosTabla('<?php echo $mostrar[6] ?>')">
+                                    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="TraerDatosTabla('<?php echo
+                                        $mostrar[6]
+                                    ?>')">
                                         <span class="fa fa-phone"></span>
                                     </span>
                                 </td>
                             </tr>
-                        <?php
-                        }
+                        <?php }
                         ?>
                     </tbody>
                 </table>

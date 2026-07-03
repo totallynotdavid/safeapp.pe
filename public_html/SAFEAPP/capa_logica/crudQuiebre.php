@@ -4,9 +4,8 @@ class crudQuiebre
 {
     public function agregarQuiebremovil($datosquiebre)
     {
-
-        date_default_timezone_set("America/Lima");
-        $hoy = date("Y-m-d");
+        date_default_timezone_set('America/Lima');
+        $hoy = date('Y-m-d');
         $obj = new conectar();
         $conexion = $obj->conexion();
         $sqlQuiebre = "INSERT INTO quiebre (
@@ -150,7 +149,7 @@ class crudQuiebre
             'casosf' => $ver[25],
             'comentario_validador' => $ver[26],
             'fecha_registro' => $ver[27],
-            'back' => $ver[28]
+            'back' => $ver[28],
         );
         return $datos;
     }
@@ -239,15 +238,15 @@ class crudQuiebre
             'comentario_validador' => $ver[24],
             'estado' => $ver[25],
             'fecha_registro' => $ver[26],
-            'back' => $ver[27]
+            'back' => $ver[27],
         );
         return $datos;
     }
 
     public function agregarQuiebreValidacion($datos)
     {
-        date_default_timezone_set("America/Lima");
-        $hoy = date("Y-m-d");
+        date_default_timezone_set('America/Lima');
+        $hoy = date('Y-m-d');
         $obj = new conectar();
         $conexion = $obj->conexion();
         $sqlquiebreMovil = "UPDATE quiebre 

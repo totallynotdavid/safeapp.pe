@@ -1,7 +1,7 @@
 <?php
 
-require_once "../capa_conexion/conexion.php";
-require_once "../capa_logica/crudQuiebre.php";
+require_once '../capa_conexion/conexion.php';
+require_once '../capa_logica/crudQuiebre.php';
 $obj = new crudQuiebre();
 
 try {
@@ -33,7 +33,7 @@ try {
         $_POST['quiebre_back'],
     );
 } catch (Exception $exce) {
-    header("HTTP/1.1 500");
+    header('HTTP/1.1 500');
     echo $exc->getMessage();
 }
 
@@ -43,6 +43,6 @@ try {
     print_r($resultado);
     echo $resultado;
 } catch (Exception $exc) {
-    header("HTTP/1.1 500");
+    header('HTTP/1.1 500');
     echo $exc->getMessage();
 }

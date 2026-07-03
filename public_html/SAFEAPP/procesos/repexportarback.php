@@ -1,45 +1,44 @@
 <?php
+
 session_start();
-$idusu = $_SESSION["idusu"];
-require_once "../capa_conexion/conexion.php";
+$idusu = $_SESSION['idusu'];
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-header("Content-Type: application/xls");
-header("Content-Disposition: attachment; filename= reporteseguimientoFT.xls");
+header('Content-Type: application/xls');
+header('Content-Disposition: attachment; filename= reporteseguimientoFT.xls');
 
-$ano = $_POST["ncano"];
-$periodo = $_POST["ncperiodo"];
-$ncestado = $_POST["ncestadof"];
-$tienda = $_POST["tienda"];
-
+$ano = $_POST['ncano'];
+$periodo = $_POST['ncperiodo'];
+$ncestado = $_POST['ncestadof'];
+$tienda = $_POST['tienda'];
 
 if (
-    $ncestado === 'PENDIENTE' || $ncestado === 'AGENDADO' || $ncestado === 'XINGRESAR' ||
-    $ncestado === 'INICIADO' || $ncestado === 'OBSERVADO' || $ncestado === 'BOLSA'
+    $ncestado === 'PENDIENTE'
+    || $ncestado === 'AGENDADO'
+    || $ncestado === 'XINGRESAR'
+    || $ncestado === 'INICIADO'
+    || $ncestado === 'OBSERVADO'
+    || $ncestado === 'BOLSA'
 ) {
     $sqlEXCEL = " SELECT usu.personal, sup.nombre, nc.fecha_ingreso, nc.fecha_liquidacion, nc.fecha_actualizacion,nc.ruc, nc.razon_social, nc.modalidad,nc.tipo, nc.subtipo, nc.descripcion, nc.q_lineas, nc.cargo_fijo, nc.direccion, nc.coordenadas, nc.contacto, nc.telefono1, nc.telefono2, nc.comentario, nc.estado, nc.validacion,nc.fecha_validacion, nc.comentario_validador,   nc.peticion, nc.nasignado,  nc.contrata, nc.ejecutivo_telefonica, t.nombre,nc.comentario_back,nc.caso_sf,car.nombre,car.propietario,car.DNI,nc.nodo FROM nc_fija as nc inner join usuario as usu on usu.id_usuario= nc.id_usuario left JOIN supervisor as sup on sup.id_supervisor= nc.id_supervisor LEFT JOIN tienda as t on t.id_tienda=nc.zonal_telefonica LEFT JOIN cartera as car on car.id_cartera=nc.id_cartera
         where  year(nc.fecha_validacion)<='$ano' and nc.estado='$ncestado' and nc.validacion='PROCEDE'  and nc.zonal='$tienda'
             ORDER BY nc.fecha_ingreso DESC";
 } else {
-
     if ($ncestado === 'COMPLETADO') {
-
         $sqlEXCEL = " SELECT usu.personal, sup.nombre, nc.fecha_ingreso, nc.fecha_liquidacion, nc.fecha_actualizacion,nc.ruc, nc.razon_social, nc.modalidad,nc.tipo, nc.subtipo, nc.descripcion, nc.q_lineas, nc.cargo_fijo, nc.direccion, nc.coordenadas, nc.contacto, nc.telefono1, nc.telefono2, nc.comentario, nc.estado, nc.validacion,nc.fecha_validacion, nc.comentario_validador,   nc.peticion, nc.nasignado,  nc.contrata, nc.ejecutivo_telefonica,t.nombre, nc.comentario_back,nc.caso_sf,car.nombre,car.propietario,car.DNI,nc.nodo FROM nc_fija as nc inner join usuario as usu on usu.id_usuario= nc.id_usuario left JOIN supervisor as sup on sup.id_supervisor= nc.id_supervisor LEFT JOIN tienda as t on t.id_tienda=nc.zonal_telefonica LEFT JOIN cartera as car on car.id_cartera=nc.id_cartera
 where month(nc.fecha_liquidacion)='$periodo' and year(nc.fecha_liquidacion)='$ano' and nc.estado=
 '$ncestado' and nc.validacion='PROCEDE'  and nc.zonal='$tienda'
 ORDER BY nc.fecha_ingreso DESC";
     } else {
-
         if ($ncestado === 'CANCELADO') {
-
             $sqlEXCEL = " SELECT usu.personal, sup.nombre, nc.fecha_ingreso, nc.fecha_liquidacion, nc.fecha_actualizacion,nc.ruc, nc.razon_social, nc.modalidad,nc.tipo, nc.subtipo, nc.descripcion, nc.q_lineas, nc.cargo_fijo, nc.direccion, nc.coordenadas, nc.contacto, nc.telefono1, nc.telefono2, nc.comentario, nc.estado, nc.validacion,nc.fecha_validacion, nc.comentario_validador,   nc.peticion, nc.nasignado,  nc.contrata, nc.ejecutivo_telefonica,t.nombre,nc.comentario_back,nc.caso_sf,car.nombre,car.propietario,car.DNI,nc.nodo FROM nc_fija as nc inner join usuario as usu on usu.id_usuario= nc.id_usuario left JOIN supervisor as sup  on sup.id_supervisor= nc.id_supervisor LEFT JOIN tienda as t on t.id_tienda=nc.zonal_telefonica LEFT JOIN cartera as car on car.id_cartera=nc.id_cartera
 where month(nc.fecha_validacion)='$periodo' and year(nc.fecha_validacion)='$ano' and nc.estado=
 '$ncestado' and nc.validacion='PROCEDE'  and nc.zonal='$tienda'
 ORDER BY nc.fecha_ingreso DESC";
         } else {
-
             $sqlEXCEL = " SELECT usu.personal, sup.nombre, nc.fecha_ingreso, nc.fecha_liquidacion, nc.fecha_actualizacion,nc.ruc, nc.razon_social, nc.modalidad,nc.tipo, nc.subtipo, nc.descripcion, nc.q_lineas, nc.cargo_fijo, nc.direccion, nc.coordenadas, nc.contacto, nc.telefono1, nc.telefono2, nc.comentario, nc.estado, nc.validacion,nc.fecha_validacion, nc.comentario_validador,   nc.peticion, nc.nasignado,  nc.contrata, nc.ejecutivo_telefonica,t.nombre, nc.comentario_back,nc.caso_sf,car.nombre,car.propietario,car.DNI,nc.nodo FROM nc_fija as nc inner join usuario as usu on usu.id_usuario= nc.id_usuario left JOIN supervisor as sup 
         on sup.id_supervisor= nc.id_supervisor LEFT JOIN tienda as t on t.id_tienda=nc.zonal_telefonica LEFT JOIN cartera as car on car.id_cartera=nc.id_cartera
         where  year(nc.fecha_validacion)<='$ano'  and 
@@ -66,7 +65,6 @@ where month(nc.fecha_validacion)='$periodo' and year(nc.fecha_validacion)='$ano'
         }
     }
 }
-
 
 $resultEXCEL = mysqli_query($conexion, $sqlEXCEL);
 
@@ -119,8 +117,8 @@ $resultEXCEL = mysqli_query($conexion, $sqlEXCEL);
 
     <tbody>
         <?php
-        while ($mostrar = mysqli_fetch_array($resultEXCEL)) {
-        ?>
+
+        while ($mostrar = mysqli_fetch_array($resultEXCEL)) { ?>
             <tr>
                 <td><?php echo utf8_decode($mostrar[0]) ?></td>
                 <td><?php echo utf8_decode($mostrar[1]) ?></td>
@@ -161,8 +159,7 @@ $resultEXCEL = mysqli_query($conexion, $sqlEXCEL);
 
 
             </tr>
-        <?php
-        }
+        <?php }
         ?>
     </tbody>
 </table>

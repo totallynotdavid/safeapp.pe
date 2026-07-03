@@ -1,23 +1,24 @@
 <?php
 
-require_once "../capa_conexion/conexion.php";
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-$ano = $_GET["ano"];
-$periodo = $_GET["periodo"];
-$ncestado = $_GET["ncestadof"];
-$tienda = $_GET["tienda"];
+$ano = $_GET['ano'];
+$periodo = $_GET['periodo'];
+$ncestado = $_GET['ncestadof'];
+$tienda = $_GET['tienda'];
 
 if ($tienda === 'TODO') {
-
     if (
-        $ncestado === 'PENDIENTE' || $ncestado === 'INSERTADO' || $ncestado === 'EMITIDO' || $ncestado === 'OBSERVADO' ||
-        $ncestado === 'INSTALADO' || $ncestado === 'AGENDADO'
+        $ncestado === 'PENDIENTE'
+        || $ncestado === 'INSERTADO'
+        || $ncestado === 'EMITIDO'
+        || $ncestado === 'OBSERVADO'
+        || $ncestado === 'INSTALADO'
+        || $ncestado === 'AGENDADO'
     ) {
-
-
         $sqlncFija = "  SELECT  ncf.id_cargo,
                                 ncf.fecha_ingreso, 
                                 ncf.ruc,
@@ -41,9 +42,7 @@ if ($tienda === 'TODO') {
                                 and ncf.validacion='PROCEDE' 
                                 ORDER BY ncf.fecha_ingreso DESC";
     } else {
-
         if ($ncestado === 'LIQUIDADO') {
-
             $sqlncFija = " SELECT   ncf.id_cargo,
                                     ncf.fecha_ingreso, 
                                     ncf.ruc,
@@ -68,9 +67,7 @@ if ($tienda === 'TODO') {
                                     and ncf.validacion='PROCEDE'   
                                     ORDER BY ncf.fecha_ingreso DESC";
         } else {
-
             if ($ncestado === 'CAIDO') {
-
                 $sqlncFija = " SELECT   ncf.id_cargo,
                                         ncf.fecha_ingreso, 
                                         ncf.ruc,
@@ -95,7 +92,6 @@ if ($tienda === 'TODO') {
                                         and ncf.validacion='PROCEDE'  
                                         ORDER BY ncf.fecha_ingreso DESC";
             } else {
-
                 $sqlncFija = " SELECT   ncf.id_cargo,
                                         ncf.fecha_ingreso, 
                                         ncf.ruc,
@@ -171,12 +167,14 @@ UNION
         }
     }
 } else {
-
     if (
-        $ncestado === 'PENDIENTE' || $ncestado === 'INSERTADO' || $ncestado === 'EMITIDO' || $ncestado === 'OBSERVADO' ||
-        $ncestado === 'INSTALADO' || $ncestado === 'AGENDADO'
+        $ncestado === 'PENDIENTE'
+        || $ncestado === 'INSERTADO'
+        || $ncestado === 'EMITIDO'
+        || $ncestado === 'OBSERVADO'
+        || $ncestado === 'INSTALADO'
+        || $ncestado === 'AGENDADO'
     ) {
-
         $sqlncFija = "      SELECT  ncf.id_cargo,
                                     ncf.fecha_ingreso, 
                                     ncf.ruc,
@@ -201,9 +199,7 @@ UNION
                                     and ncf.zonal='$tienda'
                                     ORDER BY ncf.fecha_ingreso DESC";
     } else {
-
         if ($ncestado === 'LIQUIDADO') {
-
             $sqlncFija = " SELECT   ncf.id_cargo,
                                     ncf.fecha_ingreso, 
                                     ncf.ruc,
@@ -229,9 +225,7 @@ UNION
                                     and ncf.zonal='$tienda'
                                     ORDER BY ncf.fecha_ingreso DESC";
         } else {
-
             if ($ncestado === 'CAIDO') {
-
                 $sqlncFija = " SELECT   ncf.id_cargo,
                                         ncf.fecha_ingreso, 
                                         ncf.ruc,
@@ -257,7 +251,6 @@ UNION
                                         and ncf.zonal='$tienda'
                                         ORDER BY ncf.fecha_ingreso DESC";
             } else {
-
                 $sqlncFija = " SELECT   ncf.id_cargo,
                                         ncf.fecha_ingreso, 
                                         ncf.ruc,
@@ -339,9 +332,7 @@ UNION
     }
 }
 
-
 $resultncFija = mysqli_query($conexion, $sqlncFija);
-
 
 ?>
 
@@ -369,8 +360,8 @@ $resultncFija = mysqli_query($conexion, $sqlncFija);
                     </thead>
                     <tbody>
                         <?php
-                        while ($mostrar = mysqli_fetch_array($resultncFija)) {
-                        ?>
+
+                        while ($mostrar = mysqli_fetch_array($resultncFija)) { ?>
                         <tr>
                             <td><?php echo $mostrar[1] ?></td>
                             <td><?php echo $mostrar[2] ?></td>
@@ -393,8 +384,7 @@ $resultncFija = mysqli_query($conexion, $sqlncFija);
 
 
                         </tr>
-                        <?php
-                        }
+                        <?php }
                         ?>
                     </tbody>
                 </table>

@@ -1,8 +1,9 @@
 <?php
+
 session_start();
-if (isset($_SESSION["idusu"])) {
-    $idusu = $_SESSION["idusu"];
-    require_once "../capa_conexion/conexion.php";
+if (isset($_SESSION['idusu'])) {
+    $idusu = $_SESSION['idusu'];
+    require_once '../capa_conexion/conexion.php';
     $obj = new conectar();
     $conexion = $obj->conexion();
     $sql = "SELECT id_tienda from asigna where id_usuario='$idusu' and estado='0'";
@@ -13,7 +14,7 @@ if (isset($_SESSION["idusu"])) {
     $versup = mysqli_fetch_array($resultsup);
     $idsupervisor = $versup[0];
     $tienda = $ver[0];
-?>
+    ?>
 
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
     <html>
@@ -23,6 +24,7 @@ if (isset($_SESSION["idusu"])) {
         <title>LLAMADA | Dashboard</title>
         <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
         <?php
+
         include 'scriptsup.php';
         ?>
         <link rel="stylesheet" type="text/css" href="../capa_presentacion/librerias/datatable/dataTables.bootstrap4.min.css">
@@ -41,6 +43,7 @@ if (isset($_SESSION["idusu"])) {
         <div class="wrapper">
 
             <?php
+
             include 'cabecera.php';
             ?>
 
@@ -50,6 +53,7 @@ if (isset($_SESSION["idusu"])) {
             <aside class="main-sidebar">
                 <!-- sidebar: style can be found in sidebar.less -->
                 <?php
+
                 include 'menu.php';
                 ?>
                 <!-- /.sidebar -->
@@ -61,8 +65,12 @@ if (isset($_SESSION["idusu"])) {
             <div class="content-wrapper">
                 <div class="col-lg-12" style="background-color: #00a65a;color: white; font-weight: bold;text-align: center ">REPORTE GESTION EJECUTIVOS</div> </br>
                 <form class="form form-horizontal" id='frmrephistoricousu' action="../procesos/rephistoricousuexcel.php" method="post">
-                    <input type="hidden" class="form-control input-sm" id="idsupervisor" name="idsupervisor" value="<?php echo $idsupervisor ?>">
-                    <input type="hidden" class="form-control input-sm" id="idusu" name="idusu" value="<?php echo $idusu ?>">
+                    <input type="hidden" class="form-control input-sm" id="idsupervisor" name="idsupervisor" value="<?php echo
+                        $idsupervisor
+                    ?>">
+                    <input type="hidden" class="form-control input-sm" id="idusu" name="idusu" value="<?php echo
+                        $idusu
+                    ?>">
                     <ol class="breadcrumb">
                         <div class="form-group">
                             <div class="col-lg-1">
@@ -128,17 +136,22 @@ if (isset($_SESSION["idusu"])) {
                                         <div class="row">
                                             <!--- div para elegir el tipo de respuesta-->
 
-                                            <input type="hidden" class="form-control input-sm" id="idusu" name="idusu" value="<?php echo $idusu ?>">
+                                            <input type="hidden" class="form-control input-sm" id="idusu" name="idusu" value="<?php echo
+                                                $idusu
+                                            ?>">
                                             <input type="hidden" class="form-control input-sm" id="ruc" name="ruc">
                                             <input type="hidden" class="form-control input-sm" id="razon_social" name="razon_social">
                                             <input type="hidden" class="form-control input-sm" id="tipo_data" name="tipo_data">
 
-                                            <input type="hidden" class="form-control input-sm" id="tienda" name="tienda" value="<?php echo $tienda ?>">
+                                            <input type="hidden" class="form-control input-sm" id="tienda" name="tienda" value="<?php echo
+                                                $tienda
+                                            ?>">
 
                                             <input type="hidden" disabled="" class="form-control input-sm" id="fechahoy" name="fechahoy" value="<?php
-                                                                                                                                                date_default_timezone_set("America/Lima");
-                                                                                                                                                $hoy = date("Y-m-d H:i:s");
-                                                                                                                                                echo $hoy ?>">
+
+                                            date_default_timezone_set('America/Lima');
+                                            $hoy = date('Y-m-d H:i:s');
+                                            echo $hoy ?>">
 
 
                                             <div class="col-xs-4">
@@ -351,8 +364,7 @@ if (isset($_SESSION["idusu"])) {
 
     </html>
 
-<?php } else {
-
-
+<?php
+} else {
     header('Location: /SAFEAPP/vista/login.php');
-} ?>
+}

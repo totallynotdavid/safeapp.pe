@@ -13,5 +13,3 @@
     <link href="../util/lte/skins/_all-skins.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../capa_presentacion/librerias/datatable/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" type="text/css" href="../capa_presentacion/librerias/alertify/css/alertify.min.css">
-
-    

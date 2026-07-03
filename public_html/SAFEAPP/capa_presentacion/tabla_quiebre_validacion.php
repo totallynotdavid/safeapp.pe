@@ -1,17 +1,21 @@
 <?php
 
-require_once "../capa_conexion/conexion.php";
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-$ano = $_GET["ano"];
-$periodo = $_GET["periodo"];
-$validacionf = $_GET["validacionf"];
-$tienda = $_GET["tienda"];
+$ano = $_GET['ano'];
+$periodo = $_GET['periodo'];
+$validacionf = $_GET['validacionf'];
+$tienda = $_GET['tienda'];
 
-
-if ($validacionf === 'PENDIENTE' || $validacionf === 'ATENDIDO' || $validacionf === 'PROCESANDO' || $validacionf === 'DEVUELTO') {
+if (
+    $validacionf === 'PENDIENTE'
+    || $validacionf === 'ATENDIDO'
+    || $validacionf === 'PROCESANDO'
+    || $validacionf === 'DEVUELTO'
+) {
     $sqlquiebreMovil = " SELECT 
         quiebre.id_quiebre,
         quiebre.fecha_registro, 
@@ -86,9 +90,7 @@ if ($validacionf === 'PENDIENTE' || $validacionf === 'ATENDIDO' || $validacionf 
          ";
 }
 
-
 $resultquiebreMovil = mysqli_query($conexion, $sqlquiebreMovil);
-
 
 ?>
 
@@ -110,8 +112,8 @@ $resultquiebreMovil = mysqli_query($conexion, $sqlquiebreMovil);
                     </thead>
                     <tbody>
                         <?php
-                        while ($mostrar = mysqli_fetch_array($resultquiebreMovil)) {
-                        ?>
+
+                        while ($mostrar = mysqli_fetch_array($resultquiebreMovil)) { ?>
                             <tr>
                                 <td><?php echo $mostrar[1] ?></td>
                                 <td><?php echo $mostrar[2] ?></td>
@@ -120,12 +122,13 @@ $resultquiebreMovil = mysqli_query($conexion, $sqlquiebreMovil);
                                 <td><?php echo $mostrar[5] ?></td>
                                 <td><?php echo $mostrar[6] ?></td>
                                 <td style="text-align: center;">
-                                    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="TraerDatosTabla('<?php echo $mostrar[0] ?>')"> <span class="fa fa-bars"></span>
+                                    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="TraerDatosTabla('<?php echo
+                                        $mostrar[0]
+                                    ?>')"> <span class="fa fa-bars"></span>
                                     </span>
                                 </td>
                             </tr>
-                        <?php
-                        }
+                        <?php }
                         ?>
                     </tbody>
                 </table>

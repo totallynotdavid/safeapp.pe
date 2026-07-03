@@ -1,13 +1,14 @@
 <?php
+
 session_start();
-$idusu = $_SESSION ["idusu"];
-require_once "../capa_conexion/conexion.php";
+$idusu = $_SESSION['idusu'];
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-$ano=$_GET["ano"];
-$periodo=$_GET["periodo"];
+$ano = $_GET['ano'];
+$periodo = $_GET['periodo'];
 
 $sqldatos = "SELECT u.personal,
 CASE WHEN nc.id_usuario=PENDIENTE.usu THEN ROUND(PENDIENTE.suma,2) ELSE 0 END as 'PENDIENTE' ,
@@ -70,19 +71,25 @@ $resultdatos = mysqli_query($conexion, $sqldatos);
                     <tbody >
                         <?php
 
-                        
-
                         while ($mostrar = mysqli_fetch_array($resultdatos)) {
-                            
-                        $total=  $mostrar[1] + $mostrar[2] +$mostrar[3]+$mostrar[4] + $mostrar[5] + $mostrar[6] +$mostrar[7] + $mostrar[8];
-                        if ( $total == 0) {
-                            +1;
-                        }else{
-                            ?>
+                            $total =
+                                $mostrar[1]
+                                + $mostrar[2]
+                                + $mostrar[3]
+                                + $mostrar[4]
+                                + $mostrar[5]
+                                + $mostrar[6]
+                                + $mostrar[7]
+                                + $mostrar[8];
+                            if ($total == 0) {
+                                +1;
+                            } else { ?>
                             <tr >
                                 
                                 <td >
-                            <a href="../procesos/repexportardashboardFija.php?idusu=<?php echo $mostrar[9] ?>&ano=<?php echo $ano ?>&periodo=<?php echo $periodo ?>"><?php echo $mostrar[0] ?></a> 
+                            <a href="../procesos/repexportardashboardFija.php?idusu=<?php echo
+                                $mostrar[9]
+                            ?>&ano=<?php echo $ano ?>&periodo=<?php echo $periodo ?>"><?php echo $mostrar[0] ?></a> 
                                  
                                 </td>    
                                 <td><?php echo $mostrar[1] ?></td>
@@ -99,8 +106,8 @@ $resultdatos = mysqli_query($conexion, $sqldatos);
 
                             
                             </tr>
-                            <?php
-                        }}
+                            <?php }
+                        }
                         ?>								
                     </tbody>
                 </table>

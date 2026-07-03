@@ -2,16 +2,13 @@
 
 class crudNotadecargo
 {
-
     public function agregarNCfija($datos)
     {
-
-        date_default_timezone_set("America/Lima");
-        $hoy = date("Y-m-d");
+        date_default_timezone_set('America/Lima');
+        $hoy = date('Y-m-d');
 
         $obj = new conectar();
         $conexion = $obj->conexion();
-
 
         $sqlLLAMADA = "INSERT into nc_fija (id_usuario, id_supervisor,fecha_ingreso, ruc,razon_social,tipo, subtipo, descripcion,q_lineas,cargo_fijo,modalidad,contacto,telefono1,telefono2,estado,validacion,direccion,coordenadas,zonal,comentario,tecnologia,nodo)
                                     values ('$datos[0]',
@@ -44,17 +41,13 @@ class crudNotadecargo
         return $rpta;
     }
 
-
-
     public function agregarNCfijaAv($datos)
     {
-
-        date_default_timezone_set("America/Lima");
-        $hoy = date("Y-m-d");
+        date_default_timezone_set('America/Lima');
+        $hoy = date('Y-m-d');
 
         $obj = new conectar();
         $conexion = $obj->conexion();
-
 
         $sqlLLAMADA = "INSERT into nc_avanzado (id_usuario, id_supervisor,fecha_ingreso, ruc,razon_social,tipo, subtipo, descripcion,q_lineas,cargo_fijo,modalidad,contacto,telefono1,telefono2,estado,validacion,direccion,coordenadas,zonal,comentario,tecnologia,back,nodo)
                                     values ('$datos[0]',
@@ -88,7 +81,6 @@ class crudNotadecargo
         return $rpta;
     }
 
-
     public function obtenCargoFija($idcargo)
     {
         $obj = new conectar();
@@ -112,7 +104,6 @@ class crudNotadecargo
         $resultsup = mysqli_query($conexion, $sqlsup);
         $versup = mysqli_fetch_array($resultsup);
 
-
         $datos = array(
             'q_lineas' => $ver[0],
             'modalidad' => $ver[1],
@@ -133,15 +124,10 @@ class crudNotadecargo
             'comentario_validador' => $ver[16],
             'tecnologia' => $ver[17],
             'ejecutivo_telefonica' => $ver[18],
-            'supervisor' => $versup[0]
-
-
-
-
+            'supervisor' => $versup[0],
         );
         return $datos;
     }
-
 
     public function obtenCargoFijaAv($idcargo)
     {
@@ -183,7 +169,6 @@ class crudNotadecargo
         $resultsup = mysqli_query($conexion, $sqlsup);
         $versup = mysqli_fetch_array($resultsup);
 
-
         $datos = array(
             'q_lineas' => $ver[0],
             'modalidad' => $ver[1],
@@ -204,22 +189,18 @@ class crudNotadecargo
             'comentario_validador' => $ver[16],
             'tecnologia' => $ver[17],
             'ejecutivo_telefonica' => $ver[18],
-            'supervisor' => $versup[0]
-
+            'supervisor' => $versup[0],
         );
         return $datos;
     }
 
-
     public function agregarncfValidacion($datos)
     {
-
-        date_default_timezone_set("America/Lima");
-        $hoy = date("Y-m-d");
+        date_default_timezone_set('America/Lima');
+        $hoy = date('Y-m-d');
 
         $obj = new conectar();
         $conexion = $obj->conexion();
-
 
         $sqlnotadecargo = "UPDATE nc_fija SET validacion='$datos[2]',id_validador='$datos[1]',
             fecha_validacion='$hoy' , comentario_validador='$datos[3]',ejecutivo_telefonica='$datos[5]' WHERE id_cargo='$datos[4]'
@@ -232,13 +213,11 @@ class crudNotadecargo
 
     public function agregarncfValidacionAv($datos)
     {
-
-        date_default_timezone_set("America/Lima");
-        $hoy = date("Y-m-d");
+        date_default_timezone_set('America/Lima');
+        $hoy = date('Y-m-d');
 
         $obj = new conectar();
         $conexion = $obj->conexion();
-
 
         $sqlnotadecargo = "UPDATE nc_avanzado SET validacion='$datos[2]',id_validador='$datos[1]',
             fecha_validacion='$hoy' , comentario_validador='$datos[3]',ejecutivo_telefonica='$datos[5]',cargo_fijo='$datos[6]' WHERE id_cargo='$datos[4]'
@@ -248,7 +227,6 @@ class crudNotadecargo
 
         return $rpta;
     }
-
 
     public function obtenCargoFijaBack($idcargo)
     {
@@ -306,7 +284,6 @@ class crudNotadecargo
         $resultsup = mysqli_query($conexion, $sqlsup);
         $versup = mysqli_fetch_array($resultsup);
 
-
         $sqlval = "SELECT usu.personal
                     from nc_fija as nc inner join usuario as usu on nc.id_validador=usu.id_usuario
                    
@@ -350,11 +327,10 @@ class crudNotadecargo
             'caso_sf' => $ver[30],
             'nodo' => $ver[32],
             'ncfinanciera' => $ver[33],
-            'ncfe' => $ver[34]
+            'ncfe' => $ver[34],
         );
         return $datos;
     }
-
 
     public function obtenCargoFijaBackAv($idcargo)
     {
@@ -414,7 +390,6 @@ class crudNotadecargo
         $resultsup = mysqli_query($conexion, $sqlsup);
         $versup = mysqli_fetch_array($resultsup);
 
-
         $sqlval = "SELECT usu.personal
                     from nc_avanzado as nc inner join usuario as usu on nc.id_validador=usu.id_usuario
                    
@@ -422,7 +397,6 @@ class crudNotadecargo
 
         $resultval = mysqli_query($conexion, $sqlval);
         $verval = mysqli_fetch_array($resultval);
-
 
         $datos = array(
             'q_lineas' => $ver[0],
@@ -461,21 +435,18 @@ class crudNotadecargo
             'back' => $ver[31],
             'nodo' => $ver[32],
             //'caso_sf' => $ver[35],
-            'mes' => $ver[34]
+            'mes' => $ver[34],
         );
         return $datos;
     }
 
-
     public function agregarncfBack($datos)
     {
-
-        date_default_timezone_set("America/Lima");
-        $hoy = date("Y-m-d");
+        date_default_timezone_set('America/Lima');
+        $hoy = date('Y-m-d');
 
         $obj = new conectar();
         $conexion = $obj->conexion();
-
 
         $sqlnotadecargo = "UPDATE nc_fija SET 
                 estado='$datos[2]',
@@ -503,13 +474,11 @@ class crudNotadecargo
 
     public function agregarncfBackAv($datos)
     {
-
-        date_default_timezone_set("America/Lima");
-        $hoy = date("Y-m-d");
+        date_default_timezone_set('America/Lima');
+        $hoy = date('Y-m-d');
 
         $obj = new conectar();
         $conexion = $obj->conexion();
-
 
         $sqlnotadecargo = "UPDATE nc_avanzado SET estado='$datos[2]',peticion='$datos[3]',
             contrata='$datos[4]',fecha_actualizacion='$hoy' , fecha_liquidacion='$datos[5]' 
@@ -525,14 +494,10 @@ class crudNotadecargo
         return $rpta;
     }
 
-
     public function agregarNCfijacomentario($datos)
     {
-
-
         $obj = new conectar();
         $conexion = $obj->conexion();
-
 
         $sqlnotadecargo = "UPDATE nc_fija SET comentario='$datos[1]',telefono1='$datos[2]',
             telefono2='$datos[3]'
@@ -545,11 +510,8 @@ class crudNotadecargo
 
     public function agregarNCfijacomentarioAv($datos)
     {
-
-
         $obj = new conectar();
         $conexion = $obj->conexion();
-
 
         $sqlnotadecargo = "UPDATE nc_avanzado SET comentario='$datos[1]',telefono1='$datos[2]',
             telefono2='$datos[3]'
@@ -560,16 +522,13 @@ class crudNotadecargo
         return $rpta;
     }
 
-
     public function agregarNCmovil($datos)
     {
-
-        date_default_timezone_set("America/Lima");
-        $hoy = date("Y-m-d");
+        date_default_timezone_set('America/Lima');
+        $hoy = date('Y-m-d');
 
         $obj = new conectar();
         $conexion = $obj->conexion();
-
 
         $sqlLLAMADA = "INSERT INTO nc_movil (   id_usuario, 
                                                 id_supervisor,
@@ -622,7 +581,6 @@ class crudNotadecargo
         return $rpta;
     }
 
-
     public function agregarNCmovilcomentario($datos)
     {
         $obj = new conectar();
@@ -641,6 +599,7 @@ class crudNotadecargo
         $rpta = mysqli_query($conexion, $sqlnotadecargo);
         return $rpta;
     }
+
     public function obtenCargoMovilBack($idcargo)
     {
         $obj = new conectar();
@@ -741,7 +700,7 @@ class crudNotadecargo
             'fecha_liquidacion' => $ver[33],
             'comentario_liquidador' => $ver[34],
             'ciclo' => $ver[36],
-            'cuenta_financiera' => $ver[37]
+            'cuenta_financiera' => $ver[37],
         );
         return $datos;
     }
@@ -839,14 +798,14 @@ class crudNotadecargo
             'observacion' => $ver[32],
             'descuento' => $ver[33],
             'fecha_liquidacion' => $ver[34],
-            'comentario_liquidador' => $ver[35]
+            'comentario_liquidador' => $ver[35],
         );
         return $datos;
     }
 
     public function agregarliquidacion($datos)
     {
-        date_default_timezone_set("America/Lima");
+        date_default_timezone_set('America/Lima');
         $obj = new conectar();
         $conexion = $obj->conexion();
         $sqlnotadecargo = "UPDATE nc_movil 
@@ -921,16 +880,15 @@ class crudNotadecargo
             'ejecutivo_tdp' => $ver[14],
             'tipo_producto' => $ver[15],
             'etapa' => $ver[16],
-            'oportunidad' => $ver[17]
+            'oportunidad' => $ver[17],
         );
         return $datos;
     }
 
-
     public function agregarncmValidacion($datos)
     {
-        date_default_timezone_set("America/Lima");
-        $hoy = date("Y-m-d");
+        date_default_timezone_set('America/Lima');
+        $hoy = date('Y-m-d');
         $obj = new conectar();
         $conexion = $obj->conexion();
         $sqlnotadecargo = "UPDATE nc_movil 
@@ -947,8 +905,8 @@ class crudNotadecargo
 
     public function agregarncmBack($datos)
     {
-        date_default_timezone_set("America/Lima");
-        $hoy = date("Y-m-d");
+        date_default_timezone_set('America/Lima');
+        $hoy = date('Y-m-d');
         $obj = new conectar();
         $conexion = $obj->conexion();
         $sqlnotadecargo = "UPDATE nc_movil 
@@ -1006,7 +964,7 @@ class crudNotadecargo
         $datos = array(
             'id_cartera' => $ver[0],
             'nombre' => $ver[1],
-            'DNI' => $ver[2]
+            'DNI' => $ver[2],
         );
         return $datos;
     }
@@ -1016,7 +974,7 @@ class crudNotadecargo
         $obj = new conectar();
         $conexion = $obj->conexion();
         $datos = array();
-        $sql = "SELECT id_cartera,nombre,propietario,DNI FROM cartera ";
+        $sql = 'SELECT id_cartera,nombre,propietario,DNI FROM cartera ';
         $result = mysqli_query($conexion, $sql);
         while ($row = mysqli_fetch_array($result)) {
             $datos[] = $row;

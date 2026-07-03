@@ -1,17 +1,16 @@
 <?php
 
-require_once "../capa_conexion/conexion.php";
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-$ano = $_GET["ano"];
-$periodo = $_GET["periodo"];
-$ncestado = $_GET["ncestadof"];
-$tienda = $_GET["tienda"];
+$ano = $_GET['ano'];
+$periodo = $_GET['periodo'];
+$ncestado = $_GET['ncestadof'];
+$tienda = $_GET['tienda'];
 
 if ($ncestado === 'LIQUIDADO') {
-
     $sqlncMovil = " SELECT  ncf.id_cargo,
                             ncf.fecha_actualizacion, 
                             ncf.ruc,
@@ -40,7 +39,6 @@ if ($ncestado === 'LIQUIDADO') {
                             and ncf.validacion='PROCEDE' 
                             ORDER BY ncf.fecha_actualizacion DESC";
 } else {
-
     if ($ncestado === 'DEUDA') {
         $sqlncMovil = " SELECT  ncf.id_cargo,
                                 ncf.fecha_actualizacion, 
@@ -70,7 +68,6 @@ if ($ncestado === 'LIQUIDADO') {
                                 and ncf.validacion='PROCEDE' 
                                 ORDER BY ncf.fecha_actualizacion DESC";
     } else {
-
         if ($ncestado === 'BAJA') {
             $sqlncMovil = " SELECT  ncf.id_cargo,
                                 ncf.fecha_actualizacion, 
@@ -275,7 +272,6 @@ if ($ncestado === 'LIQUIDADO') {
 
 $resultncMovil = mysqli_query($conexion, $sqlncMovil);
 
-
 ?>
 
 <form class="form form-horizontal">
@@ -302,8 +298,8 @@ $resultncMovil = mysqli_query($conexion, $sqlncMovil);
                     </thead>
                     <tbody>
                         <?php
-                        while ($mostrar = mysqli_fetch_array($resultncMovil)) {
-                        ?>
+
+                        while ($mostrar = mysqli_fetch_array($resultncMovil)) { ?>
                             <tr>
                                 <td><?php echo $mostrar[1] ?></td>
                                 <td><?php echo $mostrar[2] ?></td>
@@ -318,12 +314,13 @@ $resultncMovil = mysqli_query($conexion, $sqlncMovil);
                                 <td><?php echo $mostrar[6] ?></td>
                                 <td><?php echo $mostrar[16] ?></td>
                                 <td style="text-align: center;">
-                                    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="TraerDatosTabla('<?php echo $mostrar[0] ?>')"> <span class="fa fa-check-circle"></span>
+                                    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="TraerDatosTabla('<?php echo
+                                        $mostrar[0]
+                                    ?>')"> <span class="fa fa-check-circle"></span>
                                     </span>
                                 </td>
                             </tr>
-                        <?php
-                        }
+                        <?php }
                         ?>
                     </tbody>
                 </table>

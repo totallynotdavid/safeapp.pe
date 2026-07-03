@@ -24,8 +24,8 @@ function verificarClave(mysqli $conexion, int $idUsuario, string $claveIngresada
     }
 
     $claveNueva = hashearClave($claveIngresada);
-    $stmt = mysqli_prepare($conexion, "UPDATE usuario SET clave = ? WHERE id_usuario = ?");
-    mysqli_stmt_bind_param($stmt, "si", $claveNueva, $idUsuario);
+    $stmt = mysqli_prepare($conexion, 'UPDATE usuario SET clave = ? WHERE id_usuario = ?');
+    mysqli_stmt_bind_param($stmt, 'si', $claveNueva, $idUsuario);
     mysqli_stmt_execute($stmt);
 
     return true;

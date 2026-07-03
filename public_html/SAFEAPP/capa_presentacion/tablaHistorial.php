@@ -1,11 +1,11 @@
 <?php
 
-require_once "../capa_conexion/conexion.php";
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-$param = $_GET["ruc"];
+$param = $_GET['ruc'];
 
 $sqlhistorial = " SELECT    
                             ll.fecha, 
@@ -22,10 +22,7 @@ $sqlhistorial = " SELECT
                             where ll.ruc='$param'
                             ORDER BY fecha DESC";
 
-
-
 $resulthistorial = mysqli_query($conexion, $sqlhistorial);
-
 
 ?>
 
@@ -49,8 +46,8 @@ $resulthistorial = mysqli_query($conexion, $sqlhistorial);
                     </thead>
                     <tbody>
                         <?php
-                        while ($mostrar = mysqli_fetch_array($resulthistorial)) {
-                        ?>
+
+                        while ($mostrar = mysqli_fetch_array($resulthistorial)) { ?>
                         <tr>
                             <td><?php echo $mostrar[0] ?></td>
                             <td><?php echo $mostrar[1] ?></td>
@@ -60,8 +57,7 @@ $resulthistorial = mysqli_query($conexion, $sqlhistorial);
                             <td><?php echo $mostrar[5] ?></td>
 
                         </tr>
-                        <?php
-                        }
+                        <?php }
                         ?>
 
 

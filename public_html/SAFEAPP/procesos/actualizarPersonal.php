@@ -1,6 +1,7 @@
 <?php
-require_once "../capa_conexion/conexion.php";
-require_once "../capa_logica/crudUsuario.php";
+
+require_once '../capa_conexion/conexion.php';
+require_once '../capa_logica/crudUsuario.php';
 $obj = new crudusuario();
 
 $datos = array(
@@ -8,7 +9,7 @@ $datos = array(
     $_POST['personalA'],
     $_POST['fecha_nacimientoA'],
     $_POST['telefonoA'],
-    $_POST['correoA']
+    $_POST['correoA'],
 );
 
 try {
@@ -16,6 +17,6 @@ try {
     echo json_encode($resultado);
     print_r($resultado);
 } catch (Exception $exc) {
-    header("HTTP/1.1 500");
+    header('HTTP/1.1 500');
     echo $exc->getMessage();
 }

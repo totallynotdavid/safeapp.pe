@@ -1,16 +1,15 @@
 <?php
 
-require_once "../capa_conexion/conexion.php";
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-$ano = $_GET["ano"];
-$periodo = $_GET["periodo"];
+$ano = $_GET['ano'];
+$periodo = $_GET['periodo'];
 
-$ncvalidacionf = $_GET["ncvalidacionf"];
-$tienda = $_GET["tienda"];
-
+$ncvalidacionf = $_GET['ncvalidacionf'];
+$tienda = $_GET['tienda'];
 
 if ($ncvalidacionf === 'PENDIENTE') {
     $sqlncMovil = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,ncf.q_lineas,ncf.cargo_fijo, ncf.estado,ncf.validacion,s.nombre,u.personal
@@ -20,9 +19,7 @@ where  year(ncf.fecha_ingreso)<='$ano'
 and ncf.validacion='$ncvalidacionf' and ncf.zonal='$tienda'
 ORDER BY ncf.fecha_ingreso DESC";
 } else {
-
     if ($ncvalidacionf === 'PROCEDE') {
-
         $sqlncMovil = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,ncf.q_lineas,ncf.cargo_fijo, ncf.estado,ncf.validacion,s.nombre,u.personal
  from nc_movil as ncf left join supervisor as s on ncf.id_supervisor=s.id_supervisor
   left join usuario as u on u.id_usuario=ncf.id_usuario
@@ -30,9 +27,7 @@ where month(ncf.fecha_validacion)='$periodo' and year(ncf.fecha_validacion)='$an
 and ncf.validacion='$ncvalidacionf' and ncf.zonal='$tienda'
 ORDER BY ncf.fecha_ingreso DESC";
     } else {
-
         if ($ncvalidacionf === 'RECHAZADO') {
-
             $sqlncMovil = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,ncf.q_lineas,ncf.cargo_fijo, ncf.estado,ncf.validacion,s.nombre,u.personal
  from nc_movil as ncf left join supervisor as s on ncf.id_supervisor=s.id_supervisor
   left join usuario as u on u.id_usuario=ncf.id_usuario
@@ -40,7 +35,6 @@ where month(ncf.fecha_ingreso)='$periodo' and year(ncf.fecha_ingreso)='$ano'
 and ncf.validacion='$ncvalidacionf' and ncf.zonal='$tienda'
 ORDER BY ncf.fecha_ingreso DESC";
         } else {
-
             $sqlncMovil = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,ncf.q_lineas,ncf.cargo_fijo, ncf.estado,ncf.validacion,s.nombre,u.personal
  from nc_movil as ncf left join supervisor as s on ncf.id_supervisor=s.id_supervisor
   left join usuario as u on u.id_usuario=ncf.id_usuario
@@ -68,9 +62,7 @@ and ncf.validacion='RECHAZADO' and ncf.zonal='$tienda'
     }
 }
 
-
 $resultncMovil = mysqli_query($conexion, $sqlncMovil);
-
 
 ?>
 
@@ -100,8 +92,8 @@ $resultncMovil = mysqli_query($conexion, $sqlncMovil);
                     </thead>
                     <tbody>
                         <?php
-                        while ($mostrar = mysqli_fetch_array($resultncMovil)) {
-                        ?>
+
+                        while ($mostrar = mysqli_fetch_array($resultncMovil)) { ?>
                             <tr>
                                 <td><?php echo $mostrar[1] ?></td>
                                 <td><?php echo $mostrar[2] ?></td>
@@ -116,14 +108,15 @@ $resultncMovil = mysqli_query($conexion, $sqlncMovil);
 
 
                                 <td style="text-align: center;">
-                                    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="TraerDatosTabla('<?php echo $mostrar[0] ?>')"> <span class="fa fa-check-circle"></span>
+                                    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="TraerDatosTabla('<?php echo
+                                        $mostrar[0]
+                                    ?>')"> <span class="fa fa-check-circle"></span>
                                     </span>
                                 </td>
 
 
                             </tr>
-                        <?php
-                        }
+                        <?php }
                         ?>
 
 

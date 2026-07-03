@@ -1,16 +1,17 @@
-<?php 
-session_start();
-$idusu=$_SESSION ["idusu"];
-require_once "../capa_conexion/conexion.php";
-$obj= new conectar();
-$conexion=$obj->conexion();
+<?php
 
-$sql="SELECT u.id_usuario, u.usuario, u.clave, r.nombre_rol, u.personal, u.estado,s.nombre from usuario as u
+session_start();
+$idusu = $_SESSION['idusu'];
+require_once '../capa_conexion/conexion.php';
+$obj = new conectar();
+$conexion = $obj->conexion();
+
+$sql = 'SELECT u.id_usuario, u.usuario, u.clave, r.nombre_rol, u.personal, u.estado,s.nombre from usuario as u
 inner join rol as r on r.id_rol=u.id_rol inner join supervisor as s on s.id_supervisor=u.id_supervisor where u.estado=1
 
- ";
+ ';
 
-$result=mysqli_query($conexion,$sql);
+$result = mysqli_query($conexion, $sql);
 
 ?>
 <form class="form form-horizontal" >
@@ -32,25 +33,30 @@ $result=mysqli_query($conexion,$sql);
 		</thead>
 		
 			<tbody >
-			<?php 
-			while ($mostrar=mysqli_fetch_array($result)) {
-				?>
+			<?php
+
+			while ($mostrar = mysqli_fetch_array($result)) { ?>
 				<tr >
 					<td><?php echo $mostrar[0] ?></td>
 					<td><?php echo $mostrar[1] ?></td>	
 					<td><?php echo $mostrar[3] ?></td>
 					<td><?php echo $mostrar[4] ?></td>
-					<td><?php if($mostrar[5]=='1'){echo "Habilitado";}else{echo "Inhabilitado";} ?></td>
+					<td><?php if ($mostrar[5] == '1') {
+    					echo 'Habilitado';
+					} else {
+    					echo 'Inhabilitado';
+					} ?></td>
 					<td><?php echo $mostrar[6] ?></td>
 					<td style="text-align: center;">
-						<span class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="FrmActualizar('<?php echo $mostrar[0] ?>')">
+						<span class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="FrmActualizar('<?php echo
+    						$mostrar[0]
+						?>')">
 							<span class="fa fa-pencil-square-o"></span>
 						</span>
 						
 					</td>
 						</tr>
-				<?php 
-			}
+				<?php }
 			?>								
 		</tbody>
 	</table>

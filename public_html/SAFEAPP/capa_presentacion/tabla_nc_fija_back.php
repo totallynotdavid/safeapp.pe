@@ -1,18 +1,22 @@
 <?php
 
-require_once "../capa_conexion/conexion.php";
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-$ano = $_GET["ano"];
-$periodo = $_GET["periodo"];
-$ncestado = $_GET["ncestadof"];
-$tienda = $_GET["tienda"];
+$ano = $_GET['ano'];
+$periodo = $_GET['periodo'];
+$ncestado = $_GET['ncestadof'];
+$tienda = $_GET['tienda'];
 
 if (
-    $ncestado === 'XINGRESAR' || $ncestado === 'PENDIENTE' || $ncestado === 'AGENDADO' || $ncestado === 'OBSERVADO' ||
-    $ncestado === 'INICIADO' || $ncestado === 'BOLSA'
+    $ncestado === 'XINGRESAR'
+    || $ncestado === 'PENDIENTE'
+    || $ncestado === 'AGENDADO'
+    || $ncestado === 'OBSERVADO'
+    || $ncestado === 'INICIADO'
+    || $ncestado === 'BOLSA'
 ) {
     $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , ncf.cargo_fijo, ncf.estado,ncf.validacion
@@ -21,9 +25,7 @@ where  year(ncf.fecha_validacion)<='$ano' and ncf.estado=
 '$ncestado' and ncf.validacion='PROCEDE' and ncf.zonal='$tienda'
 ORDER BY ncf.fecha_ingreso DESC";
 } else {
-
     if ($ncestado === 'COMPLETADO') {
-
         $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , ncf.cargo_fijo, ncf.estado,ncf.validacion
  from nc_fija as ncf 
@@ -31,9 +33,7 @@ where month(ncf.fecha_liquidacion)='$periodo' and year(ncf.fecha_liquidacion)='$
 '$ncestado' and ncf.validacion='PROCEDE'   and ncf.zonal='$tienda'
 ORDER BY ncf.fecha_ingreso DESC";
     } else {
-
         if ($ncestado === 'CANCELADO') {
-
             $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , ncf.cargo_fijo, ncf.estado,ncf.validacion
  from nc_fija as ncf 
@@ -41,7 +41,6 @@ where month(ncf.fecha_validacion)='$periodo' and year(ncf.fecha_validacion)='$an
 '$ncestado' and ncf.validacion='PROCEDE'  and ncf.zonal='$tienda'
 ORDER BY ncf.fecha_ingreso DESC";
         } else {
-
             $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , ncf.cargo_fijo, ncf.estado,ncf.validacion
  from nc_fija as ncf 
@@ -72,9 +71,7 @@ where month(ncf.fecha_validacion)='$periodo' and year(ncf.fecha_validacion)='$an
     }
 }
 
-
 $resultncFija = mysqli_query($conexion, $sqlncFija);
-
 
 ?>
 
@@ -101,8 +98,8 @@ $resultncFija = mysqli_query($conexion, $sqlncFija);
                     </thead>
                     <tbody>
                         <?php
-                        while ($mostrar = mysqli_fetch_array($resultncFija)) {
-                        ?>
+
+                        while ($mostrar = mysqli_fetch_array($resultncFija)) { ?>
                             <tr>
                                 <td><?php echo $mostrar[1] ?></td>
                                 <td><?php echo $mostrar[2] ?></td>
@@ -114,14 +111,15 @@ $resultncFija = mysqli_query($conexion, $sqlncFija);
                                 <td><?php echo $mostrar[8] ?></td>
                                 <td><?php echo $mostrar[9] ?></td>
                                 <td style="text-align: center;">
-                                    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="TraerDatosTabla('<?php echo $mostrar[0] ?>')"> <span class="fa fa-check-circle"></span>
+                                    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="TraerDatosTabla('<?php echo
+                                        $mostrar[0]
+                                    ?>')"> <span class="fa fa-check-circle"></span>
                                     </span>
                                 </td>
 
 
                             </tr>
-                        <?php
-                        }
+                        <?php }
                         ?>
 
 

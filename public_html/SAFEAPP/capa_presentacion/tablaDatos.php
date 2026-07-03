@@ -1,7 +1,8 @@
 <?php
+
 session_start();
-$idusu = $_SESSION ["idusu"];
-require_once "../capa_conexion/conexion.php";
+$idusu = $_SESSION['idusu'];
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
@@ -10,11 +11,9 @@ $sql = "SELECT id_tienda from asigna where id_usuario='$idusu' and estado='0'";
 
 $result = mysqli_query($conexion, $sql);
 
-
 $ver = mysqli_fetch_array($result);
 
-$tienda=$ver[0];
-
+$tienda = $ver[0];
 
 $sqldatos = "SELECT  d.ruc,d.razon_social,d.zonal,d.nodo,d.origen,d.tipo_data from datos as d where d.id_usuario='$idusu' and d.id_tienda='$tienda' and d.estado='0' and d.tipo_data='MOVIL' LIMIT 50";
 
@@ -43,8 +42,7 @@ $resultdatos = mysqli_query($conexion, $sqldatos);
                     <tbody >
                         <?php
 
-                        while ($mostrar = mysqli_fetch_array($resultdatos)) {
-                            ?>
+                        while ($mostrar = mysqli_fetch_array($resultdatos)) { ?>
                             <tr >
                                 <td><?php echo $mostrar[0] ?></td>
                                 <td><?php echo $mostrar[1] ?></td>
@@ -55,12 +53,13 @@ $resultdatos = mysqli_query($conexion, $sqldatos);
                             
 
                             <td style="text-align: center;">
-    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="TraerDatosTabla('<?php echo $mostrar[0] ?>')"> <span class="fa fa-phone"></span>
+    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalEditar" onclick="TraerDatosTabla('<?php echo
+        $mostrar[0]
+    ?>')"> <span class="fa fa-phone"></span>
                                     </span>
                                 </td>
                             </tr>
-                            <?php
-                        }
+                            <?php }
                         ?>								
                     </tbody>
                 </table>

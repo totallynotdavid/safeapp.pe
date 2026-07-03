@@ -1,20 +1,17 @@
 <?php
 
-require_once "../capa_conexion/conexion.php";
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-$param=$_GET["ruc"];
+$param = $_GET['ruc'];
 
 $sqlwinback = " SELECT w.telefono,w.periodo,w.operador,w.fecha_portout
  from winback as w where w.ruc='$param'
 ";
 
-
-
 $resultwinback = mysqli_query($conexion, $sqlwinback);
-
 
 ?>
 
@@ -36,8 +33,8 @@ $resultwinback = mysqli_query($conexion, $sqlwinback);
                     </thead>
                      <tbody >
                        <?php
-                        while ($mostrar = mysqli_fetch_array($resultwinback)) {
-                            ?>
+
+                       while ($mostrar = mysqli_fetch_array($resultwinback)) { ?>
                             <tr >
                                 <td><?php echo $mostrar[0] ?></td>
                                 <td><?php echo $mostrar[1] ?></td>
@@ -48,9 +45,8 @@ $resultwinback = mysqli_query($conexion, $sqlwinback);
                                
                         
                             </tr>
-                            <?php
-                        }
-                        ?>  
+                            <?php }
+                       ?>  
 
 
                      </tbody>

@@ -1,20 +1,24 @@
 <?php
 
-require_once "../capa_conexion/conexion.php";
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-$ano = $_GET["ano"];
-$periodo = $_GET["periodo"];
-$estado = $_GET["estado"];
-$idusu = $_GET["idusu"];
+$ano = $_GET['ano'];
+$periodo = $_GET['periodo'];
+$estado = $_GET['estado'];
+$idusu = $_GET['idusu'];
 
 if (
-    $estado === 'INGRESADO' || $estado === 'PROCESANDO' || $estado === 'PENDIENTE' ||
-    $estado === 'DELIVERY' || $estado === 'BOLSA' || $estado === 'SALIDAANTICIPADA' || $estado === 'ADR'
+    $estado === 'INGRESADO'
+    || $estado === 'PROCESANDO'
+    || $estado === 'PENDIENTE'
+    || $estado === 'DELIVERY'
+    || $estado === 'BOLSA'
+    || $estado === 'SALIDAANTICIPADA'
+    || $estado === 'ADR'
 ) {
-
     $sqlncMovil = " SELECT  ncf.id_cargo,
                             ncf.fecha_ingreso, 
                             ncf.ruc,
@@ -30,7 +34,6 @@ if (
                             and validacion <> 'RECHAZADO'
                             ORDER BY ncf.fecha_ingreso DESC";
 } else {
-
     if ($estado === 'ACTIVADO') {
         $sqlncMovil = " SELECT  ncf.id_cargo,
                                 ncf.fecha_ingreso, 
@@ -48,9 +51,7 @@ if (
                                 and validacion <> 'RECHAZADO'
                                 ORDER BY ncf.fecha_ingreso DESC";
     } else {
-
         if ($estado === 'CAIDA') {
-
             $sqlncMovil = " SELECT  ncf.id_cargo,
                                     ncf.fecha_ingreso, 
                                     ncf.ruc,
@@ -67,7 +68,6 @@ if (
                                     and validacion <> 'RECHAZADO'
                                     ORDER BY ncf.fecha_ingreso DESC";
         } else {
-
             $sqlncMovil = " SELECT  ncf.id_cargo,
                                     ncf.fecha_ingreso, 
                                     ncf.ruc,
@@ -120,8 +120,6 @@ if (
     }
 }
 
-
-
 $resultncMovil = mysqli_query($conexion, $sqlncMovil);
 
 ?>
@@ -145,8 +143,8 @@ $resultncMovil = mysqli_query($conexion, $sqlncMovil);
                     </thead>
                     <tbody>
                         <?php
-                        while ($mostrar = mysqli_fetch_array($resultncMovil)) {
-                        ?>
+
+                        while ($mostrar = mysqli_fetch_array($resultncMovil)) { ?>
                             <tr>
                                 <td><?php echo $mostrar[1] ?></td>
                                 <td><?php echo $mostrar[2] ?></td>
@@ -156,13 +154,14 @@ $resultncMovil = mysqli_query($conexion, $sqlncMovil);
                                 <td><?php echo $mostrar[6] ?></td>
                                 <td><?php echo $mostrar[7] ?></td>
                                 <td style="text-align: center;">
-                                    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalSeguimiento" onclick="TraerDatosTabla('<?php echo $mostrar[0] ?>')"> <span class="fa fa-check-circle"></span>
+                                    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalSeguimiento" onclick="TraerDatosTabla('<?php echo
+                                        $mostrar[0]
+                                    ?>')"> <span class="fa fa-check-circle"></span>
                                     </span>
                                 </td>
 
                             </tr>
-                        <?php
-                        }
+                        <?php }
                         ?>
 
                     </tbody>

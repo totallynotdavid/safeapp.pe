@@ -1,47 +1,47 @@
 <?php
 
-require_once "../capa_conexion/conexion.php";
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-$ano=$_GET["ano"];
-$periodo=$_GET["periodo"];
-$estado=$_GET["estado"];
-$idusu=$_GET["idusu"];
+$ano = $_GET['ano'];
+$periodo = $_GET['periodo'];
+$estado = $_GET['estado'];
+$idusu = $_GET['idusu'];
 
-if ($estado==='PENDIENTE' || $estado==='INSERTADO' || $estado==='EMITIDO' || $estado==='OBSERVADO' || 
-    $estado==='INSTALADO' || $estado==='AGENDADO') {
-
+if (
+    $estado === 'PENDIENTE'
+    || $estado === 'INSERTADO'
+    || $estado === 'EMITIDO'
+    || $estado === 'OBSERVADO'
+    || $estado === 'INSTALADO'
+    || $estado === 'AGENDADO'
+) {
     $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , ncf.cargo_fijo, ncf.estado,ncf.validacion,ncf.back
  from nc_avanzado as ncf 
 where   year(ncf.fecha_ingreso)<='$ano' and 
 ncf.id_usuario='$idusu' and ncf.estado='$estado'
 ORDER BY ncf.fecha_ingreso DESC";
-}else{
-
-if ($estado==='LIQUIDADO') {
- $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
+} else {
+    if ($estado === 'LIQUIDADO') {
+        $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , ncf.cargo_fijo, ncf.estado,ncf.validacion,ncf.back
  from nc_avanzado as ncf 
 where month(ncf.fecha_liquidacion)='$periodo' and year(ncf.fecha_liquidacion)='$ano' and 
 ncf.id_usuario='$idusu' and ncf.estado='$estado'
 ORDER BY ncf.fecha_ingreso DESC";
-
-  }else{
-
-if ($estado==='CAIDO') {
-   
-    $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
+    } else {
+        if ($estado === 'CAIDO') {
+            $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , ncf.cargo_fijo, ncf.estado,ncf.validacion,ncf.back
  from nc_avanzado as ncf 
 where month(ncf.fecha_ingreso)='$periodo' and year(ncf.fecha_ingreso)='$ano' and 
 ncf.id_usuario='$idusu' and ncf.estado='$estado'
-ORDER BY ncf.fecha_ingreso DESC"; 
-} else{
-
-$sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
+ORDER BY ncf.fecha_ingreso DESC";
+        } else {
+            $sqlncFija = " SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
  ncf.subtipo, ncf.descripcion , ncf.cargo_fijo, ncf.estado,ncf.validacion,ncf.back
  from nc_avanzado as ncf 
 where  year(ncf.fecha_ingreso)<='$ano' and 
@@ -63,16 +63,11 @@ SELECT ncf.id_cargo,ncf.fecha_ingreso, ncf.ruc,ncf.razon_social,ncf.modalidad,
 where month(ncf.fecha_ingreso)='$periodo' and year(ncf.fecha_ingreso)='$ano' and 
 ncf.id_usuario='$idusu' and ncf.estado='CAIDO'
 ";
+        }
+    }
 }
-
-}
-
-
-}
-
 
 $resultncFija = mysqli_query($conexion, $sqlncFija);
-
 
 ?>
 
@@ -100,8 +95,8 @@ $resultncFija = mysqli_query($conexion, $sqlncFija);
                     </thead>
                      <tbody >
                        <?php
-                        while ($mostrar = mysqli_fetch_array($resultncFija)) {
-                            ?>
+
+                       while ($mostrar = mysqli_fetch_array($resultncFija)) { ?>
                             <tr >
                                 <td><?php echo $mostrar[1] ?></td>
                                 <td><?php echo $mostrar[2] ?></td>
@@ -114,14 +109,15 @@ $resultncFija = mysqli_query($conexion, $sqlncFija);
                                 <td><?php echo $mostrar[9] ?></td>
                                 <td><?php echo $mostrar[10] ?></td>
 <td style="text-align: center;">
-    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalSeguimiento" onclick="TraerDatosTabla('<?php echo $mostrar[0] ?>')"> <span class="fa fa-check-circle"></span>
+    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalSeguimiento" onclick="TraerDatosTabla('<?php echo
+        $mostrar[0]
+    ?>')"> <span class="fa fa-check-circle"></span>
                                     </span>
                                 </td>                             
                         
                             </tr>
-                            <?php
-                        }
-                        ?>  
+                            <?php }
+                       ?>  
 
 
                      </tbody>

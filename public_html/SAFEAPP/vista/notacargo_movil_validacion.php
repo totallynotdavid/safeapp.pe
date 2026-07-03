@@ -1,17 +1,18 @@
 <?php
+
 session_start();
 
-if (isset($_SESSION["idusu"])) {
-    $idusu = $_SESSION["idusu"];
-    require_once "../capa_conexion/conexion.php";
+if (isset($_SESSION['idusu'])) {
+    $idusu = $_SESSION['idusu'];
+    require_once '../capa_conexion/conexion.php';
     $obj = new conectar();
     $conexion = $obj->conexion();
     $sql = "SELECT id_tienda from asigna where id_usuario='$idusu' and estado='0'";
     $result = mysqli_query($conexion, $sql);
     $ver = mysqli_fetch_array($result);
     $tienda = $ver[0];
-    $conexion->set_charset("utf8");
-?>
+    $conexion->set_charset('utf8');
+    ?>
 
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
     <html>
@@ -21,6 +22,7 @@ if (isset($_SESSION["idusu"])) {
         <title>LLAMADA | Dashboard</title>
         <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
         <?php
+
         include 'scriptsup.php';
         ?>
         <link rel="stylesheet" type="text/css"
@@ -40,6 +42,7 @@ if (isset($_SESSION["idusu"])) {
         <div class="wrapper">
 
             <?php
+
             include 'cabecera.php';
             ?>
 
@@ -49,6 +52,7 @@ if (isset($_SESSION["idusu"])) {
             <aside class="main-sidebar">
                 <!-- sidebar: style can be found in sidebar.less -->
                 <?php
+
                 include 'menu.php';
                 ?>
                 <!-- /.sidebar -->
@@ -164,9 +168,10 @@ if (isset($_SESSION["idusu"])) {
                                                 <input type="date" disabled="" class="form-control input-sm" id="fechahoy"
                                                     name="fechahoy"
                                                     value="<?php
-                                                            date_default_timezone_set("America/Lima");
-                                                            $hoy = date("Y-m-d");
-                                                            echo $hoy ?>">
+
+                                                    date_default_timezone_set('America/Lima');
+                                                    $hoy = date('Y-m-d');
+                                                    echo $hoy ?>">
                                             </div>
                                             <div class="col-xs-4">
                                                 <label>Q lineas</label>
@@ -354,8 +359,7 @@ if (isset($_SESSION["idusu"])) {
     </body>
 
     </html>
-<?php } else {
-
-
+<?php
+} else {
     header('Location: /SAFEAPP/vista/login.php');
-} ?>
+}

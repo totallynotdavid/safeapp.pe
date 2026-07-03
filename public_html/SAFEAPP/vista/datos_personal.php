@@ -1,8 +1,8 @@
 <?php
 
 session_start();
-$idusu = $_SESSION["idusu"];
-require_once "../capa_conexion/conexion.php";
+$idusu = $_SESSION['idusu'];
+require_once '../capa_conexion/conexion.php';
 $obj = new conectar();
 $conexion = $obj->conexion();
 
@@ -16,6 +16,7 @@ $conexion = $obj->conexion();
     <title>Usuario</title>
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <?php
+
     include 'scriptsup.php';
     ?>
 </head>
@@ -25,6 +26,7 @@ $conexion = $obj->conexion();
     <div class="wrapper">
 
         <?php
+
         include 'cabecera.php';
         ?>
         <!-- =============================================== -->
@@ -33,6 +35,7 @@ $conexion = $obj->conexion();
         <aside class="main-sidebar">
             <!-- sidebar: style can be found in sidebar.less -->
             <?php
+
             include 'menu.php';
             ?>
             <!-- /.sidebar -->

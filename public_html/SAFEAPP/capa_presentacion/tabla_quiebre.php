@@ -1,15 +1,14 @@
 <?php
 
-require_once "../capa_conexion/conexion.php";
+require_once '../capa_conexion/conexion.php';
 
 $obj = new conectar();
 $conexion = $obj->conexion();
 
-$ano = $_GET["ano"];
-$periodo = $_GET["periodo"];
-$estado = $_GET["estado"];
-$idusu = $_GET["idusu"];
-
+$ano = $_GET['ano'];
+$periodo = $_GET['periodo'];
+$estado = $_GET['estado'];
+$idusu = $_GET['idusu'];
 
 if ($estado === 'PENDIENTE' || $estado === 'ATENDIDO' || $estado === 'PROCESANDO' || $estado === 'DEVUELTO') {
     $sqlquiebreMovil = " SELECT 
@@ -100,8 +99,8 @@ $resultquiebreMovil = mysqli_query($conexion, $sqlquiebreMovil);
                     </thead>
                     <tbody>
                         <?php
-                        while ($mostrar = mysqli_fetch_array($resultquiebreMovil)) {
-                        ?>
+
+                        while ($mostrar = mysqli_fetch_array($resultquiebreMovil)) { ?>
                             <tr>
                                 <td><?php echo $mostrar[1] ?></td>
                                 <td><?php echo $mostrar[2] ?></td>
@@ -109,12 +108,13 @@ $resultquiebreMovil = mysqli_query($conexion, $sqlquiebreMovil);
                                 <td><?php echo $mostrar[4] ?></td>
                                 <td><?php echo $mostrar[5] ?></td>
                                 <td style="text-align: center;">
-                                    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalSeguimiento" onclick="TraerDatosTabla('<?php echo $mostrar[0] ?>')"> <span class="fa fa-bars"></span>
+                                    <span class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalSeguimiento" onclick="TraerDatosTabla('<?php echo
+                                        $mostrar[0]
+                                    ?>')"> <span class="fa fa-bars"></span>
                                     </span>
                                 </td>
                             </tr>
-                        <?php
-                        }
+                        <?php }
                         ?>
                     </tbody>
 
