@@ -144,9 +144,13 @@ cmd_stop() {
 cmd_restore() {
   local file="${1:-${ROOT_DIR}/127_0_0_1.sql}"
   [ -f "$file" ] || { echo "File not found: $file" >&2; exit 1; }
+  : "${DB_NAME:?DB_NAME not set (check public_html/SAFEAPP/.env)}"
   cmd_start
   echo "Restoring ${file}..."
-  mdb < "$file"
+  mdb -e "CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;"
+  # 127_0_0_1.sql carries its own CREATE DATABASE/USE for the Hostinger
+  # account name. Strip those so restore always targets DB_NAME instead.
+  grep -v -E '^(CREATE DATABASE|USE `)' "$file" | mdb -D "$DB_NAME"
   echo "Done"
 }
 
