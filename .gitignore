@@ -4,6 +4,9 @@ public_html/SAFEAPP/.env
 # Composer dependencies (run `composer install` to regenerate)
 public_html/SAFEAPP/vendor/
 
+# Personal mise overrides (not shared config)
+.mise.local.toml
+
 # Runtime-generated logs
 error_log
 **/error_log
