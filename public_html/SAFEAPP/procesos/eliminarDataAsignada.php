@@ -1,13 +1,6 @@
 <?php
 
-session_start();
-
-if (!isset($_SESSION['idusu'])) {
-    header('HTTP/1.1 403');
-    echo json_encode(array('status' => 'error', 'message' => 'No autorizado'));
-    exit();
-}
-
+require_once '../capa_logica/sesion.php';
 require_once '../capa_conexion/conexion.php';
 require_once '../capa_logica/crudDatos.php';
 $obj = new crud();

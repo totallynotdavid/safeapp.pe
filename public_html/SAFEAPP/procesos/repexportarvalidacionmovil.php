@@ -1,6 +1,6 @@
 <?php
 
-session_start();
+require_once '../capa_logica/sesion.php';
 $idusu = $_SESSION['idusu'];
 require_once '../capa_conexion/conexion.php';
 
