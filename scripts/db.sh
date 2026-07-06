@@ -21,7 +21,7 @@ PORT="${MARIADB_PORT:-3306}"
 # could exceed that on its own.
 SOCKET="/tmp/safeapp-pe-mariadb.sock"
 
-ENV_FILE="${ROOT_DIR}/public_html/SAFEAPP/.env"
+ENV_FILE="${ROOT_DIR}/public/SAFEAPP/.env"
 if [ -f "$ENV_FILE" ]; then
   set -a
   # shellcheck disable=SC1090
@@ -77,7 +77,7 @@ is_running() {
 # not this instance's, so .env forces 127.0.0.1. The localhost grant stays too,
 # for direct CLI use.
 ensure_app_user() {
-  : "${DB_NAME:?DB_NAME not set (check public_html/SAFEAPP/.env)}"
+  : "${DB_NAME:?DB_NAME not set (check public/SAFEAPP/.env)}"
   : "${DB_USER:?DB_USER not set}"
   : "${DB_PASS:?DB_PASS not set}"
   mdb -e "
@@ -141,16 +141,47 @@ cmd_stop() {
   fi
 }
 
+DEV_ADMIN_USER="dev.admin"
+DEV_ADMIN_PASS="devpassword"
+
+# The dump's real accounts carry unknown production password hashes (MD5, no
+# recovery). Seed a known-password admin instead of guessing at one.
+#
+# vista/principal.php reads asigna (user -> tienda) unconditionally on login,
+# with no null check, so every user needs a row there too or PHP throws
+# "Trying to access array offset on value of type null" warnings. Real
+# ADMINISTRADOR accounts are assigned id_tienda=4 (REGION LIMA); match that.
+seed_dev_admin() {
+  mdb -D "$DB_NAME" -e "
+    DELETE FROM acceso WHERE id_usuario IN (SELECT id_usuario FROM usuario WHERE usuario = '${DEV_ADMIN_USER}');
+    DELETE FROM asigna WHERE id_usuario IN (SELECT id_usuario FROM usuario WHERE usuario = '${DEV_ADMIN_USER}');
+    DELETE FROM usuario WHERE usuario = '${DEV_ADMIN_USER}';
+    INSERT INTO usuario
+      (usuario, clave, id_rol, personal, estado, sexo, id_supervisor, fecha_nacimiento, telefono, correo)
+      VALUES ('${DEV_ADMIN_USER}', MD5('${DEV_ADMIN_PASS}'), 1, 'DEV ADMIN', 1, 'M', 1, '0000-00-00', '', '');
+    INSERT INTO acceso (id_menu, id_usuario)
+      SELECT id_menu, LAST_INSERT_ID() FROM accesoxrol WHERE id_rol = 1;
+    INSERT INTO asigna (id_tienda, id_usuario, estado)
+      VALUES (4, LAST_INSERT_ID(), 0);
+  "
+  echo "Dev admin ready: ${DEV_ADMIN_USER} / ${DEV_ADMIN_PASS}"
+}
+
 cmd_restore() {
   local file="${1:-${ROOT_DIR}/127_0_0_1.sql}"
   [ -f "$file" ] || { echo "File not found: $file" >&2; exit 1; }
-  : "${DB_NAME:?DB_NAME not set (check public_html/SAFEAPP/.env)}"
+  : "${DB_NAME:?DB_NAME not set (check public/SAFEAPP/.env)}"
   cmd_start
   echo "Restoring ${file}..."
   mdb -e "CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;"
   # 127_0_0_1.sql carries its own CREATE DATABASE/USE for the Hostinger
   # account name. Strip those so restore always targets DB_NAME instead.
   grep -v -E '^(CREATE DATABASE|USE `)' "$file" | mdb -D "$DB_NAME"
+  # 127_0_0_1.sql isn't version-controlled (see .gitignore), so a schema fix
+  # committed here never reaches it. See migrations/2026-07-03-widen-usuario-clave.sql
+  # for why: password_hash() output (60+ chars) doesn't fit the dump's varchar(50).
+  mdb -D "$DB_NAME" -e "ALTER TABLE usuario MODIFY clave VARCHAR(255) NOT NULL;"
+  seed_dev_admin
   echo "Done"
 }
 

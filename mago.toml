@@ -3,11 +3,11 @@
 php-version = "8.2"
 
 [source]
-paths      = ["public_html/SAFEAPP"]
-includes   = ["public_html/SAFEAPP/vendor"]
+paths      = ["public/SAFEAPP"]
+includes   = ["public/SAFEAPP/vendor"]
 excludes   = [
-    "public_html/SAFEAPP/vendor/**",
-    "public_html/SAFEAPP/nbproject/**",
+    "public/SAFEAPP/vendor/**",
+    "public/SAFEAPP/nbproject/**",
 ]
 
 [formatter]

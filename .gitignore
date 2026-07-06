@@ -1,12 +1,29 @@
-# Secrets
-public_html/SAFEAPP/.env
+# Laravel app
+/vendor
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+/.phpunit.cache
+/auth.json
+Homestead.json
+Homestead.yaml
+
+# Legacy app (public/SAFEAPP)
+public/SAFEAPP/.env
+public/SAFEAPP/vendor/
+public/SAFEAPP/procesos/tmp_excel/
+public/SAFEAPP/nbproject/
 
 # Database backups/dumps
 *.sql
 *.sql.gz
-
-# Composer dependencies (run `composer install` to regenerate)
-public_html/SAFEAPP/vendor/
 
 # Personal mise overrides (not shared config)
 .mise.local.toml
@@ -15,21 +32,8 @@ public_html/SAFEAPP/vendor/
 /.mariadb/
 
 # Runtime-generated logs
+*.log
 error_log
 **/error_log
 
-# Runtime-generated exports
-public_html/SAFEAPP/procesos/tmp_excel/
-
-# NetBeans IDE project metadata
-public_html/SAFEAPP/nbproject/
-
-# Hosting artifact, unclear origin, not part of the app
 /DO_NOT_UPLOAD_HERE
-
-# OS / editor cruft
-.DS_Store
-Thumbs.db
-desktop.ini
-*.swp
-*~

@@ -2,6 +2,12 @@
 
 PHP call center and debt collection system for Entel operations.
 
+`public/SAFEAPP` is a separate, legacy PHP application, still fully in
+service. It's nested under `public/` (rather than elsewhere in the repo)
+because Laravel's dev server serves any real file under `public/` directly,
+so one `make dev` runs both apps at once: the new one at `/`, the legacy one
+at `/SAFEAPP/`.
+
 ## Prerequisites
 
 - [mise](https://mise.jdx.dev/getting-started.html): installs and pins PHP
@@ -13,25 +19,29 @@ PHP call center and debt collection system for Entel operations.
 git clone https://github.com/totallynotdavid/safeapp.pe.git
 cd safeapp.pe
 
-cp public_html/SAFEAPP/.env.example public_html/SAFEAPP/.env
+cp public/SAFEAPP/.env.example public/SAFEAPP/.env
 ```
 
-Edit `public_html/SAFEAPP/.env` and set `DB_USER` and `DB_PASS`. Any local
-values work. `DB_HOST` and `DB_NAME` in `.env.example` already work as
-provided; `DB_NAME` can be renamed if needed (see comment in that file).
+Edit `public/SAFEAPP/.env` and set `DB_USER` and `DB_PASS`. Any local values
+work. `DB_HOST` and `DB_NAME` in `.env.example` already work as provided;
+`DB_NAME` can be renamed if needed (see comment in that file).
 
 ```sh
-make setup   # installs PHP dependencies, starts a local MariaDB, loads 127_0_0_1.sql
-make dev     # starts PHP's built-in server at http://127.0.0.1:8000/SAFEAPP/
+make setup          # Laravel: composer install, .env, app key, migrate
+make setup-legacy    # legacy: composer install, starts a local MariaDB, loads 127_0_0_1.sql
+make dev             # starts the Laravel dev server: new app at /, legacy at /SAFEAPP/
 ```
 
-`make help` lists the full command set: DB start, stop, restore, dump, reset.
+`make help` lists the full command set, including `pint`/`pint-check` for the
+Laravel app's code style, `fmt`/`fmt-check`/`lint` (Mago) for the legacy
+app's, and `test` for the Laravel test suite.
 
 ## Local database
 
 `scripts/db.sh` downloads and runs a MariaDB instance under `.mariadb/`, with
 its own datadir, socket, and port. It does not touch any system MySQL/MariaDB
-install or Hostinger's production database.
+install or Hostinger's production database. Both apps point at this same
+local instance.
 
 `make db-reset` wipes the local database and reloads it from `127_0_0_1.sql`.
 
