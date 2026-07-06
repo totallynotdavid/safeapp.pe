@@ -3,7 +3,10 @@
 namespace App\Providers;
 
 use App\Models\Usuario;
+use App\Navigation\Sidebar;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -26,6 +29,11 @@ class AppServiceProvider extends ServiceProvider
         // those verbs are never registered as permiso keys.
         Gate::before(function (Usuario $user, string $ability): ?bool {
             return $user->hasPermiso($ability) ? true : null;
+        });
+
+        View::composer('layouts.app', function ($view): void {
+            $user = Auth::user();
+            $view->with('sidebarSections', $user ? Sidebar::forUser($user) : collect());
         });
     }
 }

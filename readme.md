@@ -2,12 +2,6 @@
 
 PHP call center and debt collection system for Entel operations.
 
-`public/SAFEAPP` is a separate, legacy PHP application, still fully in
-service. It's nested under `public/` (rather than elsewhere in the repo)
-because Laravel's dev server serves any real file under `public/` directly,
-so one `make dev` runs both apps at once: the new one at `/`, the legacy one
-at `/SAFEAPP/`.
-
 ## Prerequisites
 
 - [mise](https://mise.jdx.dev/getting-started.html): installs and pins PHP
@@ -27,10 +21,14 @@ work. `DB_HOST` and `DB_NAME` in `.env.example` already work as provided;
 `DB_NAME` can be renamed if needed (see comment in that file).
 
 ```sh
-make setup          # Laravel: composer install, .env, app key, migrate
-make setup-legacy    # legacy: composer install, starts a local MariaDB, loads 127_0_0_1.sql
-make dev             # starts the Laravel dev server: new app at /, legacy at /SAFEAPP/
+make setup          # composer install, .env, app key, MariaDB, migrate + seed
+make dev             # starts the Laravel dev server at /
 ```
+
+`make setup` builds a fresh dev database from migrations and seeders, including
+a known admin login (`admin` / `admin`). `make db-reset` rebuilds it from
+scratch. To capture legacy behavior before porting a module, load a real dump
+into a scratch DB with `make setup-legacy` (see Local database).
 
 `make help` lists the full command set, including `pint`/`pint-check` for the
 Laravel app's code style, `fmt`/`fmt-check`/`lint` (Mago) for the legacy
@@ -43,7 +41,10 @@ its own datadir, socket, and port. It does not touch any system MySQL/MariaDB
 install or Hostinger's production database. Both apps point at this same
 local instance.
 
-`make db-reset` wipes the local database and reloads it from `127_0_0_1.sql`.
+`make db-reset` wipes the dev database and rebuilds it from migrations and
+seeders. Loading a real dump (`make db-restore FILE=...`) is only for legacy
+snapshot capture; it writes the old legacy schema, so point `DB_NAME` at a
+scratch database rather than overwriting the dev one.
 
 `scripts/db.sh` currently only supports Linux and WSL: it downloads a
 `linux-systemd-x86_64` MariaDB binary.

@@ -6,12 +6,11 @@ use App\Models\Menu;
 use Illuminate\Database\Seeder;
 
 /**
- * Seeds the menu tree so fresh databases have a working sidebar and permission
- * set. Explicit id_menu values preserve the id_ref parent links.
+ * Explicit id_menu values keep the id_ref parent links stable across reseeds.
  *
- * permiso value convention: section headers are null. A leaf a ported module
- * owns gets a designed key (usuarios.manage). Every other leaf keeps a
- * provisional slug until its module is ported and renames it.
+ * permiso convention: section headers are null. A leaf owned by a ported module
+ * gets a designed key (usuarios.manage). Every other leaf keeps a provisional
+ * slug until its module is ported and renames it.
  */
 class MenuSeeder extends Seeder
 {

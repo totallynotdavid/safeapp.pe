@@ -12,20 +12,22 @@ class LoginTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_login_screen_renders(): void
+    {
+        $this->get('/login')->assertOk()->assertViewIs('auth.login');
+    }
+
     public function test_authenticates_with_a_correct_bcrypt_password(): void
     {
         $usuario = Usuario::factory()
             ->for(Rol::factory()->state(['nombre_rol' => 'Supervisor']), 'rol')
             ->create(['usuario' => 'agente1']);
 
-        $response = $this->postJson('/login', [
+        $this->post('/login', [
             'usuario' => 'agente1',
             'clave' => UsuarioFactory::CLAVE,
-        ]);
+        ])->assertRedirect(route('dashboard'));
 
-        $response->assertOk()
-            ->assertJsonPath('usuario', 'agente1')
-            ->assertJsonPath('rol', 'Supervisor');
         $this->assertAuthenticatedAs($usuario);
     }
 
@@ -33,10 +35,10 @@ class LoginTest extends TestCase
     {
         Usuario::factory()->create(['usuario' => 'agente1']);
 
-        $this->postJson('/login', [
+        $this->from('/login')->post('/login', [
             'usuario' => 'agente1',
             'clave' => 'contrasena-incorrecta',
-        ])->assertStatus(422)->assertJsonValidationErrors('usuario');
+        ])->assertRedirect('/login')->assertSessionHasErrors('usuario');
 
         $this->assertGuest();
     }
@@ -45,10 +47,10 @@ class LoginTest extends TestCase
     {
         Usuario::factory()->inactivo()->create(['usuario' => 'baja']);
 
-        $this->postJson('/login', [
+        $this->from('/login')->post('/login', [
             'usuario' => 'baja',
             'clave' => UsuarioFactory::CLAVE,
-        ])->assertStatus(422)->assertJsonValidationErrors('usuario');
+        ])->assertRedirect('/login')->assertSessionHasErrors('usuario');
 
         $this->assertGuest();
     }
@@ -58,10 +60,10 @@ class LoginTest extends TestCase
         $usuario = Usuario::factory()->claveMd5('secreto-legado')->create(['usuario' => 'viejo']);
         $this->assertSame(md5('secreto-legado'), $usuario->clave);
 
-        $this->postJson('/login', [
+        $this->post('/login', [
             'usuario' => 'viejo',
             'clave' => 'secreto-legado',
-        ])->assertOk();
+        ])->assertRedirect(route('dashboard'));
 
         $this->assertAuthenticatedAs($usuario);
 
@@ -75,9 +77,8 @@ class LoginTest extends TestCase
         $usuario = Usuario::factory()->create();
 
         $this->actingAs($usuario)
-            ->postJson('/logout')
-            ->assertOk()
-            ->assertJsonPath('ok', true);
+            ->post('/logout')
+            ->assertRedirect(route('login'));
 
         $this->assertGuest();
     }

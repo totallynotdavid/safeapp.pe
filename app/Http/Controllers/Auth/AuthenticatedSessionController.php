@@ -6,13 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\Usuario;
 use App\Services\Auth\LegacyPasswordHasher;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
-    public function store(LoginRequest $request, LegacyPasswordHasher $hasher): JsonResponse
+    public function create(): View
+    {
+        return view('auth.login');
+    }
+
+    public function store(LoginRequest $request, LegacyPasswordHasher $hasher): RedirectResponse
     {
         $usuario = Usuario::where('usuario', $request->string('usuario'))
             ->where('estado', true)
@@ -27,15 +34,15 @@ class AuthenticatedSessionController extends Controller
         Auth::login($usuario);
         $request->session()->regenerate();
 
-        return response()->json(['usuario' => $usuario->usuario, 'rol' => $usuario->rol?->nombre_rol]);
+        return redirect()->intended(route('dashboard'));
     }
 
-    public function destroy(): JsonResponse
+    public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
-        request()->session()->invalidate();
-        request()->session()->regenerateToken();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
-        return response()->json(['ok' => true]);
+        return redirect()->route('login');
     }
 }

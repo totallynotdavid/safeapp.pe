@@ -81,6 +81,7 @@ ensure_app_user() {
   : "${DB_USER:?DB_USER not set}"
   : "${DB_PASS:?DB_PASS not set}"
   mdb -e "
+    CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;
     CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';
     CREATE USER IF NOT EXISTS '${DB_USER}'@'127.0.0.1' IDENTIFIED BY '${DB_PASS}';
     GRANT ALL PRIVILEGES ON \`${DB_NAME}\`.* TO '${DB_USER}'@'localhost';
