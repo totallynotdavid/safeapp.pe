@@ -2,12 +2,17 @@
 
 namespace App\Models;
 
+use Database\Factories\RolFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Rol extends Model
 {
+    /** @use HasFactory<RolFactory> */
+    use HasFactory;
+
     public $timestamps = false;
 
     protected $table = 'rol';
