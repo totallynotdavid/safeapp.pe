@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Database\Factories\MenuFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -9,6 +11,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Menu extends Model
 {
+    /** @use HasFactory<MenuFactory> */
+    use HasFactory;
+
     public $timestamps = false;
 
     protected $table = 'menu';
@@ -19,7 +24,7 @@ class Menu extends Model
     // not disabled. Verified against vista/menu.php's sidebar query, which
     // filters on `estado = 0`. Left uncast (not boolean) to avoid implying
     // the usual true/false-means-enabled reading.
-    protected $fillable = ['descripcion', 'icono', 'estado', 'id_ref', 'url'];
+    protected $fillable = ['descripcion', 'icono', 'estado', 'id_ref', 'permiso'];
 
     public function padre(): BelongsTo
     {

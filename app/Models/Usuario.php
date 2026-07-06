@@ -49,4 +49,11 @@ class Usuario extends Authenticatable
     {
         return $this->belongsToMany(Menu::class, 'acceso', 'id_usuario', 'id_menu');
     }
+
+    public function hasPermiso(string $permiso): bool
+    {
+        // Strict compare: Collection's two-arg contains() uses loose ==, and
+        // PHP's null == '' is true, so a null-permiso header would match ''.
+        return $this->menus->contains(fn (Menu $menu): bool => $menu->permiso === $permiso);
+    }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Usuario;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +21,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // A held permiso grants that ability. Return null, not false, when it
+        // is absent so model policies still decide view/create/update/delete;
+        // those verbs are never registered as permiso keys.
+        Gate::before(function (Usuario $user, string $ability): ?bool {
+            return $user->hasPermiso($ability) ? true : null;
+        });
     }
 }

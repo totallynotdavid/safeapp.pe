@@ -24,7 +24,9 @@ return new class extends Migration
             // estado is inverted from usuario.estado: 0 means visible/active.
             $table->integer('estado');
             $table->integer('id_ref');
-            $table->string('url', 200);
+            // Permission token the RBAC gate checks. Null on section-header
+            // rows, which group leaves in the sidebar and grant nothing.
+            $table->string('permiso', 200)->nullable();
         });
 
         Schema::create('usuario', function (Blueprint $table) {
@@ -42,16 +44,17 @@ return new class extends Migration
             $table->text('correo');
         });
 
-        // The legacy pivots have no primary key or unique constraint, so
-        // nothing stops duplicate grant rows. Mirrored as-is.
+        // The composite key makes each grant unique: a repeated pair is rejected.
         Schema::create('acceso', function (Blueprint $table) {
-            $table->integer('id_menu');
             $table->integer('id_usuario');
+            $table->integer('id_menu');
+            $table->primary(['id_usuario', 'id_menu']);
         });
 
         Schema::create('accesoxrol', function (Blueprint $table) {
             $table->integer('id_rol');
             $table->integer('id_menu');
+            $table->primary(['id_rol', 'id_menu']);
         });
     }
 
