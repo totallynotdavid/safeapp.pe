@@ -30,9 +30,10 @@ a known admin login (`admin` / `admin`). `make db-reset` rebuilds it from
 scratch. To capture legacy behavior before porting a module, load a real dump
 into a scratch DB with `make setup-legacy` (see Local database).
 
-`make help` lists the full command set, including `pint`/`pint-check` for the
-Laravel app's code style, `fmt`/`fmt-check`/`lint` (Mago) for the legacy
-app's, and `test` for the Laravel test suite.
+`make help` lists the full command set. Code quality runs through Mago (one
+toolchain, scoped to the Laravel app via `mago.toml`): `fmt`/`fmt-check` and
+`lint` are clean gates; `analyze` (static type analysis) is advisory, since it
+is not Laravel-magic-aware. `test` runs the Laravel test suite.
 
 ## Local database
 

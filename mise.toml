@@ -1,6 +1,6 @@
 [tools]
 php = "8.2.31"
-mago = "1.42.0"
+mago = "1.43.0"
 
 [env]
 _.php = { prebuilt_static = true }

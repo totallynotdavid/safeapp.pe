@@ -1,14 +1,25 @@
-#:schema https://mago.carthage.software/1.42.0/schema.json
+#:schema https://mago.carthage.software/1.43.0/schema.json
 
 php-version = "8.2"
 
 [source]
-paths      = ["public/SAFEAPP"]
-includes   = ["public/SAFEAPP/vendor"]
-excludes   = [
-    "public/SAFEAPP/vendor/**",
-    "public/SAFEAPP/nbproject/**",
-]
+paths = ["app", "config", "database", "routes", "tests"]
+includes = ["vendor"]
 
 [formatter]
-print-width = 120
+preset = "laravel"
+
+[linter]
+integrations = ["laravel", "phpunit"]
+
+[linter.rules]
+# Laravel's own code omits declare(strict_types=1); matching the framework
+# convention beats fighting it on every file.
+strict-types = { enabled = false }
+# Laravel controllers extend a shared base and are not final by convention.
+final-controller = { enabled = false }
+# Positional literals read fine in Laravel's fluent builders (schema columns,
+# validation rules); named-argument nudges are noise here.
+literal-named-argument = { enabled = false }
+# Our PHPUnit assertions follow a deliberate, consistent style already.
+assertion-style = { enabled = false }
