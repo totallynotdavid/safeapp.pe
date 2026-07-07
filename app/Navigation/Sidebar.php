@@ -15,6 +15,7 @@ class Sidebar
     private const ROUTES = [
         'usuarios.manage' => 'usuarios.index',
         'roles.manage' => 'roles.index',
+        'quiebre.registrar' => 'quiebres.registro.index',
         'quiebre.validar' => 'quiebres.validacion.index',
     ];
 

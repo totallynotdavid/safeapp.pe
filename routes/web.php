@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\QuiebreRegistroController;
 use App\Http\Controllers\QuiebreValidacionController;
 use App\Http\Controllers\RolController;
 use App\Http\Controllers\UsuarioController;
@@ -33,6 +34,20 @@ Route::middleware('auth')->group(function () {
         Route::get('/roles/{rol}/editar', [RolController::class, 'edit'])->name('roles.edit');
         Route::put('/roles/{rol}', [RolController::class, 'update'])->name('roles.update');
         Route::delete('/roles/{rol}', [RolController::class, 'destroy'])->name('roles.destroy');
+    });
+
+    Route::middleware('can:quiebre.registrar')->group(function () {
+        Route::get('/quiebres/registro', [QuiebreRegistroController::class, 'index'])->name('quiebres.registro.index');
+        Route::get('/quiebres/registro/crear', [QuiebreRegistroController::class, 'create'])->name(
+            'quiebres.registro.create',
+        );
+        Route::post('/quiebres/registro', [QuiebreRegistroController::class, 'store'])->name('quiebres.registro.store');
+        Route::get('/quiebres/registro/{quiebre}/editar', [QuiebreRegistroController::class, 'edit'])->name(
+            'quiebres.registro.edit',
+        );
+        Route::put('/quiebres/registro/{quiebre}', [QuiebreRegistroController::class, 'update'])->name(
+            'quiebres.registro.update',
+        );
     });
 
     Route::middleware('can:quiebre.validar')->group(function () {
