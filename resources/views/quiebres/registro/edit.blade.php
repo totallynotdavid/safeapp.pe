@@ -12,21 +12,21 @@
         <div class="rounded-lg border border-gray-200 bg-white p-6">
             <h2 class="mb-4 text-lg font-semibold text-gray-800">Detalle del quiebre</h2>
             <dl class="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
-                @include('quiebres.campo', ['label' => 'Fecha registro', 'value' => $quiebre->fecha_registro?->format('Y-m-d')])
-                @include('quiebres.campo', ['label' => 'Activación', 'value' => $quiebre->fecha_activacion?->format('Y-m-d')])
-                @include('quiebres.campo', ['label' => 'Inicio avería', 'value' => $quiebre->fecha_inicio_averia?->format('Y-m-d')])
-                @include('quiebres.campo', ['label' => 'RUC', 'value' => $quiebre->ruc])
-                @include('quiebres.campo', ['label' => 'Razón social', 'value' => $quiebre->razon_social])
-                @include('quiebres.campo', ['label' => 'Región', 'value' => $quiebre->tienda?->nombre])
-                @include('quiebres.campo', ['label' => 'Servicio', 'value' => $quiebre->servicio])
-                @include('quiebres.campo', ['label' => 'Tipo de avería', 'value' => $tiposAveria[$quiebre->tipo_averia] ?? $quiebre->tipo_averia])
-                @include('quiebres.campo', ['label' => 'Estado', 'value' => $quiebre->estado])
-                @include('quiebres.campo', ['label' => 'Problema equipo', 'value' => $quiebre->problema_equipo])
-                @include('quiebres.campo', ['label' => 'Detalle equipo', 'value' => $quiebre->detalle_equipo])
-                @include('quiebres.campo', ['label' => 'Back', 'value' => $quiebre->back])
-                @include('quiebres.campo', ['label' => 'Ticket atención', 'value' => $quiebre->ticket_atencion])
-                @include('quiebres.campo', ['label' => 'N° ticket', 'value' => $quiebre->numero_ticket])
-                @include('quiebres.campo', ['label' => 'Fecha ticket', 'value' => $quiebre->fecha_ticket_atencion?->format('Y-m-d')])
+                @include('partials.campo', ['label' => 'Fecha registro', 'value' => $quiebre->fecha_registro?->format('Y-m-d')])
+                @include('partials.campo', ['label' => 'Activación', 'value' => $quiebre->fecha_activacion?->format('Y-m-d')])
+                @include('partials.campo', ['label' => 'Inicio avería', 'value' => $quiebre->fecha_inicio_averia?->format('Y-m-d')])
+                @include('partials.campo', ['label' => 'RUC', 'value' => $quiebre->ruc])
+                @include('partials.campo', ['label' => 'Razón social', 'value' => $quiebre->razon_social])
+                @include('partials.campo', ['label' => 'Región', 'value' => $quiebre->tienda?->nombre])
+                @include('partials.campo', ['label' => 'Servicio', 'value' => $quiebre->servicio])
+                @include('partials.campo', ['label' => 'Tipo de avería', 'value' => $tiposAveria[$quiebre->tipo_averia] ?? $quiebre->tipo_averia])
+                @include('partials.campo', ['label' => 'Estado', 'value' => $quiebre->estado])
+                @include('partials.campo', ['label' => 'Problema equipo', 'value' => $quiebre->problema_equipo])
+                @include('partials.campo', ['label' => 'Detalle equipo', 'value' => $quiebre->detalle_equipo])
+                @include('partials.campo', ['label' => 'Back', 'value' => $quiebre->back])
+                @include('partials.campo', ['label' => 'Ticket atención', 'value' => $quiebre->ticket_atencion])
+                @include('partials.campo', ['label' => 'N° ticket', 'value' => $quiebre->numero_ticket])
+                @include('partials.campo', ['label' => 'Fecha ticket', 'value' => $quiebre->fecha_ticket_atencion?->format('Y-m-d')])
             </dl>
         </div>
 
@@ -101,12 +101,12 @@
         <div class="rounded-lg border border-gray-200 bg-white p-6">
             <h2 class="mb-4 text-lg font-semibold text-gray-800">Validación</h2>
             <dl class="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
-                @include('quiebres.campo', ['label' => 'Validador', 'value' => $quiebre->validador?->personal])
-                @include('quiebres.campo', ['label' => 'Fecha validación', 'value' => $quiebre->fecha_validacion?->format('Y-m-d')])
-                @include('quiebres.campo', ['label' => 'Caso SF', 'value' => $quiebre->casosf])
+                @include('partials.campo', ['label' => 'Validador', 'value' => $quiebre->validador?->personal])
+                @include('partials.campo', ['label' => 'Fecha validación', 'value' => $quiebre->fecha_validacion?->format('Y-m-d')])
+                @include('partials.campo', ['label' => 'Caso SF', 'value' => $quiebre->casosf])
             </dl>
             <div class="mt-4 border-t border-gray-100 pt-4">
-                @include('quiebres.campo', ['label' => 'Comentario del validador', 'value' => $quiebre->comentario_validador])
+                @include('partials.campo', ['label' => 'Comentario del validador', 'value' => $quiebre->comentario_validador])
             </div>
         </div>
     </div>

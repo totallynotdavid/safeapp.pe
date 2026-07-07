@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             AccesoxrolSeeder::class,
             UsuarioSeeder::class,
             QuiebreSeeder::class,
+            LiquidacionSeeder::class,
         ]);
     }
 }

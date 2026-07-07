@@ -17,6 +17,7 @@ class Sidebar
         'roles.manage' => 'roles.index',
         'quiebre.registrar' => 'quiebres.registro.index',
         'quiebre.validar' => 'quiebres.validacion.index',
+        'liquidacion.gestionar' => 'liquidaciones.index',
     ];
 
     /**

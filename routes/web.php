@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\LiquidacionController;
 use App\Http\Controllers\QuiebreRegistroController;
 use App\Http\Controllers\QuiebreValidacionController;
 use App\Http\Controllers\RolController;
@@ -48,6 +49,12 @@ Route::middleware('auth')->group(function () {
         Route::put('/quiebres/registro/{quiebre}', [QuiebreRegistroController::class, 'update'])->name(
             'quiebres.registro.update',
         );
+    });
+
+    Route::middleware('can:liquidacion.gestionar')->group(function () {
+        Route::get('/liquidaciones', [LiquidacionController::class, 'index'])->name('liquidaciones.index');
+        Route::get('/liquidaciones/{ncMovil}', [LiquidacionController::class, 'edit'])->name('liquidaciones.edit');
+        Route::put('/liquidaciones/{ncMovil}', [LiquidacionController::class, 'update'])->name('liquidaciones.update');
     });
 
     Route::middleware('can:quiebre.validar')->group(function () {
