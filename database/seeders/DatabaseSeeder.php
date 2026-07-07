@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             RolSeeder::class,
             AccesoxrolSeeder::class,
             UsuarioSeeder::class,
+            QuiebreSeeder::class,
         ]);
     }
 }

@@ -51,7 +51,7 @@ class MenuSeeder extends Seeder
             [31, 'DASHBOARD EJE REAL',     'fa fa-download',   8,  'dashboard'],
             [32, 'AVERIAS',                'fa fa-file',       0,  null],
             [33, 'REGISTRO',               'fa fa-area-chart', 32, 'quiebre'],
-            [34, 'SEGUIMIENTO',            'fa fa-area-chart', 32, 'validacion_quiebre'],
+            [34, 'SEGUIMIENTO',            'fa fa-area-chart', 32, 'quiebre.validar'],
             [35, 'PERSONAL',               'fa fa-users',      0,  null],
             [36, 'DATOS PERSONAL',         'fa fa-users',      35, 'datos_personal'],
             [37, 'LIQUIDACION',            'fa fa-money',      0,  null],

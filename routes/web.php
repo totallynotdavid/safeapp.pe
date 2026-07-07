@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\QuiebreValidacionController;
 use App\Http\Controllers\RolController;
 use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Route;
@@ -32,5 +33,17 @@ Route::middleware('auth')->group(function () {
         Route::get('/roles/{rol}/editar', [RolController::class, 'edit'])->name('roles.edit');
         Route::put('/roles/{rol}', [RolController::class, 'update'])->name('roles.update');
         Route::delete('/roles/{rol}', [RolController::class, 'destroy'])->name('roles.destroy');
+    });
+
+    Route::middleware('can:quiebre.validar')->group(function () {
+        Route::get('/quiebres/validacion', [QuiebreValidacionController::class, 'index'])->name(
+            'quiebres.validacion.index',
+        );
+        Route::get('/quiebres/validacion/{quiebre}', [QuiebreValidacionController::class, 'edit'])->name(
+            'quiebres.validacion.edit',
+        );
+        Route::put('/quiebres/validacion/{quiebre}', [QuiebreValidacionController::class, 'update'])->name(
+            'quiebres.validacion.update',
+        );
     });
 });

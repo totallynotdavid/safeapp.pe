@@ -6,6 +6,7 @@ use Database\Factories\UsuarioFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Usuario extends Authenticatable
@@ -55,6 +56,19 @@ class Usuario extends Authenticatable
     public function menus(): BelongsToMany
     {
         return $this->belongsToMany(Menu::class, 'acceso', 'id_usuario', 'id_menu');
+    }
+
+    public function asignacionActiva(): HasOne
+    {
+        return $this->hasOne(Asigna::class, 'id_usuario', 'id_usuario')->where('estado', 0);
+    }
+
+    // The one place that resolves "which tienda is this operator working".
+    // Operational screens scope their rows to it; null means the user has no
+    // active assignment and sees nothing.
+    public function tiendaAsignada(): ?int
+    {
+        return $this->asignacionActiva?->id_tienda;
     }
 
     public function hasPermiso(string $permiso): bool

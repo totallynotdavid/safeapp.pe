@@ -1,0 +1,83 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+// Baseline schema for the averías/quiebre cluster and the assignment lookup the
+// validation screen scopes on. Only the validation screen is being ported now;
+// the REGISTRO screen (which writes most quiebre columns) is still legacy, so
+// those registration-owned columns are modeled nullable here and will be
+// tightened when that screen ports. Like the auth baseline, these CREATEs only
+// run against fresh databases (tests, from-scratch dev), never the prod dump.
+return new class extends Migration {
+    public function up(): void
+    {
+        Schema::create('tienda', static function (Blueprint $table) {
+            $table->increments('id_tienda');
+            $table->string('nombre', 50);
+        });
+
+        // User -> tienda assignment. estado 0 means the active assignment; the
+        // validation screen reads the current user's active tienda from here.
+        // The assignment module (not yet ported) owns writes and the final
+        // shape; this is the minimal read surface plus an index for the lookup.
+        Schema::create('asigna', static function (Blueprint $table) {
+            $table->unsignedInteger('id_tienda');
+            $table->unsignedInteger('id_usuario');
+            $table->integer('estado');
+            $table->index(['id_usuario', 'estado']);
+        });
+
+        Schema::create('quiebre', static function (Blueprint $table) {
+            $table->increments('id_quiebre');
+
+            // Validation-owned columns: the only ones this module writes.
+            $table->string('estado', 20)->default('PENDIENTE');
+            $table->unsignedInteger('id_validador')->default(0);
+            $table->date('fecha_validacion')->nullable();
+            $table->string('casosf', 50)->nullable();
+            $table->text('comentario_validador')->nullable();
+
+            // Registration-owned columns, written by the still-legacy REGISTRO
+            // screen. Nullable until that port tightens them.
+            $table->unsignedInteger('id_usuario');
+            $table->unsignedInteger('id_supervisor')->default(0);
+            // Legacy stored this as text holding an id_tienda; it is a tienda FK,
+            // so it is modeled as an integer here (the cutover transform casts it).
+            $table->unsignedInteger('zonal_telefonica')->nullable();
+            $table->string('ruc', 20)->nullable();
+            $table->string('razon_social', 255)->nullable();
+            $table->string('servicio', 100)->nullable();
+            $table->string('numero_problema', 50)->nullable();
+            $table->string('tipo_averia', 100)->nullable();
+            $table->string('problema_equipo', 255)->nullable();
+            $table->text('detalle_equipo')->nullable();
+            $table->date('fecha_inicio_averia')->nullable();
+            $table->date('fecha_activacion')->nullable();
+            $table->date('fecha_inicio')->nullable();
+            $table->string('ticket_atencion', 50)->nullable();
+            $table->string('numero_ticket', 50)->nullable();
+            $table->date('fecha_ticket_atencion')->nullable();
+            $table->string('contacto1', 100)->nullable();
+            $table->string('celular1', 50)->nullable();
+            $table->string('correo1', 100)->nullable();
+            $table->string('contacto2', 100)->nullable();
+            $table->string('celular2', 50)->nullable();
+            $table->string('correo2', 100)->nullable();
+            $table->text('comentario_ejecutivo')->nullable();
+            $table->string('back', 50)->nullable();
+            $table->date('fecha_registro')->nullable();
+            // Legacy free-text column left unused by both the registration and
+            // validation flows; kept so the schema still maps the real table.
+            $table->string('validacion', 50)->nullable();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('quiebre');
+        Schema::dropIfExists('asigna');
+        Schema::dropIfExists('tienda');
+    }
+};
