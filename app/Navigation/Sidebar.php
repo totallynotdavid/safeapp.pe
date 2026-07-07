@@ -14,6 +14,7 @@ class Sidebar
     // no mapping links nowhere yet (its module still lives in legacy).
     private const ROUTES = [
         'usuarios.manage' => 'usuarios.index',
+        'roles.manage' => 'roles.index',
     ];
 
     /**

@@ -56,6 +56,10 @@ class MenuSeeder extends Seeder
             [36, 'DATOS PERSONAL',         'fa fa-users',      35, 'datos_personal'],
             [37, 'LIQUIDACION',            'fa fa-money',      0,  null],
             [38, 'LIQUIDACION',            'fa fa-money',      37, 'liquidacion'],
+            // New screen the legacy app never had a working equivalent of: its
+            // rol page (vista/usuario.php) was an off-sidebar, broken orphan.
+            // This is the permissions-admin surface, not a legacy remap.
+            [39, 'ROLES Y PERMISOS',       'fa fa-key',        5,  'roles.manage'],
         ];
 
         $menus = array_map(static fn (array $row): array => [
