@@ -62,7 +62,9 @@ class LegacyPasswordHasherTest extends TestCase
     // through the legacy branch.
     public function test_rejects_a_lookalike_hex_string_that_is_not_the_md5(): void
     {
-        $usuario = Usuario::factory()->state(['clave' => str_repeat('a', 32)])->create();
+        $usuario = Usuario::factory()
+            ->state(['clave' => str_repeat('a', 32)])
+            ->create();
 
         $this->assertFalse($this->hasher->verifyAndUpgrade($usuario, 'cualquiera'));
     }

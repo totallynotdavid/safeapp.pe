@@ -8,16 +8,15 @@ use Illuminate\Support\Facades\Schema;
 // test suite, a from-scratch build) have the tables the Eloquent models map
 // onto. The shared dev/prod database is loaded from the SQL dump and never
 // migrated, so these CREATE statements only ever run against new databases.
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
-        Schema::create('rol', function (Blueprint $table) {
+        Schema::create('rol', static function (Blueprint $table) {
             $table->increments('id_rol');
             $table->string('nombre_rol', 50);
         });
 
-        Schema::create('menu', function (Blueprint $table) {
+        Schema::create('menu', static function (Blueprint $table) {
             $table->increments('id_menu');
             $table->string('descripcion', 200);
             $table->string('icono', 200);
@@ -29,7 +28,7 @@ return new class extends Migration
             $table->string('permiso', 200)->nullable();
         });
 
-        Schema::create('usuario', function (Blueprint $table) {
+        Schema::create('usuario', static function (Blueprint $table) {
             $table->increments('id_usuario');
             $table->string('usuario', 50);
             $table->string('clave', 255);
@@ -38,20 +37,23 @@ return new class extends Migration
             // 1 means active here (opposite of menu.estado).
             $table->integer('estado');
             $table->string('sexo', 1);
-            $table->integer('id_supervisor');
-            $table->date('fecha_nacimiento');
-            $table->text('telefono');
-            $table->text('correo');
+            // 0 until the assignment module lands and makes this a real
+            // supervisor FK. User creation does not pick a supervisor yet.
+            $table->integer('id_supervisor')->default(0);
+            // Filled by the separate "datos personal" flow, not at creation.
+            $table->date('fecha_nacimiento')->nullable();
+            $table->text('telefono')->nullable();
+            $table->text('correo')->nullable();
         });
 
         // The composite key makes each grant unique: a repeated pair is rejected.
-        Schema::create('acceso', function (Blueprint $table) {
+        Schema::create('acceso', static function (Blueprint $table) {
             $table->integer('id_usuario');
             $table->integer('id_menu');
             $table->primary(['id_usuario', 'id_menu']);
         });
 
-        Schema::create('accesoxrol', function (Blueprint $table) {
+        Schema::create('accesoxrol', static function (Blueprint $table) {
             $table->integer('id_rol');
             $table->integer('id_menu');
             $table->primary(['id_rol', 'id_menu']);

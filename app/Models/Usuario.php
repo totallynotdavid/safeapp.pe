@@ -26,8 +26,15 @@ class Usuario extends Authenticatable
     protected $rememberTokenName = '';
 
     protected $fillable = [
-        'usuario', 'clave', 'id_rol', 'personal', 'sexo', 'id_supervisor',
-        'fecha_nacimiento', 'telefono', 'correo',
+        'usuario',
+        'clave',
+        'id_rol',
+        'personal',
+        'sexo',
+        'id_supervisor',
+        'fecha_nacimiento',
+        'telefono',
+        'correo',
     ];
 
     protected $hidden = ['clave'];
@@ -54,6 +61,6 @@ class Usuario extends Authenticatable
     {
         // Strict compare: Collection's two-arg contains() uses loose ==, and
         // PHP's null == '' is true, so a null-permiso header would match ''.
-        return $this->menus->contains(fn (Menu $menu): bool => $menu->permiso === $permiso);
+        return $this->menus->contains(static fn (Menu $menu): bool => $menu->permiso === $permiso);
     }
 }

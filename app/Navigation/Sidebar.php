@@ -12,32 +12,35 @@ class Sidebar
 {
     // permiso -> app route name, filled in as modules are ported. A leaf with
     // no mapping links nowhere yet (its module still lives in legacy).
-    private const ROUTES = [];
+    private const ROUTES = [
+        'usuarios.manage' => 'usuarios.index',
+    ];
 
     /**
      * @return Collection<int, array{descripcion: string, icono: string, children: Collection}>
      */
     public static function forUser(Usuario $user): Collection
     {
-        $byParent = $user->menus()
+        $byParent = $user
+            ->menus()
             ->where('estado', 0)
             ->orderBy('id_menu')
             ->get()
             ->groupBy('id_ref');
 
         return ($byParent->get(0) ?? collect())
-            ->map(fn (Menu $section): array => [
+            ->map(static fn (Menu $section): array => [
                 'descripcion' => $section->descripcion,
                 'icono' => $section->icono,
                 'children' => ($byParent->get($section->id_menu) ?? collect())
-                    ->map(fn (Menu $leaf): array => [
+                    ->map(static fn (Menu $leaf): array => [
                         'descripcion' => $leaf->descripcion,
                         'icono' => $leaf->icono,
                         'url' => self::url($leaf->permiso),
                     ])
                     ->values(),
             ])
-            ->filter(fn (array $section): bool => $section['children']->isNotEmpty())
+            ->filter(static fn (array $section): bool => $section['children']->isNotEmpty())
             ->values();
     }
 

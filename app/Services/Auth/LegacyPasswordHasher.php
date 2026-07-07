@@ -15,6 +15,13 @@ class LegacyPasswordHasher
     // Hash::check() throws a RuntimeException on a non-bcrypt string instead
     // of returning false, which would break the fallthrough to the MD5 check
     // below for every legacy-hashed account.
+    // One owner for producing a stored clave, so new users and password
+    // changes hash the same way the upgrade path above rehashes.
+    public function hash(string $plain): string
+    {
+        return password_hash($plain, PASSWORD_DEFAULT);
+    }
+
     public function verifyAndUpgrade(Usuario $usuario, string $plain): bool
     {
         if (password_verify($plain, $usuario->clave)) {

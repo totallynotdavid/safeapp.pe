@@ -21,11 +21,13 @@ class UsuarioSeeder extends Seeder
             return;
         }
 
-        $admin = Usuario::factory()->clave(self::CLAVE)->create([
-            'usuario' => self::USUARIO,
-            'id_rol' => 1,
-            'personal' => 'ADMINISTRADOR DEV',
-        ]);
+        $admin = Usuario::factory()
+            ->clave(self::CLAVE)
+            ->create([
+                'usuario' => self::USUARIO,
+                'id_rol' => 1,
+                'personal' => 'ADMINISTRADOR DEV',
+            ]);
 
         // acceso holds the per-user grants the permission gate reads; roles are
         // only templates. Copy the admin role's rows into the user's grants.

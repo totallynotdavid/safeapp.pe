@@ -35,10 +35,14 @@ class LoginTest extends TestCase
     {
         Usuario::factory()->create(['usuario' => 'agente1']);
 
-        $this->from('/login')->post('/login', [
-            'usuario' => 'agente1',
-            'clave' => 'contrasena-incorrecta',
-        ])->assertRedirect('/login')->assertSessionHasErrors('usuario');
+        $this
+            ->from('/login')
+            ->post('/login', [
+                'usuario' => 'agente1',
+                'clave' => 'contrasena-incorrecta',
+            ])
+            ->assertRedirect('/login')
+            ->assertSessionHasErrors('usuario');
 
         $this->assertGuest();
     }
@@ -47,10 +51,14 @@ class LoginTest extends TestCase
     {
         Usuario::factory()->inactivo()->create(['usuario' => 'baja']);
 
-        $this->from('/login')->post('/login', [
-            'usuario' => 'baja',
-            'clave' => UsuarioFactory::CLAVE,
-        ])->assertRedirect('/login')->assertSessionHasErrors('usuario');
+        $this
+            ->from('/login')
+            ->post('/login', [
+                'usuario' => 'baja',
+                'clave' => UsuarioFactory::CLAVE,
+            ])
+            ->assertRedirect('/login')
+            ->assertSessionHasErrors('usuario');
 
         $this->assertGuest();
     }
@@ -76,7 +84,8 @@ class LoginTest extends TestCase
     {
         $usuario = Usuario::factory()->create();
 
-        $this->actingAs($usuario)
+        $this
+            ->actingAs($usuario)
             ->post('/logout')
             ->assertRedirect(route('login'));
 

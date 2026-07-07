@@ -21,7 +21,8 @@ class AuthenticatedSessionController extends Controller
 
     public function store(LoginRequest $request, LegacyPasswordHasher $hasher): RedirectResponse
     {
-        $usuario = Usuario::where('usuario', $request->string('usuario'))
+        $usuario = Usuario::query()
+            ->where('usuario', $request->string('usuario'))
             ->where('estado', true)
             ->first();
 

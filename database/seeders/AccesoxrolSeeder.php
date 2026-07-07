@@ -15,7 +15,7 @@ class AccesoxrolSeeder extends Seeder
         $adminRol = 1;
 
         $rows = Menu::pluck('id_menu')
-            ->map(fn (int $idMenu): array => ['id_rol' => $adminRol, 'id_menu' => $idMenu])
+            ->map(static fn (int $idMenu): array => ['id_rol' => $adminRol, 'id_menu' => $idMenu])
             ->all();
 
         DB::table('accesoxrol')->insert($rows);
