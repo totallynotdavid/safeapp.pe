@@ -53,6 +53,13 @@ class Usuario extends Authenticatable
         return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
     }
 
+    // Optional: id_supervisor defaults to 0 (no row) until a user is assigned,
+    // so this resolves to null rather than hiding the user behind an inner join.
+    public function supervisor(): BelongsTo
+    {
+        return $this->belongsTo(Supervisor::class, 'id_supervisor', 'id_supervisor');
+    }
+
     public function menus(): BelongsToMany
     {
         return $this->belongsToMany(Menu::class, 'acceso', 'id_usuario', 'id_menu');

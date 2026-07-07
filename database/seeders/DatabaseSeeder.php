@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
             UsuarioSeeder::class,
             QuiebreSeeder::class,
             LiquidacionSeeder::class,
+            // After every user-creating seeder: it back-fills their supervisor.
+            SupervisorSeeder::class,
         ]);
     }
 }

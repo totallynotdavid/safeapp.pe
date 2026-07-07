@@ -53,7 +53,7 @@ class MenuSeeder extends Seeder
             [33, 'REGISTRO',               'fa fa-area-chart', 32, 'quiebre.registrar'],
             [34, 'SEGUIMIENTO',            'fa fa-area-chart', 32, 'quiebre.validar'],
             [35, 'PERSONAL',               'fa fa-users',      0,  null],
-            [36, 'DATOS PERSONAL',         'fa fa-users',      35, 'datos_personal'],
+            [36, 'DATOS PERSONAL',         'fa fa-users',      35, 'personal.gestionar'],
             [37, 'LIQUIDACION',            'fa fa-money',      0,  null],
             [38, 'LIQUIDACION',            'fa fa-money',      37, 'liquidacion.gestionar'],
             // New screen the legacy app never had a working equivalent of: its

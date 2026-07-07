@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\LiquidacionController;
+use App\Http\Controllers\PersonalController;
 use App\Http\Controllers\QuiebreRegistroController;
 use App\Http\Controllers\QuiebreValidacionController;
 use App\Http\Controllers\RolController;
@@ -55,6 +56,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/liquidaciones', [LiquidacionController::class, 'index'])->name('liquidaciones.index');
         Route::get('/liquidaciones/{ncMovil}', [LiquidacionController::class, 'edit'])->name('liquidaciones.edit');
         Route::put('/liquidaciones/{ncMovil}', [LiquidacionController::class, 'update'])->name('liquidaciones.update');
+    });
+
+    Route::middleware('can:personal.gestionar')->group(function () {
+        Route::get('/personal', [PersonalController::class, 'index'])->name('personal.index');
+        Route::get('/personal/{usuario}/editar', [PersonalController::class, 'edit'])->name('personal.edit');
+        Route::put('/personal/{usuario}', [PersonalController::class, 'update'])->name('personal.update');
     });
 
     Route::middleware('can:quiebre.validar')->group(function () {
