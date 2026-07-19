@@ -25,11 +25,12 @@ class Cliente extends Model
 
     public const ESTADO_GESTIONADO = 1;
 
-    // Every segment a client can belong to, taken from the production data.
-    // Broader than the set that has a screen: CONVERGENTE clients exist and are
-    // currently unreachable, which is a known open decision, not an oversight.
-    // INHOUSE looks like a segment in old llamada rows but is an origen value.
-    public const TIPOS_DATA = ['MOVIL', 'FIJA', 'CONVERGENTE'];
+    // Every segment a client can belong to. This column decides which queue
+    // works the client, so it holds only segments that have a screen. It is not
+    // the place to record where a client came from: `origen` does that, and
+    // conflating the two is what stranded the legacy CONVERGENTE rows (see the
+    // create_datos_table migration).
+    public const TIPOS_DATA = ['MOVIL', 'FIJA'];
 
     // An unassigned client: id_usuario 0 is the pool, not a real user.
     public const SIN_AGENTE = 0;

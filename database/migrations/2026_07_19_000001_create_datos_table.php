@@ -17,7 +17,11 @@ return new class extends Migration {
     {
         Schema::create('datos', static function (Blueprint $table) {
             $table->increments('id_cliente');
-            $table->string('ruc', 20);
+            // Unique because every join in the app resolves a client through its
+            // ruc, so a duplicate silently merges two clients' call histories.
+            // Legacy had no constraint and carries 28 duplicated rucs (59 rows),
+            // all within one segment; the cutover transform dedupes them.
+            $table->string('ruc', 20)->unique();
             $table->string('razon_social', 250)->nullable();
 
             // Ownership of the record: id_usuario 0 means unassigned (the pool
@@ -29,8 +33,17 @@ return new class extends Migration {
             // what advances it; Cliente::registrarGestion owns that transition.
             $table->unsignedTinyInteger('estado')->default(0);
 
-            // The campaign the record was imported from, and the segment that
-            // decides which screen works it. Cliente::TIPOS_DATA holds the values.
+            // Two different questions, deliberately in two columns. `origen` is
+            // provenance: the import campaign, or AltaDeClientes::ORIGEN when an
+            // agent registered the client by hand. `tipo_data` is routing: which
+            // queue works it, limited to Cliente::TIPOS_DATA.
+            //
+            // Legacy conflated them. Client creation wrote its provenance into
+            // tipo_data as 'CONVERGENTE' (while also writing 'INHOUSE' into
+            // origen, correctly), and since the queue filters on tipo_data, all
+            // 2,677 clients created that way became unreachable. The import
+            // vocabulary was only ever MOVIL/FIJA, so the cutover transform
+            // reclassifies those rows and they stay identifiable by origen.
             $table->string('origen', 500)->nullable();
             $table->string('tipo_data', 30)->nullable();
 

@@ -22,6 +22,8 @@ class Sidebar
         'asignacion.gestionar' => 'asignacion.index',
         'gestion.movil' => 'gestion.movil',
         'gestion.fija' => 'gestion.fija',
+        'clientes.crear' => 'clientes.create',
+        'historico.ver' => 'historico.index',
     ];
 
     /**

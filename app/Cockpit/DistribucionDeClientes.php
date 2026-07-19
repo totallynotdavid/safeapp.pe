@@ -74,6 +74,41 @@ class DistribucionDeClientes
     }
 
     /**
+     * Hands one specific client from the pool to an agent, for when they arrive
+     * with a RUC rather than asking for a batch.
+     *
+     * Same lock as the batch path and for the same reason: two agents can look
+     * up the same RUC at once. Returns false when someone else got there first,
+     * so the caller can say so instead of silently taking a held client. Legacy
+     * had no check here at all and simply overwrote the owner, which moved 473
+     * clients between agents with no trace.
+     */
+    public static function tomarCliente(int $idCliente, int $idAgente, int $idTienda): bool
+    {
+        return DB::transaction(static function () use ($idCliente, $idAgente, $idTienda): bool {
+            $libre = Cliente::query()
+                ->whereKey($idCliente)
+                ->where('id_usuario', Cliente::SIN_AGENTE)
+                ->lockForUpdate()
+                ->exists();
+
+            if (! $libre) {
+                return false;
+            }
+
+            Cliente::query()
+                ->whereKey($idCliente)
+                ->update([
+                    'id_usuario' => $idAgente,
+                    'id_tienda' => $idTienda,
+                    'fecha_asignacion' => Carbon::now('America/Lima')->toDateString(),
+                ]);
+
+            return true;
+        });
+    }
+
+    /**
      * Returns the agent's pending clients to the pool. A gestionado client stays
      * with the agent, so its logged calls keep an owner.
      *
