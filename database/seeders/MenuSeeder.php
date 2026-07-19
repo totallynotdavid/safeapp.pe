@@ -20,11 +20,11 @@ class MenuSeeder extends Seeder
             // id, descripcion, icono, id_ref, permiso
             [1,  'FUNNEL',                 'fa fa-briefcase',  0,  null],
             [2,  'COBRANZA',               'fa fa-money',      0,  null],
-            [3,  'GESTION MOVIL',          'fa fa-phone',      1,  'datos'],
+            [3,  'GESTION MOVIL',          'fa fa-phone',      1,  'gestion.movil'],
             [4,  'HISTORICO',              'fa fa-download',   1,  'historicousu'],
             [5,  'MANTENIMIENTO',          'fa fa-cogs',       0,  null],
             [6,  'USUARIO',                'fa fa-users',      5,  'usuarios.manage'],
-            [7,  'GESTION FIJA',           'fa fa-wifi',       1,  'datos_fija'],
+            [7,  'GESTION FIJA',           'fa fa-wifi',       1,  'gestion.fija'],
             [8,  'REPORTES',               'fa fa-download',   0,  null],
             [9,  'GESTION DIARIA',         'fa fa-area-chart', 8,  'repseguimiento'],
             [10, 'AGREGAR CLIENTE',        'fa fa-plus',       1,  'agregarcliente'],

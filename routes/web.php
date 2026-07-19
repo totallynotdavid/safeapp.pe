@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AsignacionController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\DistribucionController;
+use App\Http\Controllers\GestionController;
 use App\Http\Controllers\LiquidacionController;
 use App\Http\Controllers\PersonalController;
 use App\Http\Controllers\QuiebreRegistroController;
@@ -70,6 +72,37 @@ Route::middleware('auth')->group(function () {
         Route::get('/asignacion/{usuario}/editar', [AsignacionController::class, 'edit'])->name('asignacion.edit');
         Route::put('/asignacion/{usuario}', [AsignacionController::class, 'update'])->name('asignacion.update');
     });
+
+    // GESTION MOVIL and GESTION FIJA are one screen over two segments. The
+    // segment is a route default so each keeps its own permiso. The shared
+    // client detail and write routes carry no permiso here, so the controller
+    // re-checks both the segment permiso and agent ownership.
+    Route::middleware('can:gestion.movil')->group(function () {
+        Route::get('/gestion/movil', [GestionController::class, 'index'])
+            ->defaults('tipo', 'MOVIL')
+            ->name('gestion.movil');
+        Route::post('/gestion/movil/asignar', [DistribucionController::class, 'asignar'])
+            ->defaults('tipo', 'MOVIL')
+            ->name('gestion.movil.asignar');
+        Route::post('/gestion/movil/liberar', [DistribucionController::class, 'liberar'])
+            ->defaults('tipo', 'MOVIL')
+            ->name('gestion.movil.liberar');
+    });
+
+    Route::middleware('can:gestion.fija')->group(function () {
+        Route::get('/gestion/fija', [GestionController::class, 'index'])
+            ->defaults('tipo', 'FIJA')
+            ->name('gestion.fija');
+        Route::post('/gestion/fija/asignar', [DistribucionController::class, 'asignar'])
+            ->defaults('tipo', 'FIJA')
+            ->name('gestion.fija.asignar');
+        Route::post('/gestion/fija/liberar', [DistribucionController::class, 'liberar'])
+            ->defaults('tipo', 'FIJA')
+            ->name('gestion.fija.liberar');
+    });
+
+    Route::get('/gestion/cliente/{cliente}', [GestionController::class, 'show'])->name('gestion.show');
+    Route::post('/gestion/cliente/{cliente}', [GestionController::class, 'store'])->name('gestion.store');
 
     Route::middleware('can:quiebre.validar')->group(function () {
         Route::get('/quiebres/validacion', [QuiebreValidacionController::class, 'index'])->name(

@@ -20,6 +20,8 @@ class Sidebar
         'liquidacion.gestionar' => 'liquidaciones.index',
         'personal.gestionar' => 'personal.index',
         'asignacion.gestionar' => 'asignacion.index',
+        'gestion.movil' => 'gestion.movil',
+        'gestion.fija' => 'gestion.fija',
     ];
 
     /**
