@@ -6,8 +6,10 @@ use Database\Factories\UsuarioFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\DB;
 
 class Usuario extends Authenticatable
 {
@@ -65,6 +67,11 @@ class Usuario extends Authenticatable
         return $this->belongsToMany(Menu::class, 'acceso', 'id_usuario', 'id_menu');
     }
 
+    public function asignaciones(): HasMany
+    {
+        return $this->hasMany(Asigna::class, 'id_usuario', 'id_usuario');
+    }
+
     public function asignacionActiva(): HasOne
     {
         return $this->hasOne(Asigna::class, 'id_usuario', 'id_usuario')->where('estado', 0);
@@ -76,6 +83,31 @@ class Usuario extends Authenticatable
     public function tiendaAsignada(): ?int
     {
         return $this->asignacionActiva?->id_tienda;
+    }
+
+    /**
+     * Write owner of the assignment invariant tiendaAsignada() reads: this user
+     * ends up assigned to exactly $idTiendas, with $idActiva the only active row
+     * (estado 0) and every other assignment inactive. Legacy switched the active
+     * tienda with two blind UPDATEs and had no working way to create the first
+     * assignment; replacing the whole set in one transaction keeps "at most one
+     * active tienda" true by construction. An $idActiva outside $idTiendas leaves
+     * the user with no active tienda, which the form request forbids.
+     *
+     * @param  list<int>  $idTiendas
+     */
+    public function sincronizarAsignaciones(array $idTiendas, ?int $idActiva): void
+    {
+        DB::transaction(function () use ($idTiendas, $idActiva): void {
+            $this->asignaciones()->delete();
+
+            foreach (array_unique($idTiendas) as $idTienda) {
+                $this->asignaciones()->create([
+                    'id_tienda' => $idTienda,
+                    'estado' => $idTienda === $idActiva ? 0 : 1,
+                ]);
+            }
+        });
     }
 
     public function hasPermiso(string $permiso): bool

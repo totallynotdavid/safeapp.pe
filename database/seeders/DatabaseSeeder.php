@@ -20,6 +20,10 @@ class DatabaseSeeder extends Seeder
             RolSeeder::class,
             AccesoxrolSeeder::class,
             UsuarioSeeder::class,
+            // Tiendas, then the admin's assignment, before any screen that scopes
+            // on it: QuiebreSeeder reads the admin's active tienda.
+            TiendaSeeder::class,
+            AsignacionSeeder::class,
             QuiebreSeeder::class,
             LiquidacionSeeder::class,
             // After every user-creating seeder: it back-fills their supervisor.

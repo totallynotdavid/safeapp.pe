@@ -5,10 +5,11 @@ namespace App\Models;
 use Database\Factories\AsignaFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-// User -> tienda assignment. estado 0 is the active assignment. The assignment
-// module (not yet ported) will own the write side; today this table is read to
-// scope operational screens to the operator's tienda.
+// User -> tienda assignment. estado 0 is the active assignment. The asignacion
+// module owns the write side; operational screens read it to scope their rows
+// to the operator's tienda via Usuario::tiendaAsignada().
 class Asigna extends Model
 {
     /** @use HasFactory<AsignaFactory> */
@@ -29,5 +30,10 @@ class Asigna extends Model
     protected function casts(): array
     {
         return ['estado' => 'integer'];
+    }
+
+    public function tienda(): BelongsTo
+    {
+        return $this->belongsTo(Tienda::class, 'id_tienda', 'id_tienda');
     }
 }

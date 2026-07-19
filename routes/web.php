@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AsignacionController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\LiquidacionController;
 use App\Http\Controllers\PersonalController;
@@ -62,6 +63,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/personal', [PersonalController::class, 'index'])->name('personal.index');
         Route::get('/personal/{usuario}/editar', [PersonalController::class, 'edit'])->name('personal.edit');
         Route::put('/personal/{usuario}', [PersonalController::class, 'update'])->name('personal.update');
+    });
+
+    Route::middleware('can:asignacion.gestionar')->group(function () {
+        Route::get('/asignacion', [AsignacionController::class, 'index'])->name('asignacion.index');
+        Route::get('/asignacion/{usuario}/editar', [AsignacionController::class, 'edit'])->name('asignacion.edit');
+        Route::put('/asignacion/{usuario}', [AsignacionController::class, 'update'])->name('asignacion.update');
     });
 
     Route::middleware('can:quiebre.validar')->group(function () {

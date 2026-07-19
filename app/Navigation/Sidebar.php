@@ -19,6 +19,7 @@ class Sidebar
         'quiebre.validar' => 'quiebres.validacion.index',
         'liquidacion.gestionar' => 'liquidaciones.index',
         'personal.gestionar' => 'personal.index',
+        'asignacion.gestionar' => 'asignacion.index',
     ];
 
     /**
