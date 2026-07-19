@@ -34,6 +34,15 @@ return new class extends Migration {
             $table->string('telefono1', 50)->nullable();
             $table->string('telefono2', 50)->nullable();
             $table->text('comentario_ejecutivo')->nullable();
+            // The carrier account executive ("ejecutivo TDP") the case is
+            // attributed to; 0 until one is chosen. Legacy carried two columns
+            // for this: producto wrote the id into a text `ejecutivo_tdp` and
+            // back-office wrote it into an int `id_cartera`, and different
+            // screens joined cartera through different ones. Only ejecutivo_tdp
+            // ever held data (8 of 72 rows; id_cartera was 0 in all 72), so the
+            // two collapse to this column and the cutover copies ejecutivo_tdp
+            // into it.
+            $table->unsignedInteger('id_cartera')->default(0);
             // Legacy stored this as text holding an id_tienda; it is a tienda FK,
             // modeled as an integer (the cutover transform casts it).
             $table->unsignedInteger('zonal')->nullable();
@@ -50,13 +59,11 @@ return new class extends Migration {
             $table->text('comentario_back')->nullable();
             $table->string('oportunidad', 100)->nullable();
             $table->string('ejecutivo_telefonica', 100)->nullable();
-            $table->unsignedInteger('id_cartera')->default(0);
             $table->string('zonal_telefonica', 100)->nullable();
             $table->string('nodo', 100)->nullable();
             $table->string('nivel_negociacion', 100)->nullable();
             $table->date('fecha_estimada')->nullable();
             $table->string('casofwa', 100)->nullable();
-            $table->string('ejecutivo_tdp', 100)->nullable();
             $table->string('tipo_producto', 100)->nullable();
             $table->string('etapa', 100)->nullable();
             $table->string('tipo_etapa', 100)->nullable();

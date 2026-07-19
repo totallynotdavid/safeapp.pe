@@ -71,4 +71,18 @@ class NcMovil extends Model
     {
         return $this->belongsTo(Tienda::class, 'zonal', 'id_tienda');
     }
+
+    // The carrier account executive the case is attributed to. Optional:
+    // id_cartera stays 0 until the producto or back-office screen picks one.
+    public function cartera(): BelongsTo
+    {
+        return $this->belongsTo(Cartera::class, 'id_cartera', 'id_cartera');
+    }
+
+    // The supervisor on record when the ejecutivo registered the case, which is
+    // not necessarily the one that user reports to today.
+    public function supervisor(): BelongsTo
+    {
+        return $this->belongsTo(Supervisor::class, 'id_supervisor', 'id_supervisor');
+    }
 }

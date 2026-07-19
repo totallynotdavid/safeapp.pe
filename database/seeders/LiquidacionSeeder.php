@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Cartera;
 use App\Models\NcMovil;
+use App\Models\Supervisor;
 use App\Models\Usuario;
 use Illuminate\Database\Seeder;
 
@@ -18,17 +20,23 @@ class LiquidacionSeeder extends Seeder
         }
 
         $admin = Usuario::query()->where('usuario', UsuarioSeeder::USUARIO)->first();
-        if ($admin === null) {
+        $idTienda = $admin?->tiendaAsignada();
+        if ($idTienda === null) {
             return;
         }
 
+        $caso = ['id_usuario' => $admin->id_usuario, 'zonal' => $idTienda];
+        $cartera = Cartera::query()->seleccionables($idTienda)->firstOrFail();
+        $supervisor = Supervisor::query()->firstOrFail();
+
         foreach (NcMovil::ESTADOS_LIQUIDACION as $estado) {
-            NcMovil::factory()
-                ->count(2)
-                ->estado($estado)
-                ->create(['id_usuario' => $admin->id_usuario]);
+            NcMovil::factory()->estado($estado)->atribuida($cartera, $supervisor)->create($caso);
+
+            // The unattributed twin of each estado. Most production cases have no
+            // ejecutivo TDP, so the screen has to read well without one.
+            NcMovil::factory()->estado($estado)->create($caso);
         }
 
-        NcMovil::factory()->improcede()->create(['id_usuario' => $admin->id_usuario]);
+        NcMovil::factory()->improcede()->create($caso);
     }
 }

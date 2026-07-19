@@ -34,7 +34,7 @@ class LiquidacionController extends Controller
     public function edit(NcMovil $ncMovil): View
     {
         return view('liquidaciones.edit', [
-            'cargo' => $ncMovil->load('ejecutivo', 'validador', 'tienda'),
+            'cargo' => $ncMovil->load('ejecutivo', 'validador', 'tienda', 'cartera', 'supervisor'),
             'observaciones' => NcMovil::OBSERVACIONES,
         ]);
     }

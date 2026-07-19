@@ -27,12 +27,15 @@ class DatabaseSeeder extends Seeder
             // on it: QuiebreSeeder reads the admin's active tienda.
             TiendaSeeder::class,
             AsignacionSeeder::class,
-            // Both read the admin's active tienda, so they follow the assignment.
+            // Carteras are per tienda, and both catalogs are read by
+            // LiquidacionSeeder when it attributes its cases, so they sit
+            // between the assignment and the case-creating seeders.
+            CarteraSeeder::class,
+            SupervisorSeeder::class,
+            // All read the admin's active tienda, so they follow the assignment.
             ClienteSeeder::class,
             QuiebreSeeder::class,
             LiquidacionSeeder::class,
-            // After every user-creating seeder: it back-fills their supervisor.
-            SupervisorSeeder::class,
         ]);
     }
 }
