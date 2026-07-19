@@ -38,10 +38,13 @@ return new class extends Migration {
             // attributed to; 0 until one is chosen. Legacy carried two columns
             // for this: producto wrote the id into a text `ejecutivo_tdp` and
             // back-office wrote it into an int `id_cartera`, and different
-            // screens joined cartera through different ones. Only ejecutivo_tdp
-            // ever held data (8 of 72 rows; id_cartera was 0 in all 72), so the
-            // two collapse to this column and the cutover copies ejecutivo_tdp
-            // into it.
+            // screens joined cartera through different ones, so they could
+            // disagree about who owns a case. Across the 2,006 production rows
+            // they do: ejecutivo_tdp holds the real data (576 rows, 21 distinct
+            // ids), id_cartera is set in 3, and in the 2 rows where both are set
+            // the values differ (85 vs 65, 34 vs 87). So the two collapse to
+            // this column and the cutover copies ejecutivo_tdp into it, taking
+            // the populated column as authoritative.
             $table->unsignedInteger('id_cartera')->default(0);
             // Legacy stored this as text holding an id_tienda; it is a tienda FK,
             // modeled as an integer (the cutover transform casts it).

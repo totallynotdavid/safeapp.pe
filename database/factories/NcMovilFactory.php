@@ -22,7 +22,9 @@ class NcMovilFactory extends Factory
         $actualizacion = fake()->dateTimeBetween($ingreso, 'now');
 
         return [
-            'estado' => 'INGRESADO',
+            // ACTIVADO is the overwhelmingly common state of a settleable case
+            // (1,218 of 2,006 production rows).
+            'estado' => 'ACTIVADO',
             'id_usuario' => Usuario::factory(),
             'fecha_ingreso' => $ingreso,
             'q_lineas' => fake()->numberBetween(1, 30),
@@ -37,13 +39,14 @@ class NcMovilFactory extends Factory
             'comentario_ejecutivo' => fake()->sentence(),
             'zonal' => Tienda::factory(),
 
-            // Most production cases are attributed to nobody (64 of 72), so
-            // unattributed is the default and conCartera() opts in.
+            // Most production cases are attributed to nobody (1,430 of 2,006),
+            // so unattributed is the default and atribuida() opts in.
             'id_cartera' => 0,
             'id_supervisor' => 0,
 
             // Validación defaults to PROCEDE so a plain factory row lands in the
-            // liquidación queue; the improcede() state flips it for negative tests.
+            // liquidación queue; rechazada() and caida() flip each gate for the
+            // negative tests.
             'id_validador' => 0,
             'validacion' => NcMovil::VALIDACION_PROCEDE,
             'fecha_validacion' => $actualizacion,
@@ -91,8 +94,15 @@ class NcMovilFactory extends Factory
     }
 
     // A case the validator rejected: it must never appear in the queue.
-    public function improcede(): static
+    public function rechazada(): static
     {
-        return $this->state(['validacion' => 'IMPROCEDE']);
+        return $this->state(['validacion' => NcMovil::VALIDACION_RECHAZADO]);
+    }
+
+    // A validated case that later fell through. It is not settleable, so it
+    // must not appear in the queue either.
+    public function caida(): static
+    {
+        return $this->state(['estado' => 'CAIDA']);
     }
 }

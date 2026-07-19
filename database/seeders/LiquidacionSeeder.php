@@ -10,7 +10,7 @@ use Illuminate\Database\Seeder;
 
 // Dev-only queue so the liquidación screen has validated cases to settle. The
 // dev admin owns them as the registering ejecutivo. A spread of estados lets the
-// filter be exercised, plus one rejected case that must stay out of the queue.
+// filter be exercised, plus one case per exclusion so both gates are visible.
 class LiquidacionSeeder extends Seeder
 {
     public function run(): void
@@ -29,7 +29,7 @@ class LiquidacionSeeder extends Seeder
         $cartera = Cartera::query()->seleccionables($idTienda)->firstOrFail();
         $supervisor = Supervisor::query()->firstOrFail();
 
-        foreach (NcMovil::ESTADOS_LIQUIDACION as $estado) {
+        foreach (NcMovil::ESTADOS_LIQUIDABLES as $estado) {
             NcMovil::factory()->estado($estado)->atribuida($cartera, $supervisor)->create($caso);
 
             // The unattributed twin of each estado. Most production cases have no
@@ -37,6 +37,8 @@ class LiquidacionSeeder extends Seeder
             NcMovil::factory()->estado($estado)->create($caso);
         }
 
-        NcMovil::factory()->improcede()->create($caso);
+        // The two ways a case stays out of the queue, one per gate.
+        NcMovil::factory()->rechazada()->create($caso);
+        NcMovil::factory()->caida()->create($caso);
     }
 }

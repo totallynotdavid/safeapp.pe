@@ -3,29 +3,14 @@
 namespace Tests\Feature\Liquidacion;
 
 use App\Models\Cartera;
-use App\Models\Menu;
 use App\Models\NcMovil;
 use App\Models\Supervisor;
 use App\Models\Tienda;
-use App\Models\Usuario;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
 // The carrier account executive catalog and the attribution the liquidación
 // screen displays from it.
-class CarteraTest extends TestCase
+class CarteraTest extends LiquidacionTestCase
 {
-    use RefreshDatabase;
-
-    private function liquidador(): Usuario
-    {
-        $menu = Menu::factory()->create(['permiso' => 'liquidacion.gestionar']);
-        $user = Usuario::factory()->create();
-        $user->menus()->attach($menu);
-
-        return $user;
-    }
-
     public function test_only_active_executives_of_the_tienda_are_selectable(): void
     {
         $tienda = Tienda::factory()->create();
@@ -76,7 +61,7 @@ class CarteraTest extends TestCase
     {
         // id_cartera and id_supervisor stay 0 for most production cases, which is
         // not a row that exists, so both relations must resolve to null.
-        $cargo = NcMovil::factory()->create(['fecha_actualizacion' => now()]);
+        $cargo = $this->enCola();
 
         $this->actingAs($this->liquidador())->get(route('liquidaciones.edit', $cargo))->assertOk();
 

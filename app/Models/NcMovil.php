@@ -19,13 +19,39 @@ class NcMovil extends Model
     // Only cases the validator passed reach the liquidación queue.
     public const VALIDACION_PROCEDE = 'PROCEDE';
 
-    // Settlement outcomes the liquidador chooses, and the states the queue
-    // filters by. Both drive the form/list options so the allowed set has a
-    // single owner. LIQUIDADO is the only filter state that is not also an
-    // observación (it marks a case already settled).
-    public const OBSERVACIONES = ['DEUDA', 'BAJA', 'BAJA PARCIAL', 'PORT OUT', 'SUSPENSION', 'ACUERDO COMERCIAL'];
+    public const VALIDACION_RECHAZADO = 'RECHAZADO';
 
-    public const ESTADOS_LIQUIDACION = ['LIQUIDADO', ...self::OBSERVACIONES];
+    /**
+     * Estados a validated case can still be settled from.
+     *
+     * Legacy's list was an if/else chain over its own filter dropdown, and only
+     * the last branch matched real data: this set (as a UNION of ACTIVADO with
+     * the other seven). CAIDA and ADR are deliberately outside it, since a
+     * fallen case is not settled, and they are not a rounding error: CAIDA is
+     * 399 of the 2,006 production rows. BOLSA and SALIDAANTICIPADA are declared
+     * by that legacy query but appear in no row; they stay so the allowlist is
+     * the one legacy states rather than one inferred from current stock.
+     */
+    public const ESTADOS_LIQUIDABLES = [
+        'ACTIVADO',
+        'INGRESADO',
+        'PROCESANDO',
+        'PENDIENTE',
+        'DELIVERY',
+        'BOLSA',
+        'SALIDAANTICIPADA',
+        'LIQUIDADO',
+    ];
+
+    /**
+     * The settlement outcome the liquidador records, written to `observacion`.
+     *
+     * This is not the estado vocabulary and must not be reused as one. Legacy's
+     * list screen offered exactly these strings as estado filter values, which
+     * no row can match (estado is never any of them in 2,006 production rows),
+     * so six of that dropdown's seven options returned nothing by construction.
+     */
+    public const OBSERVACIONES = ['DEUDA', 'BAJA', 'BAJA PARCIAL', 'PORT OUT', 'SUSPENSION', 'ACUERDO COMERCIAL'];
 
     public $timestamps = false;
 

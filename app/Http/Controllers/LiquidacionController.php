@@ -20,11 +20,11 @@ class LiquidacionController extends Controller
     {
         $ano = (int) $request->integer('ano', now()->year);
         $estado = $request->query('estado');
-        $filtroActivo = in_array($estado, NcMovil::ESTADOS_LIQUIDACION, true);
+        $filtroActivo = in_array($estado, NcMovil::ESTADOS_LIQUIDABLES, true);
 
         return view('liquidaciones.index', [
             'cargos' => $this->porLiquidar($ano, $filtroActivo ? $estado : null),
-            'estados' => NcMovil::ESTADOS_LIQUIDACION,
+            'estados' => NcMovil::ESTADOS_LIQUIDABLES,
             'estado' => $filtroActivo ? $estado : null,
             'ano' => $ano,
             'anos' => range(now()->year, now()->year - 5),
@@ -47,10 +47,15 @@ class LiquidacionController extends Controller
     }
 
     /**
-     * Validated cases updated in a year, most recent first. A specific estado
-     * narrows the queue; without one, every validated case for the year shows.
+     * Settleable cases updated in a year, most recent first. A specific estado
+     * narrows the queue; without one, every settleable case for the year shows.
      * Legacy keyed the year filter off fecha_actualizacion, which is what the
      * list displays, so this does the same.
+     *
+     * Both gates are needed. Passing validación is what admits a case, but a
+     * PROCEDE case that later fell (CAIDA) is still not settleable, and those
+     * are a quarter of production. Filtering on validación alone would put them
+     * in front of the liquidador.
      *
      * @return Collection<int, NcMovil>
      */
@@ -59,6 +64,7 @@ class LiquidacionController extends Controller
         return NcMovil::query()
             ->with('ejecutivo')
             ->where('validacion', NcMovil::VALIDACION_PROCEDE)
+            ->whereIn('estado', NcMovil::ESTADOS_LIQUIDABLES)
             ->whereYear('fecha_actualizacion', $ano)
             ->when($estado !== null, static fn ($query) => $query->where('estado', $estado))
             ->orderByDesc('fecha_actualizacion')
