@@ -63,6 +63,20 @@ class Cliente extends Model
         ];
     }
 
+    /**
+     * The single way a workflow resolves a RUC to a client.
+     *
+     * Legacy had four copies of this (the quiebre and three notacargo screens),
+     * each an AJAX endpoint, because each of those forms was a modal that had
+     * no client in hand. They exist as one lookup here so the identity a
+     * workflow files against comes from one place. `ruc` is unique, so this is
+     * a single row or nothing.
+     */
+    public static function porRuc(string $ruc): ?self
+    {
+        return self::query()->where('ruc', $ruc)->first();
+    }
+
     public function lineasPropias(): int
     {
         return (int) $this->{Operadores::columna(Operadores::PROPIO)};

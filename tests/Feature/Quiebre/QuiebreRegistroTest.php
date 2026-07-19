@@ -2,48 +2,14 @@
 
 namespace Tests\Feature\Quiebre;
 
-use App\Models\Menu;
 use App\Models\Quiebre;
 use App\Models\Tienda;
 use App\Models\Usuario;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class QuiebreRegistroTest extends TestCase
+// Opening a case and amending it afterwards. How the case gets its client lives
+// in QuiebreClienteTest.
+class QuiebreRegistroTest extends QuiebreTestCase
 {
-    use RefreshDatabase;
-
-    // An ejecutivo holding the quiebre.registrar grant.
-    private function ejecutivo(): Usuario
-    {
-        $menu = Menu::factory()->create(['permiso' => 'quiebre.registrar']);
-        $user = Usuario::factory()->create();
-        $user->menus()->attach($menu);
-
-        return $user;
-    }
-
-    /**
-     * @param  array<string, mixed>  $overrides
-     * @return array<string, mixed>
-     */
-    private function payload(Tienda $tienda, array $overrides = []): array
-    {
-        return array_merge([
-            'ruc' => '20123456789',
-            'razon_social' => 'ACME SAC',
-            'zonal_telefonica' => $tienda->id_tienda,
-            'servicio' => 'FIJA',
-            'tipo_averia' => 'SIN TV',
-            'numero_problema' => 3,
-            'problema_equipo' => 'NO',
-            'fecha_activacion' => now()->toDateString(),
-            'contacto1' => 'JUAN PEREZ',
-            'celular1' => '999888777',
-            'correo1' => 'juan@example.com',
-        ], $overrides);
-    }
-
     public function test_the_registrar_permiso_gates_the_index(): void
     {
         $this->actingAs(Usuario::factory()->create())->get(route('quiebres.registro.index'))->assertForbidden();
@@ -54,16 +20,18 @@ class QuiebreRegistroTest extends TestCase
     {
         $ejecutivo = $this->ejecutivo();
 
-        Quiebre::factory()->create([
-            'id_usuario' => $ejecutivo->id_usuario,
-            'ruc' => '20111111111',
-            'fecha_registro' => now(),
-        ]);
-        Quiebre::factory()->create([
-            'id_usuario' => Usuario::factory(),
-            'ruc' => '20999999999',
-            'fecha_registro' => now(),
-        ]);
+        Quiebre::factory()
+            ->deRuc('20111111111')
+            ->create([
+                'id_usuario' => $ejecutivo->id_usuario,
+                'fecha_registro' => now(),
+            ]);
+        Quiebre::factory()
+            ->deRuc('20999999999')
+            ->create([
+                'id_usuario' => Usuario::factory(),
+                'fecha_registro' => now(),
+            ]);
 
         $this
             ->actingAs($ejecutivo)
@@ -79,10 +47,12 @@ class QuiebreRegistroTest extends TestCase
 
         Quiebre::factory()
             ->estado('PENDIENTE')
-            ->create(['id_usuario' => $ejecutivo->id_usuario, 'ruc' => '20000000001', 'fecha_registro' => now()]);
+            ->deRuc('20000000001')
+            ->create(['id_usuario' => $ejecutivo->id_usuario, 'fecha_registro' => now()]);
         Quiebre::factory()
             ->estado('DEVUELTO')
-            ->create(['id_usuario' => $ejecutivo->id_usuario, 'ruc' => '20000000002', 'fecha_registro' => now()]);
+            ->deRuc('20000000002')
+            ->create(['id_usuario' => $ejecutivo->id_usuario, 'fecha_registro' => now()]);
 
         $this
             ->actingAs($ejecutivo)
@@ -102,7 +72,8 @@ class QuiebreRegistroTest extends TestCase
             ->post(route('quiebres.registro.store'), $this->payload($tienda))
             ->assertRedirect(route('quiebres.registro.index'));
 
-        $quiebre = Quiebre::query()->where('ruc', '20123456789')->sole();
+        $quiebre = Quiebre::query()->sole();
+        $this->assertSame(self::RUC, $quiebre->cliente->ruc, 'the case is filed against the resolved client');
         $this->assertSame('PENDIENTE', $quiebre->estado);
         $this->assertSame($ejecutivo->id_usuario, (int) $quiebre->id_usuario, 'owner comes from the session');
         $this->assertSame(0, (int) $quiebre->id_validador);

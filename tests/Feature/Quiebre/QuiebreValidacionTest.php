@@ -44,16 +44,18 @@ class QuiebreValidacionTest extends TestCase
         $otra = Tienda::factory()->create();
         $agente = $this->agente($tienda);
 
-        Quiebre::factory()->create([
-            'zonal_telefonica' => $tienda->id_tienda,
-            'ruc' => '20111111111',
-            'fecha_registro' => now(),
-        ]);
-        Quiebre::factory()->create([
-            'zonal_telefonica' => $otra->id_tienda,
-            'ruc' => '20999999999',
-            'fecha_registro' => now(),
-        ]);
+        Quiebre::factory()
+            ->deRuc('20111111111')
+            ->create([
+                'zonal_telefonica' => $tienda->id_tienda,
+                'fecha_registro' => now(),
+            ]);
+        Quiebre::factory()
+            ->deRuc('20999999999')
+            ->create([
+                'zonal_telefonica' => $otra->id_tienda,
+                'fecha_registro' => now(),
+            ]);
 
         $this
             ->actingAs($agente)
@@ -69,11 +71,13 @@ class QuiebreValidacionTest extends TestCase
         $agente = $this->agente($tienda);
 
         Quiebre::factory()
+            ->deRuc('20000000001')
             ->estado('PENDIENTE')
-            ->create(['zonal_telefonica' => $tienda->id_tienda, 'ruc' => '20000000001', 'fecha_registro' => now()]);
+            ->create(['zonal_telefonica' => $tienda->id_tienda, 'fecha_registro' => now()]);
         Quiebre::factory()
+            ->deRuc('20000000002')
             ->estado('DEVUELTO')
-            ->create(['zonal_telefonica' => $tienda->id_tienda, 'ruc' => '20000000002', 'fecha_registro' => now()]);
+            ->create(['zonal_telefonica' => $tienda->id_tienda, 'fecha_registro' => now()]);
 
         $this
             ->actingAs($agente)
@@ -100,7 +104,7 @@ class QuiebreValidacionTest extends TestCase
     {
         $tienda = Tienda::factory()->create();
         $agente = $this->agente($tienda);
-        $quiebre = Quiebre::factory()->create(['zonal_telefonica' => $tienda->id_tienda, 'ruc' => '20123123123']);
+        $quiebre = Quiebre::factory()->deRuc('20123123123')->create(['zonal_telefonica' => $tienda->id_tienda]);
 
         $this
             ->actingAs($agente)

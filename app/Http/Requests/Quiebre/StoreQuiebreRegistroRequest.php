@@ -19,8 +19,12 @@ class StoreQuiebreRegistroRequest extends FormRequest
             : ['nullable'];
 
         return [
-            'ruc' => ['required', 'digits:11'],
-            'razon_social' => ['required', 'string', 'max:255'],
+            // The client is resolved before the form renders, so this arrives as
+            // an id and must still name a real row: a hand-posted id_cliente
+            // would otherwise attach the case to nothing. Legacy took ruc and
+            // razon_social as free text here, which let the same RUC carry
+            // different names across quiebres.
+            'id_cliente' => ['required', Rule::exists('datos', 'id_cliente')],
             'zonal_telefonica' => ['required', Rule::exists('tienda', 'id_tienda')],
             'servicio' => ['required', Rule::in(Quiebre::SERVICIOS)],
             'tipo_averia' => ['required', Rule::in(array_keys(Quiebre::TIPOS_AVERIA))],
@@ -44,12 +48,5 @@ class StoreQuiebreRegistroRequest extends FormRequest
             'comentario_ejecutivo' => ['nullable', 'string'],
             'back' => ['nullable', 'string', 'max:50'],
         ];
-    }
-
-    protected function prepareForValidation(): void
-    {
-        if ($this->filled('razon_social')) {
-            $this->merge(['razon_social' => mb_strtoupper($this->string('razon_social')->trim()->value())]);
-        }
     }
 }

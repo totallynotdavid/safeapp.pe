@@ -58,8 +58,8 @@
                     @forelse ($quiebres as $quiebre)
                         <tr>
                             <td class="px-6 py-3 text-gray-600">{{ $quiebre->fecha_registro?->format('Y-m-d') }}</td>
-                            <td class="px-6 py-3 font-medium text-gray-800">{{ $quiebre->ruc }}</td>
-                            <td class="px-6 py-3 text-gray-600">{{ $quiebre->razon_social }}</td>
+                            <td class="px-6 py-3 font-medium text-gray-800">{{ $quiebre->cliente->ruc }}</td>
+                            <td class="px-6 py-3 text-gray-600">{{ $quiebre->cliente->razon_social }}</td>
                             <td class="px-6 py-3 text-gray-600">{{ $quiebre->servicio }}</td>
                             <td class="px-6 py-3">
                                 <span class="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">{{ $quiebre->estado }}</span>

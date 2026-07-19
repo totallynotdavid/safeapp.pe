@@ -40,7 +40,7 @@ class QuiebreValidacionController extends Controller
         Gate::authorize('validar', $quiebre);
 
         return view('quiebres.validacion.edit', [
-            'quiebre' => $quiebre->load('ejecutivo', 'tienda'),
+            'quiebre' => $quiebre->load('cliente', 'ejecutivo', 'tienda'),
             'estados' => Quiebre::ESTADOS,
         ]);
     }
@@ -73,6 +73,7 @@ class QuiebreValidacionController extends Controller
     private function pendientes(int $tienda, int $ano, ?string $estado): Collection
     {
         return Quiebre::query()
+            ->with('cliente')
             ->where('zonal_telefonica', $tienda)
             ->whereYear('fecha_registro', $ano)
             ->when(

@@ -46,8 +46,16 @@ return new class extends Migration {
             // Legacy stored this as text holding an id_tienda; it is a tienda FK,
             // so it is modeled as an integer here (the cutover transform casts it).
             $table->unsignedInteger('zonal_telefonica')->nullable();
-            $table->string('ruc', 20)->nullable();
-            $table->string('razon_social', 255)->nullable();
+            // The client the avería is reported for. Legacy stored the ruc and
+            // razon_social as free text on this row: it prefilled them from a
+            // RUC lookup and then let the modal edit both, so the same RUC could
+            // carry different names across quiebres and a quiebre could exist
+            // for a RUC no client row matches (7 of the 10 production rows).
+            // A quiebre is an open workflow item, not a historical record like
+            // llamada, so it references the client and joins for the name. The
+            // cutover transform resolves the legacy ruc and registers a client
+            // for the orphans, whose razon_social the legacy row still carries.
+            $table->unsignedInteger('id_cliente')->index();
             $table->string('servicio', 100)->nullable();
             $table->string('numero_problema', 50)->nullable();
             $table->string('tipo_averia', 100)->nullable();

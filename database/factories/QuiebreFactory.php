@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Cliente;
 use App\Models\Quiebre;
 use App\Models\Tienda;
 use App\Models\Usuario;
@@ -28,8 +29,9 @@ class QuiebreFactory extends Factory
             'id_usuario' => Usuario::factory(),
             'id_supervisor' => 0,
             'zonal_telefonica' => Tienda::factory(),
-            'ruc' => fake()->numerify('20#########'),
-            'razon_social' => mb_strtoupper(fake()->company()),
+            // A quiebre always names a client; there is no identity on this row
+            // to fall back to.
+            'id_cliente' => Cliente::factory(),
             'servicio' => fake()->randomElement(['INTERNET', 'TELEFONIA', 'CABLE']),
             'numero_problema' => (string) fake()->numberBetween(1, 20),
             'tipo_averia' => fake()->randomElement(['SIN SEÑAL', 'INTERMITENCIA', 'LENTITUD']),
@@ -57,5 +59,12 @@ class QuiebreFactory extends Factory
     public function estado(string $estado): static
     {
         return $this->state(['estado' => $estado]);
+    }
+
+    // A quiebre for a client with a known ruc. The screens show the client's
+    // ruc, so that is what identifies a row on the page.
+    public function deRuc(string $ruc): static
+    {
+        return $this->state(['id_cliente' => Cliente::factory()->create(['ruc' => $ruc])]);
     }
 }

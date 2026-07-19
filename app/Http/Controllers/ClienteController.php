@@ -29,7 +29,7 @@ class ClienteController extends Controller
             return view('clientes.create', ['ruc' => null, 'cliente' => null]);
         }
 
-        $cliente = AltaDeClientes::porRuc($ruc);
+        $cliente = Cliente::porRuc($ruc);
         if ($cliente === null) {
             return view('clientes.create', ['ruc' => $ruc, 'cliente' => null]);
         }

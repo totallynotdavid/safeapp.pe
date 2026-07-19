@@ -21,11 +21,6 @@ class AltaDeClientes
     // apart: origen answers "where from", tipo_data answers "which queue".
     public const ORIGEN = 'INHOUSE';
 
-    public static function porRuc(string $ruc): ?Cliente
-    {
-        return Cliente::query()->where('ruc', $ruc)->first();
-    }
-
     /**
      * Registers a client the import never delivered, already held by the agent
      * who found it.

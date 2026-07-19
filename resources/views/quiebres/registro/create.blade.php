@@ -9,8 +9,23 @@
     <div class="mx-auto max-w-4xl space-y-6">
         <a href="{{ route('quiebres.registro.index') }}" class="text-sm font-medium text-gray-600 hover:text-gray-800">&larr; Volver a la lista</a>
 
+        @include('partials.buscar-cliente', ['ruta' => 'quiebres.registro.create', 'ruc' => $ruc])
+
+        @if ($ruc && ! $cliente)
+            {{-- The avería has to belong to a client record. Registering one is a
+                 link away rather than a menu detour, which is what legacy's
+                 "IR A FUNNEL + AGREGAR CLIENTE" dead-end made agents do. --}}
+            <div class="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                El RUC {{ $ruc }} no está registrado.
+                <a href="{{ route('clientes.create', ['ruc' => $ruc]) }}" class="font-medium underline">Regístrelo primero</a>
+                y vuelva a buscarlo aquí.
+            </div>
+        @endif
+
+        @if ($cliente)
         <div class="rounded-lg border border-gray-200 bg-white p-6">
-            <h2 class="mb-4 text-lg font-semibold text-gray-800">Registrar quiebre</h2>
+            <h2 class="text-lg font-semibold text-gray-800">{{ $cliente->razon_social }}</h2>
+            <p class="mb-4 text-sm text-gray-500">RUC {{ $cliente->ruc }}</p>
 
             @if ($errors->any())
                 <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800">
@@ -25,18 +40,11 @@
             <form method="POST" action="{{ route('quiebres.registro.store') }}" class="space-y-6">
                 @csrf
 
-                {{-- Cliente. The RUC and razón social are typed directly: the cartera
-                     lookup that prefilled and validated them lives in the datos module,
-                     which is not ported yet. Reattach a lookup here when it is. --}}
+                {{-- The client is resolved, not typed. The name shown above comes
+                     from the client record and is never copied onto the quiebre. --}}
+                <input type="hidden" name="id_cliente" value="{{ $cliente->id_cliente }}">
+
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <div>
-                        <label for="ruc" class="{{ $label }}">RUC</label>
-                        <input id="ruc" name="ruc" inputmode="numeric" value="{{ old('ruc') }}" required class="{{ $field }}">
-                    </div>
-                    <div class="sm:col-span-2">
-                        <label for="razon_social" class="{{ $label }}">Razón social</label>
-                        <input id="razon_social" name="razon_social" value="{{ old('razon_social') }}" required class="{{ $field }}">
-                    </div>
                     <div>
                         <label for="zonal_telefonica" class="{{ $label }}">Región</label>
                         <select id="zonal_telefonica" name="zonal_telefonica" required class="{{ $field }}">
@@ -155,5 +163,6 @@
                 </div>
             </form>
         </div>
+        @endif
     </div>
 @endsection

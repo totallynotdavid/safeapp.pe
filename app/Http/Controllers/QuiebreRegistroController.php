@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Quiebre\StoreQuiebreRegistroRequest;
 use App\Http\Requests\Quiebre\UpdateQuiebreSeguimientoRequest;
+use App\Models\Cliente;
 use App\Models\Quiebre;
 use App\Models\Tienda;
 use Illuminate\Http\RedirectResponse;
@@ -33,9 +34,21 @@ class QuiebreRegistroController extends Controller
         ]);
     }
 
-    public function create(): View
+    /**
+     * Resolves the RUC, then shows the form for the client it names.
+     *
+     * The RUC is a step, not a field: without a resolved client there is nothing
+     * to file the avería against. Same single request shape as the intake door,
+     * and the client it resolves is the one the form files against, so the
+     * identity on a quiebre can never disagree with the client record.
+     */
+    public function create(Request $request): View
     {
+        $ruc = $request->string('ruc')->trim()->toString();
+
         return view('quiebres.registro.create', [
+            'ruc' => $ruc === '' ? null : $ruc,
+            'cliente' => $ruc === '' ? null : Cliente::porRuc($ruc),
             'tiendas' => Tienda::query()->orderBy('nombre')->get(),
             'servicios' => Quiebre::SERVICIOS,
             'tiposAveria' => Quiebre::TIPOS_AVERIA,
@@ -49,6 +62,7 @@ class QuiebreRegistroController extends Controller
         $user = $request->user();
 
         $quiebre = new Quiebre($data);
+        $quiebre->id_cliente = (int) $data['id_cliente'];
         // One "inicio de avería" input feeds both legacy date columns.
         $quiebre->fecha_inicio = $data['fecha_inicio_averia'] ?? null;
         // Owner, workflow state, and dates are server-owned: a case always opens
@@ -69,7 +83,7 @@ class QuiebreRegistroController extends Controller
         Gate::authorize('view', $quiebre);
 
         return view('quiebres.registro.edit', [
-            'quiebre' => $quiebre->load('tienda', 'validador'),
+            'quiebre' => $quiebre->load('cliente', 'tienda', 'validador'),
             'tiposAveria' => Quiebre::TIPOS_AVERIA,
         ]);
     }
@@ -92,6 +106,7 @@ class QuiebreRegistroController extends Controller
     private function misQuiebres(int $idUsuario, int $ano, ?string $estado): Collection
     {
         return Quiebre::query()
+            ->with('cliente')
             ->where('id_usuario', $idUsuario)
             ->whereYear('fecha_registro', $ano)
             ->when($estado !== null, static fn ($query) => $query->where('estado', $estado))

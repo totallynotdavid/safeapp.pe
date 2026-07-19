@@ -13,17 +13,7 @@
             <div class="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800">{{ session('error') }}</div>
         @endif
 
-        {{-- Step one: resolve the RUC. A GET form, so the resolved state is a URL
-             the agent can reload or share. --}}
-        <form method="GET" action="{{ route('clientes.create') }}" class="rounded-lg border border-gray-200 bg-white p-6">
-            <label for="ruc" class="{{ $label }}">RUC del cliente</label>
-            <div class="mt-1 flex gap-2">
-                <input id="ruc" name="ruc" inputmode="numeric" maxlength="11" value="{{ $ruc }}" required
-                       class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none">
-                <button type="submit" class="rounded-md bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">Buscar</button>
-            </div>
-            <p class="mt-2 text-xs text-gray-500">Si el RUC ya está en su cartera, lo llevamos directamente a la gestión.</p>
-        </form>
+        @include('partials.buscar-cliente', ['ruta' => 'clientes.create', 'ruc' => $ruc])
 
         @if ($cliente)
             {{-- The client exists. Registering it again is never the answer, so

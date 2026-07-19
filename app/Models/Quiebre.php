@@ -72,8 +72,6 @@ class Quiebre extends Model
         'casosf',
         'comentario_validador',
         'zonal_telefonica',
-        'ruc',
-        'razon_social',
         'servicio',
         'tipo_averia',
         'numero_problema',
@@ -122,6 +120,14 @@ class Quiebre extends Model
             $fechaActivacion !== null
             && $fechaActivacion->diffInDays(Carbon::now('America/Lima')) >= self::DIAS_PARA_TICKET
         );
+    }
+
+    // The client the avería is reported for. Not nullable in practice: a quiebre
+    // is opened from a resolved client, and the name shown anywhere comes from
+    // here rather than from a copy frozen on this row.
+    public function cliente(): BelongsTo
+    {
+        return $this->belongsTo(Cliente::class, 'id_cliente', 'id_cliente');
     }
 
     public function ejecutivo(): BelongsTo
