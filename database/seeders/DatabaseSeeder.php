@@ -19,6 +19,9 @@ class DatabaseSeeder extends Seeder
             MenuSeeder::class,
             RolSeeder::class,
             AccesoxrolSeeder::class,
+            // Contact-disposition catalog the GESTION dropdown reads; reference
+            // data like the menus and roles above.
+            RespuestaSeeder::class,
             UsuarioSeeder::class,
             // Tiendas, then the admin's assignment, before any screen that scopes
             // on it: QuiebreSeeder reads the admin's active tienda.
