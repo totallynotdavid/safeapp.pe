@@ -41,8 +41,28 @@ its own datadir, socket, and port. It does not touch any system MySQL/MariaDB
 install or Hostinger's production database.
 
 `make db-reset` wipes the dev database and rebuilds it from migrations and
-seeders. Migrations are the schema's source of truth; there is no dump to
-restore, and the pre-rewrite production dump would not load into this schema.
+seeders. Migrations are the schema's source of truth; a dev database is never
+restored from a dump.
+
+## Loading a production export
+
+The pre-rewrite export does not load into this schema, so it is restored into a
+scratch database of its own and carried across row by row:
+
+```sh
+make db-legacy FILE=export.sql   # restores into safeapp_legacy, read-only
+php artisan migrate:fresh        # build the target schema, without --seed
+php artisan cutover:transform    # carry the rows across
+```
+
+The transform reports what it wrote and what it deliberately dropped. It refuses
+a database that already holds rows, so a second run means resetting first. What
+each rule does and why is in `app/Cutover`; the reasoning behind the numbers
+those comments cite is in the plan.
+
+`make db-legacy` strips the export's own `CREATE DATABASE` and `USE`
+statements. Both name the production schema, which is the same name the dev app
+uses, so running the file directly drops legacy tables into the app's database.
 
 `scripts/db.sh` currently only supports Linux and WSL: it downloads a
 `linux-systemd-x86_64` MariaDB binary.
