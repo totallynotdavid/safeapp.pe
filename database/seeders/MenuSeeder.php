@@ -18,54 +18,55 @@ class MenuSeeder extends Seeder
     {
         $rows = [
             // id, descripcion, icono, id_ref, permiso
-            [1,  'FUNNEL',                 'fa fa-briefcase',  0,  null],
-            [2,  'COBRANZA',               'fa fa-money',      0,  null],
-            [3,  'GESTION MOVIL',          'fa fa-phone',      1,  'gestion.movil'],
-            [4,  'HISTORICO',              'fa fa-download',   1,  'historico.ver'],
-            [5,  'MANTENIMIENTO',          'fa fa-cogs',       0,  null],
-            [6,  'USUARIO',                'fa fa-users',      5,  'usuarios.manage'],
-            [7,  'GESTION FIJA',           'fa fa-wifi',       1,  'gestion.fija'],
-            [8,  'REPORTES',               'fa fa-download',   0,  null],
-            [9,  'GESTION DIARIA',         'fa fa-area-chart', 8,  'repseguimiento'],
-            [10, 'AGREGAR CLIENTE',        'fa fa-plus',       1,  'clientes.crear'],
-            [11, 'CARGAR DATOS',           'fa fa-database',   5,  'mantDatos'],
+            [1,  'FUNNEL',               'fa fa-briefcase',  0,  null],
+            [2,  'COBRANZA',             'fa fa-money',      0,  null],
+            [3,  'GESTION MOVIL',        'fa fa-phone',      1,  'gestion.movil'],
+            [4,  'HISTORICO',            'fa fa-download',   1,  'historico.ver'],
+            [5,  'MANTENIMIENTO',        'fa fa-cogs',       0,  null],
+            [6,  'USUARIO',              'fa fa-users',      5,  'usuarios.manage'],
+            [7,  'GESTION FIJA',         'fa fa-wifi',       1,  'gestion.fija'],
+            [8,  'REPORTES',             'fa fa-download',   0,  null],
+            [9,  'GESTION DIARIA',       'fa fa-area-chart', 8,  'repseguimiento'],
+            [10, 'AGREGAR CLIENTE',      'fa fa-plus',       1,  'clientes.crear'],
+            [11, 'CARGAR DATOS',         'fa fa-database',   5,  'mantDatos'],
             // The three AVANZADO leaves (legacy ids 23, 24, 25) and their report
             // (26) are not here. nc_avanzado has never held a row: its
             // AUTO_INCREMENT has never advanced, and the producto catalog the
             // registro form reads has no AVANZADO entry, so the form's product
             // dropdowns come up empty and the screen cannot be submitted. It is
             // not lightly used, it has never worked.
-            [12, 'NOTA DE CARGO',          'fa fa-file',       0,  null],
-            [13, 'FIJA',                   'fa fa-wifi',       12, 'notacargo_fija'],
-            [14, 'VALIDACION FIJA',        'fa fa-wifi',       12, 'notacargo_fija_validacion'],
-            [15, 'BACK FIJA',              'fa fa-wifi',       12, 'notacargo_fija_back'],
-            [16, 'MOVIL',                  'fa fa-mobile',     12, 'notacargo.movil.registrar'],
-            [19, 'REPORTE BACK FIJA',      'fa fa-wifi',       8,  'repbackfija'],
-            [20, 'REPORTE BACK MOVIL',     'fa fa-mobile',     8,  'repbackmovil'],
-            [21, 'BACK FIJA GLOBAL',       'fa fa-wifi',       12, 'notacargo_fija_back_global'],
-            [22, 'VALIDACION FIJA GLOBAL', 'fa fa-wifi',       12, 'notacargo_fija_validacion_global'],
-            [27, 'REPORTE FIJA GLOBAL',    'fa fa-wifi',       8,  'repbackfijaglobal'],
-            // Legacy ids 28 and 29 (the "GLOBAL" copies), kept because they are
-            // the leaves the real reviewers hold. Their tienda-filtered twins
-            // (17, 18) are gone: the four users who held them also hold these,
-            // which show a superset of the same rows, and the column they
-            // filtered on is the case's región rather than the reviewer's store.
-            [28, 'BACK MOVIL',             'fa fa-mobile',     12, 'notacargo.movil.back'],
-            [29, 'VALIDACION MOVIL',       'fa fa-mobile',     12, 'notacargo.movil.validar'],
-            [30, 'REPORTE MOVIL GLOBAL',   'fa fa-mobile',     8,  'repbackmovilglobal'],
-            [31, 'DASHBOARD EJE REAL',     'fa fa-download',   8,  'dashboard'],
-            [32, 'AVERIAS',                'fa fa-file',       0,  null],
-            [33, 'REGISTRO',               'fa fa-area-chart', 32, 'quiebre.registrar'],
-            [34, 'SEGUIMIENTO',            'fa fa-area-chart', 32, 'quiebre.validar'],
-            [35, 'PERSONAL',               'fa fa-users',      0,  null],
-            [36, 'DATOS PERSONAL',         'fa fa-users',      35, 'personal.gestionar'],
-            [40, 'ASIGNACION DE TIENDA',   'fa fa-bank',       35, 'asignacion.gestionar'],
-            [37, 'LIQUIDACION',            'fa fa-money',      0,  null],
-            [38, 'LIQUIDACION',            'fa fa-money',      37, 'liquidacion.gestionar'],
+            [12, 'NOTA DE CARGO',        'fa fa-file',       0,  null],
+            [13, 'FIJA',                 'fa fa-wifi',       12, 'notacargo.fija.registrar'],
+            [16, 'MOVIL',                'fa fa-mobile',     12, 'notacargo.movil.registrar'],
+            [19, 'REPORTE BACK FIJA',    'fa fa-wifi',       8,  'repbackfija'],
+            [20, 'REPORTE BACK MOVIL',   'fa fa-mobile',     8,  'repbackmovil'],
+            [27, 'REPORTE FIJA GLOBAL',  'fa fa-wifi',       8,  'repbackfijaglobal'],
+            // The four ids below are legacy's "GLOBAL" copies, kept because they
+            // are the leaves the real reviewers hold. Each one's tienda-filtered
+            // twin is gone (fija 14 and 15, móvil 17 and 18): the holders of a
+            // filtered leaf are in every case a strict subset of the holders of
+            // its global counterpart, which shows a superset of the same rows,
+            // and the column they filtered on is the case's región rather than
+            // the reviewer's store. Four users held each filtered leaf against
+            // 13 and 28 for the fija globals.
+            [21, 'BACK FIJA',            'fa fa-wifi',       12, 'notacargo.fija.back'],
+            [22, 'VALIDACION FIJA',      'fa fa-wifi',       12, 'notacargo.fija.validar'],
+            [28, 'BACK MOVIL',           'fa fa-mobile',     12, 'notacargo.movil.back'],
+            [29, 'VALIDACION MOVIL',     'fa fa-mobile',     12, 'notacargo.movil.validar'],
+            [30, 'REPORTE MOVIL GLOBAL', 'fa fa-mobile',     8,  'repbackmovilglobal'],
+            [31, 'DASHBOARD EJE REAL',   'fa fa-download',   8,  'dashboard'],
+            [32, 'AVERIAS',              'fa fa-file',       0,  null],
+            [33, 'REGISTRO',             'fa fa-area-chart', 32, 'quiebre.registrar'],
+            [34, 'SEGUIMIENTO',          'fa fa-area-chart', 32, 'quiebre.validar'],
+            [35, 'PERSONAL',             'fa fa-users',      0,  null],
+            [36, 'DATOS PERSONAL',       'fa fa-users',      35, 'personal.gestionar'],
+            [40, 'ASIGNACION DE TIENDA', 'fa fa-bank',       35, 'asignacion.gestionar'],
+            [37, 'LIQUIDACION',          'fa fa-money',      0,  null],
+            [38, 'LIQUIDACION',          'fa fa-money',      37, 'liquidacion.gestionar'],
             // New screen the legacy app never had a working equivalent of: its
             // rol page (vista/usuario.php) was an off-sidebar, broken orphan.
             // This is the permissions-admin surface, not a legacy remap.
-            [39, 'ROLES Y PERMISOS',       'fa fa-key',        5,  'roles.manage'],
+            [39, 'ROLES Y PERMISOS',     'fa fa-key',        5,  'roles.manage'],
         ];
 
         $menus = array_map(static fn (array $row): array => [

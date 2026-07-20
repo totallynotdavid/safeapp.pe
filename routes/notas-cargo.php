@@ -8,6 +8,9 @@
 // each existed twice: once filtered to the reviewer's tienda and once not. The
 // filtered copies are gone. See the controllers for the evidence.
 
+use App\Http\Controllers\NotaCargoFijaBackController;
+use App\Http\Controllers\NotaCargoFijaController;
+use App\Http\Controllers\NotaCargoFijaValidacionController;
 use App\Http\Controllers\NotaCargoMovilBackController;
 use App\Http\Controllers\NotaCargoMovilController;
 use App\Http\Controllers\NotaCargoMovilValidacionController;
@@ -42,4 +45,35 @@ Route::middleware('can:notacargo.movil.back')->group(function () {
         ->name('notas-cargo.movil.back.edit');
     Route::put('/notas-cargo/movil/back/{ncMovil}', [NotaCargoMovilBackController::class, 'update'])
         ->name('notas-cargo.movil.back.update');
+});
+
+Route::middleware('can:notacargo.fija.registrar')->group(function () {
+    Route::get('/notas-cargo/fija', [NotaCargoFijaController::class, 'index'])
+        ->name('notas-cargo.fija.index');
+    Route::get('/notas-cargo/fija/crear', [NotaCargoFijaController::class, 'create'])
+        ->name('notas-cargo.fija.create');
+    Route::post('/notas-cargo/fija', [NotaCargoFijaController::class, 'store'])
+        ->name('notas-cargo.fija.store');
+    Route::get('/notas-cargo/fija/{ncFija}/editar', [NotaCargoFijaController::class, 'edit'])
+        ->name('notas-cargo.fija.edit');
+    Route::put('/notas-cargo/fija/{ncFija}', [NotaCargoFijaController::class, 'update'])
+        ->name('notas-cargo.fija.update');
+});
+
+Route::middleware('can:notacargo.fija.validar')->group(function () {
+    Route::get('/notas-cargo/fija/validacion', [NotaCargoFijaValidacionController::class, 'index'])
+        ->name('notas-cargo.fija.validacion.index');
+    Route::get('/notas-cargo/fija/validacion/{ncFija}', [NotaCargoFijaValidacionController::class, 'edit'])
+        ->name('notas-cargo.fija.validacion.edit');
+    Route::put('/notas-cargo/fija/validacion/{ncFija}', [NotaCargoFijaValidacionController::class, 'update'])
+        ->name('notas-cargo.fija.validacion.update');
+});
+
+Route::middleware('can:notacargo.fija.back')->group(function () {
+    Route::get('/notas-cargo/fija/back', [NotaCargoFijaBackController::class, 'index'])
+        ->name('notas-cargo.fija.back.index');
+    Route::get('/notas-cargo/fija/back/{ncFija}', [NotaCargoFijaBackController::class, 'edit'])
+        ->name('notas-cargo.fija.back.edit');
+    Route::put('/notas-cargo/fija/back/{ncFija}', [NotaCargoFijaBackController::class, 'update'])
+        ->name('notas-cargo.fija.back.update');
 });

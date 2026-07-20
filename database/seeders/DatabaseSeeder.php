@@ -19,9 +19,11 @@ class DatabaseSeeder extends Seeder
             MenuSeeder::class,
             RolSeeder::class,
             AccesoxrolSeeder::class,
-            // Contact-disposition catalog the GESTION dropdown reads; reference
-            // data like the menus and roles above.
+            // Contact-disposition catalog the GESTION dropdown reads, and the
+            // product catalog the nota de cargo fija form reads; reference data
+            // like the menus and roles above.
             RespuestaSeeder::class,
+            ProductoSeeder::class,
             UsuarioSeeder::class,
             // Tiendas, then the admin's assignment, before any screen that scopes
             // on it: QuiebreSeeder reads the admin's active tienda.
@@ -33,10 +35,11 @@ class DatabaseSeeder extends Seeder
             CarteraSeeder::class,
             SupervisorSeeder::class,
             // All read the admin's active tienda, so they follow the assignment.
-            // The two case seeders also file against ClienteSeeder's clients.
+            // The three case seeders also file against ClienteSeeder's clients.
             ClienteSeeder::class,
             QuiebreSeeder::class,
             NotaCargoMovilSeeder::class,
+            NotaCargoFijaSeeder::class,
         ]);
     }
 }
