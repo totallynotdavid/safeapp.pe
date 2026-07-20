@@ -83,9 +83,16 @@ return [
      |
      */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    // The app is only ever Spanish, so that is the default rather than a value
+    // each environment has to remember to set.
+    'locale' => env('APP_LOCALE', 'es'),
 
-    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+    // Deliberately not from the environment. The fallback is the safety net that
+    // keeps an untranslated key from reaching a user, and pointing it at `es`
+    // (which is what the .env used to do) disables it: the framework ships only
+    // `en`, so every rule lang/es/validation.php does not cover rendered as the
+    // raw "validation.<rule>" string on screen.
+    'fallback_locale' => 'en',
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
