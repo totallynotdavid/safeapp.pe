@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Builders\NcMovilBuilder;
+use App\Models\Concerns\Validable;
 use Database\Factories\NcMovilFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -18,14 +19,7 @@ class NcMovil extends Model
     /** @use HasFactory<NcMovilFactory> */
     use HasFactory;
 
-    public const VALIDACION_PENDIENTE = 'PENDIENTE';
-
-    public const VALIDACION_PROCEDE = 'PROCEDE';
-
-    public const VALIDACION_RECHAZADO = 'RECHAZADO';
-
-    /** The validador's three-way decision; a case starts PENDIENTE. */
-    public const VALIDACIONES = [self::VALIDACION_PENDIENTE, self::VALIDACION_PROCEDE, self::VALIDACION_RECHAZADO];
+    use Validable;
 
     /**
      * The lifecycle, owned by the back office. Every one of the 8 estados
@@ -48,7 +42,7 @@ class NcMovil extends Model
     /**
      * Estados that mean the case is still moving. These are dated by
      * fecha_ingreso with no month bound, so an in-flight case never falls off
-     * the queue just because it is old. See scopeEnPeriodo.
+     * the queue just because it is old. See NotaCargoBuilder.
      */
     public const ESTADOS_EN_CURSO = [
         'INGRESADO',
@@ -156,20 +150,6 @@ class NcMovil extends Model
         'fecha_liquidacion',
         'comentario_liquidador',
     ];
-
-    // Still awaiting a decision, so the ejecutivo may amend it and the validador
-    // may rule on it. Both screens ask this before writing.
-    public function esEditable(): bool
-    {
-        return $this->validacion === self::VALIDACION_PENDIENTE;
-    }
-
-    // Passed validación, so the back office has something to fulfil. A rejected
-    // or undecided case never reaches that stage.
-    public function esValidado(): bool
-    {
-        return $this->validacion === self::VALIDACION_PROCEDE;
-    }
 
     public function cliente(): BelongsTo
     {

@@ -18,7 +18,7 @@
                 </a>
             </div>
 
-            @include('notas-cargo.movil.partials.filtros', ['ruta' => 'notas-cargo.movil.index'])
+            @include('partials.filtros-periodo', ['ruta' => 'notas-cargo.movil.index'])
         </div>
 
         <div class="overflow-x-auto">

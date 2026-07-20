@@ -1,7 +1,8 @@
 {{--
-    Período and estado filter, shared by the registro and back queues because
-    both list the same rows over the same window (NcMovil::scopeEnPeriodo) and
-    only differ in whose cases they show.
+    Período and estado filter for a nota de cargo queue. Every registro and back
+    screen uses it, over both productos: they list the same rows over the same
+    window (NotaCargoBuilder::enPeriodo) and differ only in whose cases they show
+    and which estado vocabulary they offer, which is what $estados carries.
 
     Expects: $ruta, $ano, $anos, $mes, $estado, $estados.
 --}}
