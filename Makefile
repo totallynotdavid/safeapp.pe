@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help setup dev fmt fmt-check lint analyze test setup-legacy db-up db-down db-restore db-dump db-reset db-status
+.PHONY: help setup dev fmt fmt-check lint analyze test db-up db-down db-dump db-reset db-status
 
 MISE := mise exec --
 DB := ./scripts/db.sh
@@ -8,10 +8,13 @@ FILE ?=
 help: ## Show this help
 	@grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
 
-setup: db-up ## Install the Laravel app's deps, prepare .env, build a fresh dev DB
+# .env has to exist before db-up: scripts/db.sh reads the DB name and
+# credentials from it to create the database and its account.
+setup: ## Install the Laravel app's deps, prepare .env, build a fresh dev DB
 	$(MISE) composer install
 	@[ -f .env ] || cp .env.example .env
 	$(MISE) php artisan key:generate --ansi
+	$(MAKE) db-up
 	$(MISE) php artisan migrate --seed --ansi
 
 dev: db-up ## Start the local DB and the Laravel dev server
@@ -32,18 +35,11 @@ analyze: ## Run Mago's static analysis (type errors, bugs)
 test: ## Run the Laravel app's test suite
 	$(MISE) php artisan test
 
-setup-legacy: ## Legacy snapshot capture: install legacy deps and load a real dump (old schema)
-	$(MISE) composer install --working-dir=public/SAFEAPP
-	$(DB) restore $(FILE)
-
 db-up: ## Start the local MariaDB instance (installs/initializes on first run)
 	$(DB) start
 
 db-down: ## Stop the local MariaDB instance
 	$(DB) stop
-
-db-restore: ## Load a .sql dump into the local DB for legacy snapshot capture (FILE=path)
-	$(DB) restore $(FILE)
 
 db-dump: ## Snapshot the local DB to a .sql file (FILE=path, default dev-dump.sql)
 	$(DB) dump $(FILE)

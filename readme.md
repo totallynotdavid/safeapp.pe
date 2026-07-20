@@ -13,22 +13,21 @@ PHP call center and debt collection system for Entel operations.
 git clone https://github.com/totallynotdavid/safeapp.pe.git
 cd safeapp.pe
 
-cp public/SAFEAPP/.env.example public/SAFEAPP/.env
+cp .env.example .env
 ```
 
-Edit `public/SAFEAPP/.env` and set `DB_USER` and `DB_PASS`. Any local values
-work. `DB_HOST` and `DB_NAME` in `.env.example` already work as provided;
-`DB_NAME` can be renamed if needed (see comment in that file).
+Edit `.env` and set `DB_USERNAME` and `DB_PASSWORD`. Any local values work;
+`scripts/db.sh` creates that account. `DB_HOST`, `DB_PORT` and `DB_DATABASE`
+work as provided.
 
 ```sh
-make setup          # composer install, .env, app key, MariaDB, migrate + seed
+make setup           # composer install, .env, app key, MariaDB, migrate + seed
 make dev             # starts the Laravel dev server at /
 ```
 
 `make setup` builds a fresh dev database from migrations and seeders, including
 a known admin login (`admin` / `admin`). `make db-reset` rebuilds it from
-scratch. To capture legacy behavior before porting a module, load a real dump
-into a scratch DB with `make setup-legacy` (see Local database).
+scratch.
 
 `make help` lists the full command set. Code quality runs through Mago (one
 toolchain, scoped to the Laravel app via `mago.toml`): `fmt`/`fmt-check` and
@@ -39,13 +38,11 @@ is not Laravel-magic-aware. `test` runs the Laravel test suite.
 
 `scripts/db.sh` downloads and runs a MariaDB instance under `.mariadb/`, with
 its own datadir, socket, and port. It does not touch any system MySQL/MariaDB
-install or Hostinger's production database. Both apps point at this same
-local instance.
+install or Hostinger's production database.
 
 `make db-reset` wipes the dev database and rebuilds it from migrations and
-seeders. Loading a real dump (`make db-restore FILE=...`) is only for legacy
-snapshot capture; it writes the old legacy schema, so point `DB_NAME` at a
-scratch database rather than overwriting the dev one.
+seeders. Migrations are the schema's source of truth; there is no dump to
+restore, and the pre-rewrite production dump would not load into this schema.
 
 `scripts/db.sh` currently only supports Linux and WSL: it downloads a
 `linux-systemd-x86_64` MariaDB binary.

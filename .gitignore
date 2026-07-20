@@ -15,12 +15,6 @@
 Homestead.json
 Homestead.yaml
 
-# Legacy app (public/SAFEAPP)
-public/SAFEAPP/.env
-public/SAFEAPP/vendor/
-public/SAFEAPP/procesos/tmp_excel/
-public/SAFEAPP/nbproject/
-
 # Database backups/dumps
 *.sql
 *.sql.gz
