@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 // Baseline schema for contact logging. `respuesta` is the fixed catalog of
 // dispositions an agent can choose. `llamada` is the append-only log of every
-// contact recorded against a client, joined by ruc.
+// contact recorded against a customer, joined by id_cliente.
 //
 // Types are normalized from the legacy all-text DDL: ids to integers, SI/NO
 // flags to booleans, fecha to datetime. Like the other baselines these CREATEs
@@ -33,8 +33,14 @@ return new class extends Migration {
             $table->unsignedInteger('id_respuesta');
             $table->dateTime('fecha');
 
-            // The client this contact was logged against and the point of contact.
-            $table->string('ruc', 20);
+            // The customer this contact was logged against, and the campaign
+            // record that put them in front of the agent. id_dato is nullable
+            // because a contact outlives the campaign that prompted it: the
+            // customer is the permanent fact, the campaign is not.
+            $table->unsignedInteger('id_cliente');
+            $table->unsignedInteger('id_dato')->nullable();
+
+            // The point of contact.
             $table->string('razon_social', 255)->nullable();
             $table->string('telefono', 30)->nullable();
             $table->string('nombre_contacto', 150)->nullable();
@@ -58,7 +64,7 @@ return new class extends Migration {
             // Serves an agent's log by date, and the contact history for one
             // client.
             $table->index(['id_usuario', 'fecha']);
-            $table->index('ruc');
+            $table->index('id_cliente');
         });
     }
 

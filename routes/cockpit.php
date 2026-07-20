@@ -47,7 +47,7 @@ Route::middleware('can:gestion.fija')->group(function () {
 Route::middleware('can:clientes.crear')->group(function () {
     Route::get('/clientes/nuevo', [ClienteController::class, 'create'])->name('clientes.create');
     Route::post('/clientes', [ClienteController::class, 'store'])->name('clientes.store');
-    Route::post('/clientes/{cliente}/tomar', [ClienteController::class, 'tomar'])->name('clientes.tomar');
+    Route::post('/datos/{dato}/tomar', [ClienteController::class, 'tomar'])->name('clientes.tomar');
 });
 
 // The bulk door, next to the off-list one: both create clients, and keeping them
@@ -73,8 +73,8 @@ Route::middleware('can:seguimiento.equipo')->group(function () {
     Route::get('/seguimiento/exportar', [SeguimientoController::class, 'exportar'])->name('seguimiento.exportar');
 });
 
-Route::get('/gestion/cliente/{cliente}', [GestionController::class, 'show'])->name('gestion.show');
-Route::post('/gestion/cliente/{cliente}', [GestionController::class, 'store'])->name('gestion.store');
+Route::get('/gestion/dato/{dato}', [GestionController::class, 'show'])->name('gestion.show');
+Route::post('/gestion/dato/{dato}', [GestionController::class, 'store'])->name('gestion.store');
 
 // What each ejecutivo has on the board this period, per producto. Legacy's
 // DASHBOARD EJE REAL; see ProduccionController for why three of its four tables

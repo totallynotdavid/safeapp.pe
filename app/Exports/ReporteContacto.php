@@ -59,7 +59,7 @@ final class ReporteContacto
         return [
             $contacto->agente?->personal,
             $contacto->fecha,
-            $contacto->ruc,
+            $contacto->cliente?->ruc,
             $contacto->razon_social,
             $contacto->respuesta?->descripcion,
             $contacto->gestion,

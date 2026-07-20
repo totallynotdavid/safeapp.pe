@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Cockpit\DistribucionDeClientes;
+use App\Cockpit\DistribucionDeDatos;
 use App\Http\Requests\Gestion\AsignarLoteRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -25,7 +25,7 @@ class DistribucionController extends Controller
         }
 
         $origen = $request->string('origen')->toString();
-        $asignados = DistribucionDeClientes::asignarLote($agente->id_usuario, $idTienda, $origen, $tipo);
+        $asignados = DistribucionDeDatos::asignarLote($agente->id_usuario, $idTienda, $origen, $tipo);
 
         if ($asignados === 0) {
             return back()->with('error', 'Ya no quedan clientes disponibles con ese origen.');
@@ -36,7 +36,7 @@ class DistribucionController extends Controller
 
     public function liberar(Request $request, string $tipo): RedirectResponse
     {
-        $liberados = DistribucionDeClientes::liberarPendientes($request->user()->id_usuario, $tipo);
+        $liberados = DistribucionDeDatos::liberarPendientes($request->user()->id_usuario, $tipo);
 
         return back()->with('status', "Devolvió {$liberados} clientes a la cola.");
     }

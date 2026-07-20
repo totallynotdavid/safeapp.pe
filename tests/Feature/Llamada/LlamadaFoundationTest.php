@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Llamada;
 
+use App\Models\Cliente;
 use App\Models\Llamada;
 use App\Models\Respuesta;
 use App\Models\Usuario;
@@ -51,7 +52,7 @@ class LlamadaFoundationTest extends TestCase
         $this->assertSame('Desea Movil', $llamada->respuesta->descripcion);
     }
 
-    public function test_the_log_accumulates_every_contact_for_one_client(): void
+    public function test_the_log_accumulates_every_contact_for_one_customer(): void
     {
         $this->seed(RespuestaSeeder::class);
         $agente = Usuario::factory()->create();
@@ -63,6 +64,8 @@ class LlamadaFoundationTest extends TestCase
                 'ruc' => '20123456789',
             ]);
 
-        $this->assertSame(3, Llamada::query()->where('ruc', '20123456789')->count());
+        // The log hangs off identity, so contacts accumulate across whatever
+        // campaigns delivered the customer in between.
+        $this->assertSame(3, Cliente::porRuc('20123456789')?->llamadas()->count());
     }
 }

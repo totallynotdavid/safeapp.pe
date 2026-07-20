@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Quiebre;
 
-use App\Models\Cliente;
+use App\Models\Dato;
 use App\Models\Quiebre;
 use App\Models\Tienda;
 
@@ -14,7 +14,7 @@ class QuiebreClienteTest extends QuiebreTestCase
     public function test_the_form_appears_only_once_a_ruc_resolves_to_a_client(): void
     {
         $ejecutivo = $this->ejecutivo();
-        Cliente::factory()->create(['ruc' => self::RUC, 'razon_social' => 'ACME SAC']);
+        Dato::factory()->create(['ruc' => self::RUC, 'razon_social' => 'ACME SAC']);
 
         // No RUC yet: the search box, and nothing to file against.
         $this
@@ -42,7 +42,7 @@ class QuiebreClienteTest extends QuiebreTestCase
     public function test_the_client_name_is_never_an_input(): void
     {
         $ejecutivo = $this->ejecutivo();
-        $cliente = Cliente::factory()->create(['ruc' => '20555555555', 'razon_social' => 'NOMBRE REAL']);
+        $cliente = Dato::factory()->create(['ruc' => '20555555555', 'razon_social' => 'NOMBRE REAL']);
 
         // A posted name must be ignored, not stored: the client record owns it.
         $this->actingAs($ejecutivo)->post(

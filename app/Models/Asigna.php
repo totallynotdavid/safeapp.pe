@@ -17,7 +17,7 @@ class Asigna extends Model
 
     public $timestamps = false;
 
-    protected $table = 'asigna';
+    protected $table = 'asignacion_tienda';
 
     // No natural primary key in the legacy table; reads go through the
     // (id_usuario, estado) index, never by row id.

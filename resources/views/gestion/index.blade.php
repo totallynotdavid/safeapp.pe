@@ -60,7 +60,7 @@
     <div class="rounded-lg border border-gray-200 bg-white">
         <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
             <h2 class="text-lg font-semibold text-gray-800">Gestión {{ $tipo }}</h2>
-            <span class="text-sm text-gray-500">{{ $clientes->total() }} por gestionar</span>
+            <span class="text-sm text-gray-500">{{ $datos->total() }} por gestionar</span>
         </div>
 
         <div class="overflow-x-auto">
@@ -75,14 +75,14 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
-                    @forelse ($clientes as $cliente)
+                    @forelse ($datos as $dato)
                         <tr>
-                            <td class="px-6 py-3 font-medium text-gray-800">{{ $cliente->ruc }}</td>
-                            <td class="px-6 py-3 text-gray-600">{{ $cliente->razon_social }}</td>
-                            <td class="px-6 py-3 text-gray-600">{{ $cliente->zonal ?? '—' }}</td>
-                            <td class="px-6 py-3 text-gray-600">{{ $cliente->origen ?? '—' }}</td>
+                            <td class="px-6 py-3 font-medium text-gray-800">{{ $dato->cliente->ruc }}</td>
+                            <td class="px-6 py-3 text-gray-600">{{ $dato->cliente->razon_social }}</td>
+                            <td class="px-6 py-3 text-gray-600">{{ $dato->zonal ?? '—' }}</td>
+                            <td class="px-6 py-3 text-gray-600">{{ $dato->origen ?? '—' }}</td>
                             <td class="px-6 py-3 text-right">
-                                <a href="{{ route('gestion.show', $cliente) }}" class="rounded-md bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-200">
+                                <a href="{{ route('gestion.show', $dato) }}" class="rounded-md bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-200">
                                     Gestionar
                                 </a>
                             </td>
@@ -98,9 +98,9 @@
             </table>
         </div>
 
-        @if ($clientes->hasPages())
+        @if ($datos->hasPages())
             <div class="border-t border-gray-200 px-6 py-3">
-                {{ $clientes->links() }}
+                {{ $datos->links() }}
             </div>
         @endif
     </div>

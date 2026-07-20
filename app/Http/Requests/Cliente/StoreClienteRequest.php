@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Cliente;
 
 use App\Cockpit\Operadores;
-use App\Models\Cliente;
+use App\Models\Dato;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -20,16 +20,18 @@ class StoreClienteRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            // Peruvian RUC: 11 digits. Unique because every join in the app goes
-            // through it, so a duplicate would silently merge two clients' call
-            // histories.
-            'ruc' => ['required', 'digits:11', Rule::unique('datos', 'ruc')],
+            // Peruvian RUC: 11 digits. Deliberately not checked for uniqueness
+            // here. A customer may already be known from a charge note or an
+            // avería without ever having been in a queue, and registering them
+            // is then exactly the right thing to do. Re-registering a record
+            // that does exist is idempotent, so it needs no error either.
+            'ruc' => ['required', 'digits:11'],
             'razon_social' => ['required', 'string', 'max:255'],
             'zonal' => ['nullable', 'string', 'max:100'],
             // Which queue will work this client. Required and limited to the
             // segments that have a screen: a client filed under anything else
             // can never be worked again.
-            'tipo_data' => ['required', Rule::in(Cliente::TIPOS_DATA)],
+            'tipo_data' => ['required', Rule::in(Dato::TIPOS_DATA)],
         ];
 
         foreach (Operadores::TODOS as $operador) {
@@ -46,7 +48,6 @@ class StoreClienteRequest extends FormRequest
     {
         return [
             'ruc.digits' => 'El RUC debe tener 11 dígitos.',
-            'ruc.unique' => 'Ese RUC ya está registrado.',
             'tipo_data.required' => 'Elija el segmento que trabajará al cliente.',
         ];
     }

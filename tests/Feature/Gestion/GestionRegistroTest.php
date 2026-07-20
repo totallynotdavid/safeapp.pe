@@ -2,19 +2,19 @@
 
 namespace Tests\Feature\Gestion;
 
-use App\Models\Cliente;
+use App\Models\Dato;
 use App\Models\Llamada;
 
 class GestionRegistroTest extends GestionTestCase
 {
-    public function test_logging_a_contact_appends_the_call_and_advances_the_client(): void
+    public function test_logging_a_contact_appends_the_call_and_advances_the_record(): void
     {
         $agente = $this->agente('gestion.movil');
-        $cliente = $this->clienteDe($agente);
+        $dato = $this->datoDe($agente);
 
         $this
             ->actingAs($agente)
-            ->post(route('gestion.store', $cliente), [
+            ->post(route('gestion.store', $dato), [
                 'telefono' => '987654321',
                 'id_respuesta' => 2,
                 'nombre_contacto' => 'JUAN PEREZ',
@@ -27,24 +27,33 @@ class GestionRegistroTest extends GestionTestCase
             ])
             ->assertRedirect(route('gestion.movil'));
 
-        $llamada = Llamada::query()->where('ruc', $cliente->ruc)->sole();
+        $llamada = $dato->cliente->llamadas()->sole();
         $this->assertSame($agente->id_usuario, $llamada->id_usuario);
         $this->assertSame('JUAN PEREZ', $llamada->nombre_contacto);
-        $this->assertSame($cliente->razon_social, $llamada->razon_social);
+        $this->assertSame($dato->cliente->razon_social, $llamada->razon_social);
         $this->assertSame('MOVIL', $llamada->tipo_data);
 
+        // The call names both the customer it is about and the campaign record
+        // that prompted it, so a contact outlives the campaign without losing
+        // the context it was made in.
+        $this->assertSame($dato->id_cliente, $llamada->id_cliente);
+        $this->assertSame($dato->id_dato, $llamada->id_dato);
+
         // The queue and the log move together.
-        $this->assertSame(Cliente::ESTADO_GESTIONADO, $cliente->fresh()->estado);
+        $this->assertSame(Dato::ESTADO_GESTIONADO, $dato->fresh()->estado);
     }
 
-    public function test_the_contact_refreshes_the_clients_line_mix(): void
+    public function test_the_line_mix_an_agent_confirms_is_recorded_on_the_call(): void
     {
+        // The file's counts and the agent's are two observations, not one
+        // mutable field. Legacy wrote the agent's back over the campaign row,
+        // so the next load of that campaign silently erased it.
         $agente = $this->agente('gestion.movil');
-        $cliente = $this->clienteDe($agente);
+        $dato = $this->datoDe($agente, 'MOVIL', ['q_movistar' => 1, 'q_entel' => 1]);
 
         $this
             ->actingAs($agente)
-            ->post(route('gestion.store', $cliente), [
+            ->post(route('gestion.store', $dato), [
                 'telefono' => '987654321',
                 'id_respuesta' => 2,
                 'q_movistar' => 4,
@@ -54,31 +63,53 @@ class GestionRegistroTest extends GestionTestCase
             ])
             ->assertRedirect();
 
-        $cliente = $cliente->fresh();
-        $this->assertSame(7, $cliente->lineasPropias());
-        $this->assertSame(7, $cliente->lineasCompetencia());
+        $llamada = $dato->cliente->llamadas()->sole();
+        $this->assertSame(7, $llamada->q_entel);
+        $this->assertSame(4, $llamada->q_movistar);
+
+        $dato->refresh();
+        $this->assertSame(1, $dato->q_movistar);
+        $this->assertSame(1, $dato->q_entel);
+    }
+
+    public function test_the_screen_shows_the_last_confirmed_line_mix_over_the_files(): void
+    {
+        $agente = $this->agente('gestion.movil');
+        $dato = $this->datoDe($agente, 'MOVIL', ['q_entel' => 1]);
+
+        $this->actingAs($agente)->post(route('gestion.store', $dato), [
+            'telefono' => '987654321',
+            'id_respuesta' => 2,
+            'q_entel' => 9,
+        ]);
+
+        $this
+            ->actingAs($agente)
+            ->get(route('gestion.show', $dato))
+            ->assertOk()
+            ->assertViewHas('mezcla', static fn ($mezcla): bool => $mezcla->propias() === 9);
     }
 
     public function test_the_channel_comes_from_the_chosen_respuesta(): void
     {
         $agente = $this->agente('gestion.movil');
-        $cliente = $this->clienteDe($agente);
+        $dato = $this->datoDe($agente);
 
         // id 15 is a VISITA disposition; the form never states the channel.
         $this
             ->actingAs($agente)
-            ->post(route('gestion.store', $cliente), [
+            ->post(route('gestion.store', $dato), [
                 'telefono' => '987654321',
                 'id_respuesta' => 15,
             ])
             ->assertRedirect();
 
-        $this->assertSame('VISITA', Llamada::query()->where('ruc', $cliente->ruc)->value('gestion'));
+        $this->assertSame('VISITA', $dato->cliente->llamadas()->value('gestion'));
     }
 
-    public function test_an_agent_cannot_work_another_agents_client(): void
+    public function test_an_agent_cannot_work_a_record_held_by_another_agent(): void
     {
-        $ajeno = $this->clienteDe($this->agente());
+        $ajeno = $this->datoDe($this->agente());
         $agente = $this->agente('gestion.movil');
 
         $this->actingAs($agente)->get(route('gestion.show', $ajeno))->assertForbidden();
@@ -91,23 +122,23 @@ class GestionRegistroTest extends GestionTestCase
             ->assertForbidden();
 
         $this->assertSame(0, Llamada::query()->count());
-        $this->assertSame(Cliente::ESTADO_PENDIENTE, $ajeno->fresh()->estado);
+        $this->assertSame(Dato::ESTADO_PENDIENTE, $ajeno->fresh()->estado);
     }
 
-    public function test_it_rejects_an_unknown_respuesta_and_leaves_the_client_pending(): void
+    public function test_it_rejects_an_unknown_respuesta_and_leaves_the_record_pending(): void
     {
         $agente = $this->agente('gestion.movil');
-        $cliente = $this->clienteDe($agente);
+        $dato = $this->datoDe($agente);
 
         $this
             ->actingAs($agente)
-            ->post(route('gestion.store', $cliente), [
+            ->post(route('gestion.store', $dato), [
                 'telefono' => '987654321',
                 'id_respuesta' => 9999,
             ])
             ->assertSessionHasErrors('id_respuesta');
 
         $this->assertSame(0, Llamada::query()->count());
-        $this->assertSame(Cliente::ESTADO_PENDIENTE, $cliente->fresh()->estado);
+        $this->assertSame(Dato::ESTADO_PENDIENTE, $dato->fresh()->estado);
     }
 }

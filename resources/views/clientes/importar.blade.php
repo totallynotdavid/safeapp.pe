@@ -58,7 +58,7 @@
             </div>
             <ul class="list-disc space-y-1 pl-5">
                 <li><span class="font-medium text-gray-800">ruc</span>, <span class="font-medium text-gray-800">tipo_data</span> y <span class="font-medium text-gray-800">origen</span> son obligatorios. El resto puede ir vacío.</li>
-                <li><span class="font-medium text-gray-800">tipo_data</span> decide qué cola trabaja al cliente: {{ implode(' o ', \App\Models\Cliente::TIPOS_DATA) }}.</li>
+                <li><span class="font-medium text-gray-800">tipo_data</span> decide qué cola trabaja al cliente: {{ implode(' o ', \App\Models\Dato::TIPOS_DATA) }}.</li>
                 <li><span class="font-medium text-gray-800">origen</span> es la campaña de la que viene. Los agentes piden lotes por origen.</li>
                 <li>Un RUC que ya existe se actualiza; no se duplica. La carga nunca cambia a qué agente pertenece un cliente ni si ya fue gestionado.</li>
                 <li>Si alguna fila tiene un error no se carga nada, para que no quede una carga a medias.</li>

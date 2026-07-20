@@ -7,9 +7,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-// One contact an agent logged against a client. Append-only: rows are never
+// One contact an agent logged against a customer. Append-only: rows are never
 // edited, and the accumulated history is what the client screen and the
-// seguimiento reports read. Cliente::registrarGestion owns the write.
+// seguimiento reports read. Dato::registrarGestion owns the write.
+//
+// Points at the customer, not at the campaign record that prompted the call, so
+// a contact survives the campaign. This is also the one legacy table that always
+// referenced clients by their natural key, and correspondingly the only one with
+// no orphaned rows in the production dump.
 class Llamada extends Model
 {
     /** @use HasFactory<LlamadaFactory> */
@@ -54,5 +59,15 @@ class Llamada extends Model
     public function respuesta(): BelongsTo
     {
         return $this->belongsTo(Respuesta::class, 'id_respuesta', 'id_respuesta');
+    }
+
+    public function cliente(): BelongsTo
+    {
+        return $this->belongsTo(Cliente::class, 'id_cliente', 'id_cliente');
+    }
+
+    public function dato(): BelongsTo
+    {
+        return $this->belongsTo(Dato::class, 'id_dato', 'id_dato');
     }
 }

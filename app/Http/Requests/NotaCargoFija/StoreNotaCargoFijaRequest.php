@@ -20,7 +20,7 @@ class StoreNotaCargoFijaRequest extends FormRequest
             // Resolved before the form renders, and still checked here so a
             // hand-posted id cannot attach a case to a client that does not
             // exist. Legacy took ruc and razon_social as free text.
-            'id_cliente' => ['required', Rule::exists('datos', 'id_cliente')],
+            'id_cliente' => ['required', Rule::exists('cliente', 'id_cliente')],
             'zonal' => ['required', Rule::exists('tienda', 'id_tienda')],
             // What was sold, chosen from the catalog rather than typed. Legacy
             // asked for subtipo and descripción as two dependent free-ish

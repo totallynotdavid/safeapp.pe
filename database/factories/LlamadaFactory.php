@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Cliente;
 use App\Models\Llamada;
 use App\Models\Respuesta;
 use App\Models\Usuario;
@@ -13,6 +14,26 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class LlamadaFactory extends Factory
 {
     protected $model = Llamada::class;
+
+    /**
+     * Lets a fixture name the customer by RUC, resolving it the way the gestión
+     * form does. Kept in step with DatoFactory so both read the same.
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    public function newModel(array $attributes = []): Llamada
+    {
+        if (array_key_exists('ruc', $attributes)) {
+            $attributes['id_cliente'] = Cliente::query()->firstOrCreate(
+                ['ruc' => $attributes['ruc']],
+                ['razon_social' => mb_strtoupper(fake()->company())],
+            )->id_cliente;
+
+            unset($attributes['ruc']);
+        }
+
+        return parent::newModel($attributes);
+    }
 
     public function definition(): array
     {
@@ -31,7 +52,7 @@ class LlamadaFactory extends Factory
                 ])->id_respuesta
             ),
             'fecha' => fake()->dateTimeBetween('-3 months', 'now'),
-            'ruc' => fake()->numerify('20#########'),
+            'id_cliente' => Cliente::factory(),
             'razon_social' => mb_strtoupper(fake()->company()),
             'telefono' => fake()->numerify('9########'),
             'nombre_contacto' => mb_strtoupper(fake()->name()),

@@ -49,7 +49,7 @@ class HistoricoController extends Controller
     private function mios(int $idUsuario, RangoFechas $rango): Builder
     {
         return Llamada::query()
-            ->with('respuesta')
+            ->with('respuesta', 'cliente')
             ->where('id_usuario', $idUsuario)
             ->whereBetween('fecha', $rango->limites());
     }

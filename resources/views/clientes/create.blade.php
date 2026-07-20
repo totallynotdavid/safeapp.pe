@@ -15,19 +15,20 @@
 
         @include('partials.buscar-cliente', ['ruta' => 'clientes.create', 'ruc' => $ruc])
 
-        @if ($cliente)
-            {{-- The client exists. Registering it again is never the answer, so
-                 the only offer is to take it when nobody holds it. --}}
+        @if ($dato)
+            {{-- The customer is already on a campaign list. Loading them again is
+                 never the answer, so the only offer is to take the record when
+                 nobody holds it. --}}
             <div class="rounded-lg border border-gray-200 bg-white p-6">
                 <h2 class="text-lg font-semibold text-gray-800">{{ $cliente->razon_social }}</h2>
                 <dl class="mt-4 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
                     @include('partials.campo', ['label' => 'RUC', 'value' => $cliente->ruc])
-                    @include('partials.campo', ['label' => 'Segmento', 'value' => $cliente->tipo_data])
-                    @include('partials.campo', ['label' => 'Origen', 'value' => $cliente->origen])
+                    @include('partials.campo', ['label' => 'Segmento', 'value' => $dato->tipo_data])
+                    @include('partials.campo', ['label' => 'Origen', 'value' => $dato->origen])
                 </dl>
 
-                @if ($cliente->id_usuario === \App\Models\Cliente::SIN_AGENTE)
-                    <form method="POST" action="{{ route('clientes.tomar', $cliente) }}" class="mt-4">
+                @if ($dato->asignacionActiva === null)
+                    <form method="POST" action="{{ route('clientes.tomar', $dato) }}" class="mt-4">
                         @csrf
                         <button type="submit" class="rounded-md bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">
                             Tomar este cliente
@@ -35,7 +36,7 @@
                     </form>
                 @else
                     <p class="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-900">
-                        Asignado a {{ $cliente->agente?->personal ?? 'otro agente' }}. Solicite la reasignación a su supervisor.
+                        Asignado a {{ $dato->asignacionActiva->agente?->personal ?? 'otro agente' }}. Solicite la reasignación a su supervisor.
                     </p>
                 @endif
             </div>
@@ -69,7 +70,7 @@
                         <label for="tipo_data" class="{{ $label }}">Segmento</label>
                         <select id="tipo_data" name="tipo_data" required class="{{ $field }}">
                             <option value="">-- Elegir --</option>
-                            @foreach (\App\Models\Cliente::TIPOS_DATA as $segmento)
+                            @foreach (\App\Models\Dato::TIPOS_DATA as $segmento)
                                 <option value="{{ $segmento }}" @selected(old('tipo_data') === $segmento)>{{ $segmento }}</option>
                             @endforeach
                         </select>

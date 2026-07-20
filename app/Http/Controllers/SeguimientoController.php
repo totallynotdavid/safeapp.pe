@@ -83,7 +83,7 @@ class SeguimientoController extends Controller
     private function delEquipo(int $supervisor, RangoFechas $rango): Builder
     {
         return Llamada::query()
-            ->with('respuesta', 'agente')
+            ->with('respuesta', 'agente', 'cliente')
             ->whereIn(
                 'id_usuario',
                 Usuario::query()->select('id_usuario')->where('id_supervisor', $supervisor),

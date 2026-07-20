@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Gestion;
 
+use App\Cockpit\MezclaDeLineas;
 use App\Cockpit\Operadores;
 use App\Models\Llamada;
 
@@ -12,16 +13,16 @@ class GestionPanelesTest extends GestionTestCase
     public function test_the_history_shows_every_contact_newest_first(): void
     {
         $agente = $this->agente('gestion.movil');
-        $cliente = $this->clienteDe($agente);
+        $dato = $this->datoDe($agente);
 
         Llamada::factory()->create([
-            'ruc' => $cliente->ruc,
+            'id_cliente' => $dato->id_cliente,
             'id_usuario' => $agente->id_usuario,
             'fecha' => '2026-01-01 09:00:00',
             'comentario' => 'PRIMER CONTACTO',
         ]);
         Llamada::factory()->create([
-            'ruc' => $cliente->ruc,
+            'id_cliente' => $dato->id_cliente,
             'id_usuario' => $agente->id_usuario,
             'fecha' => '2026-02-01 09:00:00',
             'comentario' => 'SEGUNDO CONTACTO',
@@ -29,7 +30,7 @@ class GestionPanelesTest extends GestionTestCase
 
         $this
             ->actingAs($agente)
-            ->get(route('gestion.show', $cliente))
+            ->get(route('gestion.show', $dato))
             ->assertOk()
             ->assertSeeInOrder(['SEGUNDO CONTACTO', 'PRIMER CONTACTO']);
     }
@@ -37,14 +38,14 @@ class GestionPanelesTest extends GestionTestCase
     public function test_the_history_is_limited_to_this_client(): void
     {
         $agente = $this->agente('gestion.movil');
-        $cliente = $this->clienteDe($agente);
-        $otro = $this->clienteDe($agente);
+        $dato = $this->datoDe($agente);
+        $otro = $this->datoDe($agente);
 
-        Llamada::factory()->create(['ruc' => $otro->ruc, 'comentario' => 'CONTACTO AJENO']);
+        Llamada::factory()->create(['id_cliente' => $otro->id_cliente, 'comentario' => 'CONTACTO AJENO']);
 
         $this
             ->actingAs($agente)
-            ->get(route('gestion.show', $cliente))
+            ->get(route('gestion.show', $dato))
             ->assertOk()
             ->assertDontSee('CONTACTO AJENO');
     }
@@ -52,13 +53,13 @@ class GestionPanelesTest extends GestionTestCase
     public function test_known_phones_are_derived_from_the_contacts(): void
     {
         $agente = $this->agente('gestion.movil');
-        $cliente = $this->clienteDe($agente);
+        $dato = $this->datoDe($agente);
 
         // Repeats of one number collapse into a single row with a count.
-        Llamada::factory()->count(2)->create(['ruc' => $cliente->ruc, 'telefono' => '987654321']);
-        Llamada::factory()->create(['ruc' => $cliente->ruc, 'telefono' => '912345678']);
+        Llamada::factory()->count(2)->create(['id_cliente' => $dato->id_cliente, 'telefono' => '987654321']);
+        Llamada::factory()->create(['id_cliente' => $dato->id_cliente, 'telefono' => '912345678']);
 
-        $telefonos = $cliente->telefonosConocidos();
+        $telefonos = $dato->cliente->telefonosConocidos();
 
         $this->assertCount(2, $telefonos);
         $this->assertSame(2, (int) $telefonos->firstWhere('telefono', '987654321')->veces);
@@ -68,38 +69,57 @@ class GestionPanelesTest extends GestionTestCase
     public function test_logging_a_contact_makes_its_phone_known(): void
     {
         $agente = $this->agente('gestion.movil');
-        $cliente = $this->clienteDe($agente);
+        $dato = $this->datoDe($agente);
 
-        $this->assertCount(0, $cliente->telefonosConocidos());
+        $this->assertCount(0, $dato->cliente->telefonosConocidos());
 
         $this
             ->actingAs($agente)
-            ->post(route('gestion.store', $cliente), [
+            ->post(route('gestion.store', $dato), [
                 'telefono' => '987654321',
                 'id_respuesta' => 2,
             ])
             ->assertRedirect();
 
-        $this->assertSame('987654321', $cliente->telefonosConocidos()->first()->telefono);
+        $this->assertSame('987654321', $dato->cliente->telefonosConocidos()->first()->telefono);
     }
 
-    public function test_the_client_panel_lists_every_operator_line_count(): void
+    /**
+     * Phones follow the customer, not the campaign. A number learned while
+     * working one list is still the number to call when a later list delivers
+     * the same customer, which is the whole reason identity is its own table.
+     */
+    public function test_known_phones_span_every_campaign_the_customer_appears_in(): void
     {
         $agente = $this->agente('gestion.movil');
-        $cliente = $this->clienteDe($agente, 'MOVIL', [
+        $anterior = $this->datoDe($agente);
+        Llamada::factory()->create(['id_cliente' => $anterior->id_cliente, 'telefono' => '987654321']);
+
+        $nuevo = $this->datoDe($agente, 'MOVIL', ['id_cliente' => $anterior->id_cliente, 'origen' => 'CAMPAÑA NUEVA']);
+
+        $this->assertSame('987654321', $nuevo->cliente->telefonosConocidos()->sole()->telefono);
+    }
+
+    public function test_the_record_panel_lists_every_operator_line_count(): void
+    {
+        $agente = $this->agente('gestion.movil');
+        $dato = $this->datoDe($agente, 'MOVIL', [
             'q_movistar' => 3,
             'q_entel' => 5,
             'q_claro' => 2,
             'q_bitel' => 1,
         ]);
 
-        $respuesta = $this->actingAs($agente)->get(route('gestion.show', $cliente))->assertOk();
+        $respuesta = $this->actingAs($agente)->get(route('gestion.show', $dato))->assertOk();
 
         foreach (Operadores::TODOS as $operador) {
             $respuesta->assertSee($operador);
         }
 
-        $this->assertSame(5, $cliente->lineasPropias());
-        $this->assertSame(6, $cliente->lineasCompetencia());
+        // Nobody has called yet, so the file's counts are what the screen reads.
+        $respuesta->assertViewHas(
+            'mezcla',
+            static fn (MezclaDeLineas $mezcla): bool => $mezcla->propias() === 5 && $mezcla->competencia() === 6,
+        );
     }
 }

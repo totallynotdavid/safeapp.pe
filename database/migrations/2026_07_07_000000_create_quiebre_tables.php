@@ -22,7 +22,7 @@ return new class extends Migration {
         // validation screen reads the current user's active tienda from here.
         // The assignment module (not yet ported) owns writes and the final
         // shape; this is the minimal read surface plus an index for the lookup.
-        Schema::create('asigna', static function (Blueprint $table) {
+        Schema::create('asignacion_tienda', static function (Blueprint $table) {
             $table->unsignedInteger('id_tienda');
             $table->unsignedInteger('id_usuario');
             $table->integer('estado');
@@ -85,7 +85,7 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::dropIfExists('quiebre');
-        Schema::dropIfExists('asigna');
+        Schema::dropIfExists('asignacion_tienda');
         Schema::dropIfExists('tienda');
     }
 };

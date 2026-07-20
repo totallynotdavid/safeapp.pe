@@ -3,32 +3,35 @@
 namespace App\Cockpit;
 
 use App\Models\Cliente;
+use App\Models\Dato;
 use App\Support\LectorCsv;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 /**
- * The bulk door into `datos`: a campaign file of clients, loaded by RUC.
+ * The bulk door: a campaign file, loaded by RUC into `cliente` and `datos`.
  *
- * AltaDeClientes owns the one-at-a-time door and DistribucionDeClientes owns who
- * holds a client. This owns only the load, and the split is what makes the
- * central rule expressible: FormatoDeImportacion::actualizables() lists every
- * column a load may overwrite, and `id_usuario`, `id_tienda`, `estado` and
- * `fecha_asignacion` are not in it. A load therefore cannot reassign, unassign,
- * or un-work a client, by construction rather than by remembering to.
+ * AltaDeClientes owns the one-at-a-time door and DistribucionDeDatos owns who
+ * holds a record. This owns only the load, and what it can reach is now decided
+ * by the schema rather than by a list. A load writes customer identity and
+ * campaign facts. Ownership lives on `asignacion_datos` and progress lives in
+ * `datos.estado`, neither of which this touches, so a load cannot reassign,
+ * unassign or un-work anything. There is no column list to keep correct.
  *
- * That was not true before. Legacy's CARGAR DATOS button copied a staging table
- * row-for-row into `datos`, ownership columns included, so a load could take
- * clients away from agents who were working them or hand them clients silently.
- * It also re-promoted the entire staging table on every click, ran one SELECT
- * and one write per row with no transaction, and returned only the last
- * statement's result, so a failure halfway through reported success.
+ * That was not true before, twice over. Legacy's CARGAR DATOS button copied a
+ * staging table row-for-row into `datos`, ownership columns included, so a load
+ * could take clients away from agents who were working them. It also re-promoted
+ * the entire staging table on every click, ran one SELECT and one write per row
+ * with no transaction, and returned only the last statement's result, so a
+ * failure halfway through reported success. The first port fixed that with a
+ * hand-maintained list of touchable columns; the schema split removed the need
+ * for the list.
  *
  * A file is all or nothing. Every row is checked before anything is written, and
  * one bad row rejects the file. The alternative, loading what parses and skipping
  * the rest, leaves an operator asking which rows are missing and no way to find
  * out; rejecting means they fix the source and upload again, which is safe
- * because the load is an upsert keyed on a unique `ruc`.
+ * because the load is an idempotent upsert.
  */
 final class ImportacionDeClientes
 {
@@ -109,12 +112,21 @@ final class ImportacionDeClientes
 
         DB::transaction(static function () use ($ruta, &$nuevos, &$actualizados): void {
             foreach (self::lotes($ruta) as $lote) {
-                $existentes = Cliente::query()->whereIn('ruc', array_column($lote, 'ruc'))->count();
+                $campana = self::registrosDeCampana($lote);
 
-                $nuevos += count($lote) - $existentes;
-                $actualizados += $existentes;
+                $repetidos = self::yaCargados($campana);
 
-                Cliente::query()->upsert($lote, ['ruc'], FormatoDeImportacion::actualizables());
+                $nuevos += count($campana) - $repetidos;
+                $actualizados += $repetidos;
+
+                // estado is absent from the update list, so a reload cannot
+                // un-work a record an agent has already gestionado. Ownership is
+                // absent because it is not on this table at all.
+                Dato::query()->upsert(
+                    $campana,
+                    ['id_cliente', 'origen', 'tipo_data'],
+                    ['zonal', 'nodo', ...array_map(Operadores::columna(...), Operadores::TODOS)],
+                );
             }
         });
 
@@ -122,14 +134,71 @@ final class ImportacionDeClientes
     }
 
     /**
-     * @return iterable<int, list<array<string, mixed>>>
+     * How many of these campaign records the load will update rather than
+     * create.
+     *
+     * Matched on the full natural key, because one file may carry several
+     * campaigns and the same customer may legitimately appear in each.
+     *
+     * @param  list<array<string, mixed>>  $campana
+     */
+    private static function yaCargados(array $campana): int
+    {
+        $clave = static fn (array $r): string => "{$r['id_cliente']}\0{$r['origen']}\0{$r['tipo_data']}";
+
+        $existentes = Dato::query()
+            ->whereIn('id_cliente', array_column($campana, 'id_cliente'))
+            ->get(['id_cliente', 'origen', 'tipo_data'])
+            ->map(static fn (Dato $d): string => $clave($d->toArray()))
+            ->flip();
+
+        return count(array_filter(
+            $campana,
+            static fn (array $r): bool => $existentes->has($clave($r)),
+        ));
+    }
+
+    /**
+     * Resolves one batch of rows to campaign records, creating any customer the
+     * file introduces.
+     *
+     * Identity is upserted first and read back in one query rather than resolved
+     * per row: a 200k-row file would otherwise be 200k lookups.
+     *
+     * @param  list<array<string, string>>  $lote
+     * @return list<array<string, mixed>>
+     */
+    private static function registrosDeCampana(array $lote): array
+    {
+        // The feed is authoritative for razon_social, which is why this
+        // overwrites where Cliente::resolver() does not. A file is a deliberate
+        // statement about these customers; a charge note mentioning a RUC in
+        // passing is not.
+        Cliente::query()->upsert(
+            array_map(FormatoDeImportacion::valoresIdentidad(...), $lote),
+            ['ruc'],
+            ['razon_social'],
+        );
+
+        $ids = Cliente::query()
+            ->whereIn('ruc', array_column($lote, 'ruc'))
+            ->pluck('id_cliente', 'ruc');
+
+        return array_map(
+            static fn (array $fila): array => FormatoDeImportacion::valoresCampana($fila, $ids[$fila['ruc']]),
+            $lote,
+        );
+    }
+
+    /**
+     * @return iterable<int, list<array<string, string>>>
      */
     private static function lotes(string $ruta): iterable
     {
         $lote = [];
 
         foreach (LectorCsv::abrir($ruta)->filas() as $fila) {
-            $lote[] = FormatoDeImportacion::valores($fila);
+            $lote[] = $fila;
 
             if (count($lote) === self::POR_LOTE) {
                 yield $lote;

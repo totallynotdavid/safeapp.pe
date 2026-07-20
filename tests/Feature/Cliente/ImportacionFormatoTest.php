@@ -48,8 +48,11 @@ class ImportacionFormatoTest extends TestCase
 
         $this->assertNotNull($cliente);
         $this->assertSame('ACME SAC', $cliente->razon_social);
-        $this->assertSame('CAMPAÑA JULIO', $cliente->origen);
-        $this->assertSame(3, $cliente->q_movistar);
+
+        // One file row becomes identity plus one campaign record.
+        $dato = $cliente->datos()->sole();
+        $this->assertSame('CAMPAÑA JULIO', $dato->origen);
+        $this->assertSame(3, $dato->q_movistar);
     }
 
     public function test_it_loads_a_comma_file_too(): void
@@ -61,7 +64,7 @@ class ImportacionFormatoTest extends TestCase
             ])
             ->assertRedirect();
 
-        $this->assertSame('FIJA', Cliente::porRuc('20123456789')?->tipo_data);
+        $this->assertSame('FIJA', Cliente::porRuc('20123456789')?->datos()->value('tipo_data'));
     }
 
     public function test_one_bad_row_rejects_the_whole_file(): void

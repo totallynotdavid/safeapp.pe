@@ -2,144 +2,77 @@
 
 namespace App\Models;
 
-use App\Cockpit\Operadores;
 use Database\Factories\ClienteFactory;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 
-// A client record an agent works: one row of the queue behind GESTION MOVIL and
-// GESTION FIJA. Legacy calls the table `datos`; the domain term is Cliente.
+/**
+ * A customer, identified by RUC. Nothing about campaigns, ownership or progress
+ * lives here: `Dato` is the customer on a campaign list, and `AsignacionDato` is
+ * the agent holding that record.
+ *
+ * A row is never deleted. Every workflow that mentions a RUC resolves to one of
+ * these, so a charge note raised years ago still names a customer even after the
+ * campaign that introduced them is long gone.
+ */
 class Cliente extends Model
 {
     /** @use HasFactory<ClienteFactory> */
     use HasFactory;
 
-    // 0 = still to be worked, 1 = already gestionado.
-    public const ESTADO_PENDIENTE = 0;
-
-    public const ESTADO_GESTIONADO = 1;
-
-    // Every segment a client can belong to. This column decides which queue
-    // works the client, so it holds only segments that have a screen. It is not
-    // the place to record where a client came from: `origen` does that, and
-    // conflating the two is what stranded the legacy CONVERGENTE rows (see the
-    // create_datos_table migration).
-    public const TIPOS_DATA = ['MOVIL', 'FIJA'];
-
-    // An unassigned client: id_usuario 0 is the pool, not a real user.
-    public const SIN_AGENTE = 0;
-
     public $timestamps = false;
 
-    protected $table = 'datos';
+    protected $table = 'cliente';
 
     protected $primaryKey = 'id_cliente';
 
-    // Only the line counts are mass-assigned, and only by registrarGestion().
-    // Ownership (id_usuario, id_tienda), estado, and the import-fed descriptors
-    // are set explicitly by whichever flow owns them.
-    protected $fillable = [
-        'q_movistar',
-        'q_entel',
-        'q_claro',
-        'q_bitel',
-    ];
-
-    protected function casts(): array
-    {
-        return [
-            'fecha_asignacion' => 'date',
-            'estado' => 'integer',
-            'q_movistar' => 'integer',
-            'q_entel' => 'integer',
-            'q_claro' => 'integer',
-            'q_bitel' => 'integer',
-        ];
-    }
+    protected $fillable = ['ruc', 'razon_social'];
 
     /**
-     * The single way a workflow resolves a RUC to a client.
+     * The single way a workflow resolves a RUC to a customer.
      *
      * Legacy had four copies of this (the quiebre and three notacargo screens),
-     * each an AJAX endpoint, because each of those forms was a modal that had
-     * no client in hand. They exist as one lookup here so the identity a
-     * workflow files against comes from one place. `ruc` is unique, so this is
-     * a single row or nothing.
+     * each its own AJAX endpoint, because each of those forms was a modal with
+     * no customer in hand. `ruc` is unique, so this is one row or nothing.
      */
     public static function porRuc(string $ruc): ?self
     {
         return self::query()->where('ruc', $ruc)->first();
     }
 
-    public function lineasPropias(): int
-    {
-        return (int) $this->{Operadores::columna(Operadores::PROPIO)};
-    }
-
-    public function lineasCompetencia(): int
-    {
-        return array_sum(array_map(
-            fn (string $operador): int => (int) $this->{Operadores::columna($operador)},
-            Operadores::competencia(),
-        ));
-    }
-
     /**
-     * Write owner of "logging a contact advances the client's state". The
-     * llamada insert and the estado change must stay in one transaction: split
-     * them and a failure leaves a logged call on a client that never leaves the
-     * queue.
+     * Resolves a RUC, creating the customer when it is new.
      *
-     * @param  array<string, mixed>  $contacto  validated payload from StoreGestionRequest
+     * This is what a workflow calls when it must have a customer to file
+     * against: raising a charge note for a RUC nobody has loaded is normal, and
+     * used to leave the record pointing at nothing. In the production dump 83%
+     * of nc_fija rows referenced a RUC absent from the work queue, which is the
+     * defect this closes. Creating identity is safe precisely because identity
+     * carries no campaign, no owner and no progress: it puts nobody in a queue.
      */
-    public function registrarGestion(int $idAgente, array $contacto): Llamada
+    public static function resolver(string $ruc, ?string $razonSocial = null): self
     {
-        return DB::transaction(function () use ($idAgente, $contacto): Llamada {
-            // $fillable guards the agent-supplied half. The rest is server
-            // state. The channel comes from the chosen respuesta, never from the
-            // request, so a VISITA outcome cannot be filed against a LLAMADA.
-            $llamada = $this->llamadas()->make($contacto);
-            $llamada->forceFill([
-                'id_usuario' => $idAgente,
-                'razon_social' => $this->razon_social,
-                'tipo_data' => $this->tipo_data,
-                'gestion' => Respuesta::query()->whereKey($contacto['id_respuesta'])->value('tipo'),
-                'fecha' => now(),
-            ])->save();
+        $cliente = self::query()->firstOrCreate(['ruc' => $ruc], ['razon_social' => $razonSocial]);
 
-            // The contact is also the freshest read on the client's line mix.
-            $this->fill(array_intersect_key($contacto, array_flip($this->getFillable())));
-            $this->forceFill(['estado' => self::ESTADO_GESTIONADO])->save();
+        // A later mention with a name fills in one we never had. It does not
+        // overwrite a name already on file: a load never overwrites what a
+        // person recorded, and that rule does not stop at the campaign table.
+        if ($razonSocial !== null && $cliente->razon_social === null) {
+            $cliente->update(['razon_social' => $razonSocial]);
+        }
 
-            return $llamada;
-        });
+        return $cliente;
     }
 
     /**
-     * The agent's outstanding queue for one segment, scoped to their active
-     * tienda. A client assigned under a tienda the agent no longer holds is
-     * intentionally invisible here.
-     */
-    public function scopeEnCola(Builder $query, int $idAgente, ?int $idTienda, string $tipoData): Builder
-    {
-        return $query
-            ->where('id_usuario', $idAgente)
-            ->where('id_tienda', $idTienda)
-            ->where('estado', self::ESTADO_PENDIENTE)
-            ->where('tipo_data', $tipoData);
-    }
-
-    /**
-     * The phone numbers known for this client, newest contact first.
+     * The phone numbers known for this customer, newest contact first.
      *
      * Derived from the call log, which is the source of truth: a number is known
      * because someone was contacted on it. There is deliberately no phone table
-     * to keep in step.
+     * to keep in step. Spanning campaigns is the point, since the customer is
+     * the same person whichever list delivered them.
      *
      * @return Collection<int, object{telefono: string, veces: int, ultimo_contacto: string}>
      */
@@ -155,18 +88,13 @@ class Cliente extends Model
             ->get();
     }
 
-    public function agente(): BelongsTo
+    public function datos(): HasMany
     {
-        return $this->belongsTo(Usuario::class, 'id_usuario', 'id_usuario');
-    }
-
-    public function tienda(): BelongsTo
-    {
-        return $this->belongsTo(Tienda::class, 'id_tienda', 'id_tienda');
+        return $this->hasMany(Dato::class, 'id_cliente', 'id_cliente');
     }
 
     public function llamadas(): HasMany
     {
-        return $this->hasMany(Llamada::class, 'ruc', 'ruc');
+        return $this->hasMany(Llamada::class, 'id_cliente', 'id_cliente');
     }
 }

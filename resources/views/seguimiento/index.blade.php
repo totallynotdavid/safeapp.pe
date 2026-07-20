@@ -52,7 +52,7 @@
                             <td class="px-6 py-3 text-gray-600">{{ $contacto->agente?->personal }}</td>
                             <td class="px-6 py-3">
                                 <span class="font-medium text-gray-800">{{ $contacto->razon_social }}</span>
-                                <span class="block text-xs text-gray-500">{{ $contacto->ruc }}</span>
+                                <span class="block text-xs text-gray-500">{{ $contacto->cliente?->ruc }}</span>
                             </td>
                             <td class="px-6 py-3 text-gray-600">{{ $contacto->gestion }}</td>
                             <td class="px-6 py-3 text-gray-600">{{ $contacto->respuesta?->descripcion }}</td>

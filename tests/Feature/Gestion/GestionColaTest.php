@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Gestion;
 
-use App\Models\Cliente;
+use App\Models\Dato;
 use App\Models\Tienda;
 
 class GestionColaTest extends GestionTestCase
@@ -24,15 +24,15 @@ class GestionColaTest extends GestionTestCase
     public function test_the_queue_lists_only_my_pending_clients_of_that_segment(): void
     {
         $agente = $this->agente('gestion.movil');
-        $this->clienteDe($agente, 'MOVIL', ['razon_social' => 'CLIENTE EN COLA']);
+        $this->datoDe($agente, 'MOVIL', ['razon_social' => 'CLIENTE EN COLA']);
 
         // Excluded: already worked, wrong segment, and another agent's client.
-        Cliente::factory()
+        Dato::factory()
             ->gestionado()
             ->asignadoA($agente->id_usuario, $this->tienda->id_tienda)
             ->create(['razon_social' => 'CLIENTE GESTIONADO']);
-        $this->clienteDe($agente, 'FIJA', ['razon_social' => 'CLIENTE FIJA']);
-        Cliente::factory()
+        $this->datoDe($agente, 'FIJA', ['razon_social' => 'CLIENTE FIJA']);
+        Dato::factory()
             ->asignadoA($this->agente()->id_usuario, $this->tienda->id_tienda)
             ->create(['razon_social' => 'CLIENTE DE OTRO']);
 
@@ -50,7 +50,7 @@ class GestionColaTest extends GestionTestCase
     {
         $agente = $this->agente('gestion.movil');
         $otraTienda = Tienda::factory()->create();
-        Cliente::factory()
+        Dato::factory()
             ->asignadoA($agente->id_usuario, $otraTienda->id_tienda)
             ->create(['razon_social' => 'CLIENTE DE OTRA TIENDA']);
 

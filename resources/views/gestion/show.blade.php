@@ -16,40 +16,39 @@
     <div class="mb-4 rounded-lg border border-gray-200 bg-white">
         <div class="border-b border-gray-200 px-6 py-4">
             <h2 class="text-lg font-semibold text-gray-800">{{ $cliente->razon_social }}</h2>
-            <p class="text-sm text-gray-500">RUC {{ $cliente->ruc }} · {{ $cliente->tipo_data }}</p>
+            <p class="text-sm text-gray-500">RUC {{ $cliente->ruc }} · {{ $dato->tipo_data }}</p>
         </div>
 
         <dl class="grid grid-cols-2 gap-4 px-6 py-4 text-sm md:grid-cols-4">
             <div>
                 <dt class="text-xs uppercase tracking-wider text-gray-500">Zonal</dt>
-                <dd class="text-gray-800">{{ $cliente->zonal ?? '—' }}</dd>
+                <dd class="text-gray-800">{{ $dato->zonal ?? '—' }}</dd>
             </div>
             <div>
                 <dt class="text-xs uppercase tracking-wider text-gray-500">Origen</dt>
-                <dd class="text-gray-800">{{ $cliente->origen ?? '—' }}</dd>
+                <dd class="text-gray-800">{{ $dato->origen ?? '—' }}</dd>
             </div>
             <div>
                 <dt class="text-xs uppercase tracking-wider text-gray-500">Líneas {{ \App\Cockpit\Operadores::PROPIO }}</dt>
-                <dd class="text-gray-800">{{ $cliente->lineasPropias() }}</dd>
+                <dd class="text-gray-800">{{ $mezcla->propias() }}</dd>
             </div>
             <div>
                 <dt class="text-xs uppercase tracking-wider text-gray-500">Líneas competencia</dt>
-                <dd class="text-gray-800">{{ $cliente->lineasCompetencia() }}</dd>
+                <dd class="text-gray-800">{{ $mezcla->competencia() }}</dd>
             </div>
         </dl>
 
-        {{-- Read off the client already loaded above, so this costs no query. --}}
         <div class="flex flex-wrap gap-x-6 gap-y-1 border-t border-gray-100 px-6 py-3 text-sm text-gray-600">
             @foreach (\App\Cockpit\Operadores::TODOS as $operador)
                 <span>
                     {{ $operador }}
-                    <span class="font-semibold text-gray-800">{{ $cliente->{\App\Cockpit\Operadores::columna($operador)} }}</span>
+                    <span class="font-semibold text-gray-800">{{ $mezcla->cantidad($operador) }}</span>
                 </span>
             @endforeach
         </div>
     </div>
 
-    <form method="POST" action="{{ route('gestion.store', $cliente) }}" class="rounded-lg border border-gray-200 bg-white">
+    <form method="POST" action="{{ route('gestion.store', $dato) }}" class="rounded-lg border border-gray-200 bg-white">
         @csrf
 
         <div class="border-b border-gray-200 px-6 py-4">
@@ -110,7 +109,7 @@
                             @endif
                         </label>
                         <input type="number" min="0" id="{{ $columna }}" name="{{ $columna }}"
-                            value="{{ old($columna, $cliente->{$columna}) }}"
+                            value="{{ old($columna, $mezcla->cantidad($operador)) }}"
                             class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
                     </div>
                 @endforeach

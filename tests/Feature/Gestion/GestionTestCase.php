@@ -2,11 +2,13 @@
 
 namespace Tests\Feature\Gestion;
 
-use App\Models\Cliente;
+use App\Models\Dato;
 use App\Models\Menu;
 use App\Models\Tienda;
 use App\Models\Usuario;
 use Database\Seeders\RespuestaSeeder;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -45,13 +47,34 @@ abstract class GestionTestCase extends TestCase
     }
 
     /**
+     * A campaign record held by the given agent, which is the only state in
+     * which one is workable.
+     *
      * @param  array<string, mixed>  $atributos
      */
-    protected function clienteDe(Usuario $agente, string $tipoData = 'MOVIL', array $atributos = []): Cliente
+    protected function datoDe(Usuario $agente, string $tipoData = 'MOVIL', array $atributos = []): Dato
     {
-        return Cliente::factory()
+        return Dato::factory()
             ->tipoData($tipoData)
             ->asignadoA($agente->id_usuario, $this->tienda->id_tienda)
             ->create($atributos);
+    }
+
+    /**
+     * The records the agent currently holds. Ownership is an open hold, never a
+     * column on the record, so every test that asks "what does this agent have"
+     * asks it the one way.
+     *
+     * @return Collection<int, Dato>
+     */
+    protected function enPoderDe(Usuario $agente): Collection
+    {
+        return Dato::query()
+            ->whereHas(
+                'asignacionActiva',
+                static fn (Builder $q): Builder => $q->where('id_usuario', $agente->id_usuario),
+            )
+            ->with('asignacionActiva')
+            ->get();
     }
 }

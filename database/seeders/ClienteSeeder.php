@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Cliente;
+use App\Models\Dato;
 use App\Models\Usuario;
 use Illuminate\Database\Seeder;
 
@@ -27,14 +27,14 @@ class ClienteSeeder extends Seeder
         }
 
         foreach (['MOVIL', 'FIJA'] as $tipoData) {
-            Cliente::factory()
+            Dato::factory()
                 ->count(8)
                 ->tipoData($tipoData)
                 ->asignadoA($admin->id_usuario, $idTienda)
                 ->create();
 
             foreach (self::ORIGENES as $origen) {
-                Cliente::factory()
+                Dato::factory()
                     ->count(40)
                     ->tipoData($tipoData)
                     ->create(['origen' => $origen]);
