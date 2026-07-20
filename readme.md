@@ -50,10 +50,17 @@ The pre-rewrite export does not load into this schema, so it is restored into a
 scratch database of its own and carried across row by row:
 
 ```sh
-make db-legacy FILE=export.sql   # restores into safeapp_legacy, read-only
-php artisan migrate:fresh        # build the target schema, without --seed
-php artisan cutover:transform    # carry the rows across
+make db-legacy FILE=export.sql            # restores into safeapp_legacy, read-only
+php artisan migrate:fresh --drop-views    # build the target schema, without --seed
+php artisan cutover:transform             # carry the rows across
 ```
+
+`--drop-views` is not optional. The database being transformed is the legacy one,
+and `migrate:fresh` drops tables while leaving views standing, so legacy's
+`reporteusu_excel` would outlive the columns it selects. An invalid view makes
+`mysqldump` fail for the entire database, which means the first thing it breaks
+is the backup. The transform refuses to run while any view is left, rather than
+letting that reach production.
 
 The transform reports what it wrote and what it deliberately dropped. It refuses
 a database that already holds rows, so a second run means resetting first. What

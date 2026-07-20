@@ -4,6 +4,7 @@ namespace Tests\Feature\Cutover;
 
 use App\Models\Cliente;
 use App\Models\Dato;
+use Illuminate\Support\Facades\DB;
 
 /**
  * The command's contract with whoever runs it on the night.
@@ -28,6 +29,22 @@ class TransformCommandTest extends CutoverTestCase
 
         $this->assertSame(1, Cliente::query()->count());
         $this->assertSame(1, Dato::query()->count());
+    }
+
+    /**
+     * The destination on the night is the legacy database itself, and
+     * migrate:fresh drops tables while leaving views standing. A legacy view
+     * outlives the columns it selects, and an invalid view makes mysqldump fail
+     * for the whole database, so the backup is what breaks first.
+     */
+    public function test_it_refuses_a_database_still_holding_legacy_views(): void
+    {
+        DB::statement('CREATE VIEW reporteusu_excel AS SELECT id_usuario FROM usuario');
+
+        $this
+            ->artisan('cutover:transform')
+            ->expectsOutputToContain('--drop-views')
+            ->assertFailed();
     }
 
     public function test_an_empty_export_still_leaves_the_catalogs_the_app_owns(): void

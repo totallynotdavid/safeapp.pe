@@ -16,13 +16,14 @@ use Database\Seeders\MenuSeeder;
 use Database\Seeders\RespuestaSeeder;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Turns a restored pre-rewrite production export into a database this app can
  * run on.
  *
  *     ./scripts/db.sh restore-legacy <export.sql>
- *     php artisan migrate:fresh
+ *     php artisan migrate:fresh --drop-views
  *     php artisan cutover:transform
  *
  * Reads the `legacy` connection, writes the default one. Deliberately not a SQL
@@ -81,7 +82,7 @@ class CutoverTransform extends Command
 
     public function handle(): int
     {
-        if (! $this->destinoVacio()) {
+        if (! $this->destinoVacio() || ! $this->destinoSinVistas()) {
             return self::FAILURE;
         }
 
@@ -146,7 +147,7 @@ class CutoverTransform extends Command
         foreach (self::TABLAS_DESTINO as $tabla) {
             if (DB::table($tabla)->exists()) {
                 $this->components->error(
-                    "`{$tabla}` already has rows. Run `php artisan migrate:fresh` first, without --seed.",
+                    "`{$tabla}` already has rows. Run `php artisan migrate:fresh --drop-views` first, without --seed.",
                 );
 
                 return false;
@@ -154,5 +155,45 @@ class CutoverTransform extends Command
         }
 
         return true;
+    }
+
+    /**
+     * migrate:fresh drops tables and leaves views standing, which matters here
+     * because the database this writes into is the legacy one. Production
+     * carries a reporting view, `reporteusu_excel`, joining `asigna`,
+     * `datos.ruc` and `llamada.ruc`. The rewrite moved identity to `cliente`,
+     * holds to `asignacion_datos` and renamed `asigna`, so after the cutover
+     * the view references columns that no longer exist.
+     *
+     * Worth refusing over rather than warning about, because the damage is
+     * silent and lands somewhere else: an invalid view makes mysqldump fail for
+     * the *whole* database ("references invalid table(s)"), so the first thing
+     * it breaks is the backup, which is also the rollback. Found by dumping a
+     * transformed database and getting 873 bytes instead of a schema.
+     */
+    private function destinoSinVistas(): bool
+    {
+        $esquema = Schema::getCurrentSchemaName();
+
+        $vistas = array_column(
+            array_filter(
+                Schema::getViews(),
+                static fn (array $vista): bool => $vista['schema'] === $esquema,
+            ),
+            'name',
+        );
+
+        if ($vistas === []) {
+            return true;
+        }
+
+        $this->components->error(
+            'Views left over from the legacy schema: '
+            .implode(', ', $vistas)
+            .'. '
+            .'Run `php artisan migrate:fresh --drop-views`, which removes them.',
+        );
+
+        return false;
     }
 }
