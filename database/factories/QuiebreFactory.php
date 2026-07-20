@@ -23,7 +23,7 @@ class QuiebreFactory extends Factory
             'estado' => 'PENDIENTE',
             'id_validador' => 0,
             'fecha_validacion' => null,
-            'casosf' => null,
+            'caso_sf' => null,
             'comentario_validador' => null,
 
             'id_usuario' => Usuario::factory(),

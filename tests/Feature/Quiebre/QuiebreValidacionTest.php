@@ -122,13 +122,13 @@ class QuiebreValidacionTest extends TestCase
 
         $this->actingAs($agente)->put(route('quiebres.validacion.update', $quiebre), [
             'estado' => 'ATENDIDO',
-            'casosf' => 'SF-123',
+            'caso_sf' => 'SF-123',
             'comentario_validador' => 'Revisado y atendido.',
         ])->assertRedirect(route('quiebres.validacion.index'));
 
         $quiebre->refresh();
         $this->assertSame('ATENDIDO', $quiebre->estado);
-        $this->assertSame('SF-123', $quiebre->casosf);
+        $this->assertSame('SF-123', $quiebre->caso_sf);
         $this->assertSame(
             $agente->id_usuario,
             $quiebre->id_validador,
@@ -146,7 +146,7 @@ class QuiebreValidacionTest extends TestCase
 
         $this->actingAs($agente)->put(route('quiebres.validacion.update', $ajeno), [
             'estado' => 'ATENDIDO',
-            'casosf' => 'SF-1',
+            'caso_sf' => 'SF-1',
         ])->assertForbidden();
 
         $this->assertSame('PENDIENTE', $ajeno->fresh()->estado);
@@ -160,7 +160,7 @@ class QuiebreValidacionTest extends TestCase
 
         $this->actingAs($agente)->put(route('quiebres.validacion.update', $quiebre), [
             'estado' => 'INVENTADO',
-            'casosf' => 'SF-1',
+            'caso_sf' => 'SF-1',
         ])->assertSessionHasErrors('estado');
 
         $this->assertSame('PENDIENTE', $quiebre->fresh()->estado);

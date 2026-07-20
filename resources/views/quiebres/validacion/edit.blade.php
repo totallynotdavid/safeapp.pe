@@ -64,8 +64,8 @@
                         </select>
                     </div>
                     <div>
-                        <label for="casosf" class="block text-sm font-medium text-gray-700">Caso SF</label>
-                        <input id="casosf" name="casosf" value="{{ old('casosf', $quiebre->casosf) }}" required
+                        <label for="caso_sf" class="block text-sm font-medium text-gray-700">Caso SF</label>
+                        <input id="caso_sf" name="caso_sf" value="{{ old('caso_sf', $quiebre->caso_sf) }}" required
                             class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none">
                     </div>
                 </div>

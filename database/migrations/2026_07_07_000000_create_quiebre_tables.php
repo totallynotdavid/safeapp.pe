@@ -36,7 +36,7 @@ return new class extends Migration {
             $table->string('estado', 20)->default('PENDIENTE');
             $table->unsignedInteger('id_validador')->default(0);
             $table->date('fecha_validacion')->nullable();
-            $table->string('casosf', 50)->nullable();
+            $table->string('caso_sf', 50)->nullable();
             $table->text('comentario_validador')->nullable();
 
             // Registration-owned columns, written by the still-legacy REGISTRO

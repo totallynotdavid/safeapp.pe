@@ -69,7 +69,7 @@ class Quiebre extends Model
         'estado',
         'id_validador',
         'fecha_validacion',
-        'casosf',
+        'caso_sf',
         'comentario_validador',
         'zonal_telefonica',
         'servicio',

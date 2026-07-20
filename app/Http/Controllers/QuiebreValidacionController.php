@@ -50,7 +50,7 @@ class QuiebreValidacionController extends Controller
 
         $data = $request->validated();
         $quiebre->estado = $data['estado'];
-        $quiebre->casosf = $data['casosf'];
+        $quiebre->caso_sf = $data['caso_sf'];
         $quiebre->comentario_validador = $data['comentario_validador'];
         // Validator identity comes from the session, never the form, and the
         // date is stamped server-side (legacy trusted a hidden field for both).

@@ -103,7 +103,7 @@
             <dl class="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
                 @include('partials.campo', ['label' => 'Validador', 'value' => $quiebre->validador?->personal])
                 @include('partials.campo', ['label' => 'Fecha validación', 'value' => $quiebre->fecha_validacion?->format('Y-m-d')])
-                @include('partials.campo', ['label' => 'Caso SF', 'value' => $quiebre->casosf])
+                @include('partials.campo', ['label' => 'Caso SF', 'value' => $quiebre->caso_sf])
             </dl>
             <div class="mt-4 border-t border-gray-100 pt-4">
                 @include('partials.campo', ['label' => 'Comentario del validador', 'value' => $quiebre->comentario_validador])

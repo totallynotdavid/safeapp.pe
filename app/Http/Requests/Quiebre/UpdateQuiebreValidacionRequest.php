@@ -22,7 +22,7 @@ class UpdateQuiebreValidacionRequest extends FormRequest
     {
         return [
             'estado' => ['required', Rule::in(Quiebre::ESTADOS)],
-            'casosf' => ['required', 'string', 'max:50'],
+            'caso_sf' => ['required', 'string', 'max:50'],
             'comentario_validador' => ['nullable', 'string'],
         ];
     }
