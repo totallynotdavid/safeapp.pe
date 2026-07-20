@@ -22,7 +22,11 @@ class Quiebre extends Model
     // still amend its contact/comentario fields; once validated it is frozen.
     public const ESTADOS_EDITABLES = ['PENDIENTE', 'PROCESANDO'];
 
-    public const SERVICIOS = ['FIJA', 'MOVIL', 'AVANZADO'];
+    // The two segments the rest of the app has. Legacy offered AVANZADO as a
+    // third, but no AVANZADO product has ever existed in the catalog and all 10
+    // legacy quiebre rows are FIJA (9) or MOVIL (1), so the option only ever
+    // filed a case under a service nobody sells.
+    public const SERVICIOS = ['FIJA', 'MOVIL'];
 
     public const DETALLES_EQUIPO = ['DECO', 'BAM', 'MODEM', 'CELULAR', 'TELEFONO', 'OTROS'];
 

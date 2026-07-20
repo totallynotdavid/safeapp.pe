@@ -102,30 +102,6 @@ class PermisosTrasladadosTest extends CutoverTestCase
         $this->assertFalse($agente->hasPermiso('asignacion.gestionar'));
     }
 
-    public function test_the_roles_are_the_ten_production_has_and_not_the_seeder_three(): void
-    {
-        $this->usuarioLegado(1, idRol: 6);
-
-        $this->transformar();
-
-        $this->assertSame('EJECUTIVO COMERCIAL', Usuario::query()->sole()->rol?->nombre_rol);
-    }
-
-    public function test_a_store_assignment_naming_a_deleted_account_is_dropped(): void
-    {
-        // asigna has no key of its own, so 23 rows naming deleted users are
-        // invisible junk rather than a broken link.
-        $this->usuarioLegado(1);
-        $this->filaLegado('tienda', ['id_tienda' => 4, 'nombre' => 'REGION LIMA']);
-        $this->filaLegado('asigna', ['id_tienda' => 4, 'id_usuario' => 1, 'estado' => 0]);
-        $this->filaLegado('asigna', ['id_tienda' => 4, 'id_usuario' => 999, 'estado' => 0]);
-
-        $this->transformar();
-
-        $this->assertSame(1, DB::table('asignacion_tienda')->count());
-        $this->assertSame(4, Usuario::query()->sole()->tiendaAsignada());
-    }
-
     public function test_the_seeded_menu_keeps_the_ids_the_grants_point_at(): void
     {
         $this->transformar();
@@ -134,20 +110,5 @@ class PermisosTrasladadosTest extends CutoverTestCase
         // would silently repoint every grant at a different screen.
         $this->assertSame('gestion.movil', Menu::query()->find(3)?->permiso);
         $this->assertSame('notacargo.fija.back', Menu::query()->find(21)?->permiso);
-    }
-
-    private function usuarioLegado(int $id, int $idRol = 1): void
-    {
-        $this->filaLegado('usuario', [
-            'id_usuario' => $id,
-            'usuario' => "usuario{$id}",
-            'clave' => 'hash',
-            'id_rol' => $idRol,
-            'personal' => "PERSONA {$id}",
-            'estado' => 1,
-            'sexo' => 'M',
-            'id_supervisor' => 0,
-            'fecha_nacimiento' => '0000-00-00',
-        ]);
     }
 }

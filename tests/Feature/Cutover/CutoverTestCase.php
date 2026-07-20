@@ -70,6 +70,25 @@ abstract class CutoverTestCase extends TestCase
         ]);
     }
 
+    /**
+     * An account with the columns every test would otherwise have to repeat.
+     * Role 1 is ADMINISTRADOR, which is the one most tests want.
+     */
+    protected function usuarioLegado(int $id, int $idRol = 1): void
+    {
+        $this->filaLegado('usuario', [
+            'id_usuario' => $id,
+            'usuario' => "usuario{$id}",
+            'clave' => 'hash',
+            'id_rol' => $idRol,
+            'personal' => "PERSONA {$id}",
+            'estado' => 1,
+            'sexo' => 'M',
+            'id_supervisor' => 0,
+            'fecha_nacimiento' => '0000-00-00',
+        ]);
+    }
+
     protected function transformar(): void
     {
         $this->artisan('cutover:transform')->assertSuccessful();
