@@ -26,7 +26,7 @@ class MenuSeeder extends Seeder
             [6,  'USUARIO',              'fa fa-users',      5,  'usuarios.manage'],
             [7,  'GESTION FIJA',         'fa fa-wifi',       1,  'gestion.fija'],
             [8,  'REPORTES',             'fa fa-download',   0,  null],
-            [9,  'GESTION DIARIA',       'fa fa-area-chart', 8,  'repseguimiento'],
+            [9,  'GESTION DIARIA',       'fa fa-area-chart', 8,  'seguimiento.equipo'],
             [10, 'AGREGAR CLIENTE',      'fa fa-plus',       1,  'clientes.crear'],
             [11, 'CARGAR DATOS',         'fa fa-database',   5,  'mantDatos'],
             // The three AVANZADO leaves (legacy ids 23, 24, 25) and their report
@@ -38,9 +38,16 @@ class MenuSeeder extends Seeder
             [12, 'NOTA DE CARGO',        'fa fa-file',       0,  null],
             [13, 'FIJA',                 'fa fa-wifi',       12, 'notacargo.fija.registrar'],
             [16, 'MOVIL',                'fa fa-mobile',     12, 'notacargo.movil.registrar'],
-            [19, 'REPORTE BACK FIJA',    'fa fa-wifi',       8,  'repbackfija'],
-            [20, 'REPORTE BACK MOVIL',   'fa fa-mobile',     8,  'repbackmovil'],
-            [27, 'REPORTE FIJA GLOBAL',  'fa fa-wifi',       8,  'repbackfijaglobal'],
+            // The five REPORTE leaves under REPORTES (legacy ids 19, 20, 26, 27
+            // and 30) are gone, and none of them was a report. Each embedded the
+            // back-office edit modal and posted to the same agregarnc?back
+            // endpoints, so they were the back screen a third and fourth time
+            // with an Excel button on top. The export is now a second submit on
+            // the back queue's own filter form, under that screen's permiso, so
+            // it needs no leaf of its own: see routes/notas-cargo.php. Their
+            // holders keep the access through BACK FIJA and BACK MOVIL, which
+            // every one of them already holds.
+            //
             // The four ids below are legacy's "GLOBAL" copies, kept because they
             // are the leaves the real reviewers hold. Each one's tienda-filtered
             // twin is gone (fija 14 and 15, móvil 17 and 18): the holders of a
@@ -53,8 +60,7 @@ class MenuSeeder extends Seeder
             [22, 'VALIDACION FIJA',      'fa fa-wifi',       12, 'notacargo.fija.validar'],
             [28, 'BACK MOVIL',           'fa fa-mobile',     12, 'notacargo.movil.back'],
             [29, 'VALIDACION MOVIL',     'fa fa-mobile',     12, 'notacargo.movil.validar'],
-            [30, 'REPORTE MOVIL GLOBAL', 'fa fa-mobile',     8,  'repbackmovilglobal'],
-            [31, 'DASHBOARD EJE REAL',   'fa fa-download',   8,  'dashboard'],
+            [31, 'PRODUCCION',           'fa fa-area-chart', 8,  'produccion.ver'],
             [32, 'AVERIAS',              'fa fa-file',       0,  null],
             [33, 'REGISTRO',             'fa fa-area-chart', 32, 'quiebre.registrar'],
             [34, 'SEGUIMIENTO',          'fa fa-area-chart', 32, 'quiebre.validar'],

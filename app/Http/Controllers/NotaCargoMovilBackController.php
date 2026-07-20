@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ReporteNotaCargoMovil;
+use App\Http\FiltroPeriodo;
 use App\Http\Requests\NotaCargoMovil\UpdateBackMovilRequest;
+use App\Models\Builders\NcMovilBuilder;
 use App\Models\Cartera;
 use App\Models\NcMovil;
 use App\Models\Tienda;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 // Nota de cargo móvil, BACK: the back office moves validated cases through the
 // lifecycle and records what fulfilment produced. `estado` is this stage's
@@ -22,19 +25,21 @@ class NotaCargoMovilBackController extends Controller
 {
     public function index(Request $request): View
     {
-        $ano = (int) $request->integer('ano', now()->year);
-        $mes = (int) $request->integer('mes', now()->month);
-        $estado = $request->query('estado');
-        $filtroActivo = in_array($estado, NcMovil::ESTADOS, true);
+        $filtro = FiltroPeriodo::desde($request, NcMovil::ESTADOS);
 
         return view('notas-cargo.movil.back.index', [
-            'cargos' => $this->enSeguimiento($ano, $mes, $filtroActivo ? $estado : null),
+            'cargos' => $this->enSeguimiento($filtro)->orderByDesc('fecha_ingreso')->get(),
             'estados' => NcMovil::ESTADOS,
-            'estado' => $filtroActivo ? $estado : null,
-            'ano' => $ano,
-            'mes' => $mes,
-            'anos' => range(now()->year, now()->year - 5),
+            'filtro' => $filtro,
         ]);
+    }
+
+    public function exportar(Request $request): StreamedResponse
+    {
+        return ReporteNotaCargoMovil::descargar(
+            'notas-cargo-movil-back',
+            $this->enSeguimiento(FiltroPeriodo::desde($request, NcMovil::ESTADOS)),
+        );
     }
 
     public function edit(NcMovil $ncMovil): View
@@ -73,15 +78,17 @@ class NotaCargoMovilBackController extends Controller
     /**
      * Validated cases in the period, windowed per estado by NcMovil::enPeriodo.
      *
-     * @return Collection<int, NcMovil>
+     * Returned unresolved so the screen and the export run the same filter. The
+     * screen adds its own ordering; the export streams by primary key, for the
+     * reason recorded on Reporte.
+     *
+     * @return NcMovilBuilder<NcMovil>
      */
-    private function enSeguimiento(int $ano, int $mes, ?string $estado): Collection
+    private function enSeguimiento(FiltroPeriodo $filtro): NcMovilBuilder
     {
         return NcMovil::query()
             ->with('cliente', 'ejecutivo', 'region')
             ->where('validacion', NcMovil::VALIDACION_PROCEDE)
-            ->enPeriodo($ano, $mes, $estado)
-            ->orderByDesc('fecha_ingreso')
-            ->get();
+            ->enPeriodo($filtro->ano, $filtro->mes, $filtro->estado);
     }
 }

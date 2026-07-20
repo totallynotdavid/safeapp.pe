@@ -8,16 +8,20 @@
     <div class="space-y-6">
         <h1 class="text-xl font-semibold text-gray-800">Mis gestiones</h1>
 
+        {{-- Exportar is a second submit on this form, so the download always
+             carries exactly the range on screen. --}}
         <form method="GET" action="{{ route('historico.index') }}" class="flex flex-wrap items-end gap-3 rounded-lg border border-gray-200 bg-white p-4">
             <div>
                 <label for="desde" class="block text-sm font-medium text-gray-700">Desde</label>
-                <input id="desde" name="desde" type="date" value="{{ $desde }}" class="{{ $field }}">
+                <input id="desde" name="desde" type="date" value="{{ $rango->desde->toDateString() }}" class="{{ $field }}">
             </div>
             <div>
                 <label for="hasta" class="block text-sm font-medium text-gray-700">Hasta</label>
-                <input id="hasta" name="hasta" type="date" value="{{ $hasta }}" class="{{ $field }}">
+                <input id="hasta" name="hasta" type="date" value="{{ $rango->hasta->toDateString() }}" class="{{ $field }}">
             </div>
             <button type="submit" class="rounded-md bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">Filtrar</button>
+            <button type="submit" formaction="{{ route('historico.exportar') }}"
+                class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Exportar</button>
         </form>
 
         <div class="overflow-x-auto rounded-lg border border-gray-200 bg-white">

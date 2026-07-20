@@ -30,6 +30,8 @@ class Sidebar
         'gestion.fija' => 'gestion.fija',
         'clientes.crear' => 'clientes.create',
         'historico.ver' => 'historico.index',
+        'seguimiento.equipo' => 'seguimiento.index',
+        'produccion.ver' => 'produccion.index',
     ];
 
     /**

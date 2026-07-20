@@ -105,4 +105,19 @@ class NcFijaFactory extends Factory
     {
         return $this->state(['validacion' => NcFija::VALIDACION_RECHAZADO]);
     }
+
+    /**
+     * A case that settled this month, which is what puts it on the current back
+     * queue. All three dates have to move together: a COMPLETADO case is
+     * windowed by fecha_liquidacion, so pinning only fecha_ingreso leaves the
+     * fixture outside the period the screen defaults to.
+     */
+    public function liquidadaEsteMes(): static
+    {
+        return $this->state([
+            'fecha_ingreso' => now(),
+            'fecha_actualizacion' => now(),
+            'fecha_liquidacion' => now(),
+        ]);
+    }
 }

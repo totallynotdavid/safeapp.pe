@@ -3,6 +3,7 @@
 namespace App\Models\Builders;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 /**
  * How a nota de cargo queue is windowed to a period, which every screen over
@@ -51,6 +52,33 @@ abstract class NotaCargoBuilder extends Builder
         }
 
         return $this->enCurso([$estado], $ano);
+    }
+
+    /**
+     * How much each ejecutivo has in each estado, over whatever window is
+     * already applied.
+     *
+     * This lives on the builder because both productos aggregate identically and
+     * because the numbers have to come from the same window the queues use.
+     * Legacy computed them with one correlated subquery per estado, each picking
+     * its own date column, so the dashboard and the queue disagreed about which
+     * month a case belonged to. One of those subqueries bounded PENDIENTE with a
+     * hardcoded `month(fecha_validacion) <= 6`, ignoring the chosen month
+     * entirely.
+     *
+     * Returns ids rather than names: resolving an ejecutivo is the caller's job,
+     * and joining `usuario` here would both overreach and collide, since that
+     * table has an `estado` column of its own.
+     *
+     * @return Collection<int, object{id_usuario: int, estado: string, total: float}>
+     */
+    public function totalPorEstado(): Collection
+    {
+        return $this
+            ->toBase()
+            ->selectRaw('id_usuario, estado, SUM(cargo_fijo) as total')
+            ->groupBy('id_usuario', 'estado')
+            ->get();
     }
 
     /**

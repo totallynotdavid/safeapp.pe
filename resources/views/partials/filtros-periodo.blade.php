@@ -4,7 +4,12 @@
     window (NotaCargoBuilder::enPeriodo) and differ only in whose cases they show
     and which estado vocabulary they offer, which is what $estados carries.
 
-    Expects: $ruta, $ano, $anos, $mes, $estado, $estados.
+    Exportar is a second submit on this same form rather than a link, so the
+    download always carries exactly the filter on screen. Legacy gave the export
+    its own form with its own copy of the period inputs, which is one of the ways
+    the two came apart.
+
+    Expects: $ruta, $rutaExportar, $filtro, $estados.
 --}}
 @php($control = 'mt-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-gray-500 focus:outline-none')
 @php($meses = ['01' => 'Enero', '02' => 'Febrero', '03' => 'Marzo', '04' => 'Abril', '05' => 'Mayo', '06' => 'Junio', '07' => 'Julio', '08' => 'Agosto', '09' => 'Setiembre', '10' => 'Octubre', '11' => 'Noviembre', '12' => 'Diciembre'])
@@ -13,8 +18,8 @@
     <div>
         <label for="ano" class="block text-xs font-medium text-gray-500">Año</label>
         <select id="ano" name="ano" class="{{ $control }}">
-            @foreach ($anos as $opcion)
-                <option value="{{ $opcion }}" @selected($ano === $opcion)>{{ $opcion }}</option>
+            @foreach ($filtro->anos() as $opcion)
+                <option value="{{ $opcion }}" @selected($filtro->ano === $opcion)>{{ $opcion }}</option>
             @endforeach
         </select>
     </div>
@@ -22,7 +27,7 @@
         <label for="mes" class="block text-xs font-medium text-gray-500">Mes</label>
         <select id="mes" name="mes" class="{{ $control }}">
             @foreach ($meses as $valor => $nombre)
-                <option value="{{ $valor }}" @selected($mes === (int) $valor)>{{ $nombre }}</option>
+                <option value="{{ $valor }}" @selected($filtro->mes === (int) $valor)>{{ $nombre }}</option>
             @endforeach
         </select>
     </div>
@@ -31,11 +36,15 @@
         <select id="estado" name="estado" class="{{ $control }}">
             <option value="">Todos</option>
             @foreach ($estados as $opcion)
-                <option value="{{ $opcion }}" @selected($estado === $opcion)>{{ $opcion }}</option>
+                <option value="{{ $opcion }}" @selected($filtro->estado === $opcion)>{{ $opcion }}</option>
             @endforeach
         </select>
     </div>
     <button type="submit" class="rounded-md bg-gray-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-700">
         Filtrar
+    </button>
+    <button type="submit" formaction="{{ route($rutaExportar) }}"
+        class="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+        Exportar
     </button>
 </form>

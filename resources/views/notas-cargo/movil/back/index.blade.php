@@ -13,7 +13,7 @@
         <div class="flex flex-wrap items-end justify-between gap-4 border-b border-gray-200 px-6 py-4">
             <h2 class="text-lg font-semibold text-gray-800">Notas de cargo móvil en seguimiento</h2>
 
-            @include('partials.filtros-periodo', ['ruta' => 'notas-cargo.movil.back.index'])
+            @include('partials.filtros-periodo', ['ruta' => 'notas-cargo.movil.back.index', 'rutaExportar' => 'notas-cargo.movil.back.exportar'])
         </div>
 
         <div class="overflow-x-auto">

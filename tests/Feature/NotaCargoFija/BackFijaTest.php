@@ -11,17 +11,6 @@ class BackFijaTest extends NotaCargoFijaTestCase
 {
     private const PERMISO = 'notacargo.fija.back';
 
-    /**
-     * A COMPLETADO case is windowed by fecha_liquidacion, the month it settled,
-     * so that is the date a fixture on this queue has to pin.
-     *
-     * @return array<string, mixed>
-     */
-    private function cerradoEsteMes(): array
-    {
-        return ['fecha_ingreso' => now(), 'fecha_actualizacion' => now(), 'fecha_liquidacion' => now()];
-    }
-
     public function test_the_back_permiso_gates_the_screen(): void
     {
         $ruta = route('notas-cargo.fija.back.index');
@@ -32,9 +21,9 @@ class BackFijaTest extends NotaCargoFijaTestCase
 
     public function test_the_queue_holds_only_validated_cases(): void
     {
-        NcFija::factory()->deRuc('20111111111')->create($this->cerradoEsteMes());
-        NcFija::factory()->registrada()->deRuc('20222222222')->create($this->cerradoEsteMes());
-        NcFija::factory()->rechazada()->deRuc('20999999999')->create($this->cerradoEsteMes());
+        NcFija::factory()->liquidadaEsteMes()->deRuc('20111111111')->create();
+        NcFija::factory()->registrada()->liquidadaEsteMes()->deRuc('20222222222')->create();
+        NcFija::factory()->rechazada()->liquidadaEsteMes()->deRuc('20999999999')->create();
 
         $this
             ->actingAs($this->usuarioCon(self::PERMISO))

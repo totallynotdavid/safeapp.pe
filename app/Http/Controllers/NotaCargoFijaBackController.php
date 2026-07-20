@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ReporteNotaCargoFija;
+use App\Http\FiltroPeriodo;
 use App\Http\Requests\NotaCargoFija\UpdateBackFijaRequest;
+use App\Models\Builders\NcFijaBuilder;
 use App\Models\NcFija;
 use App\Models\Tienda;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 // Nota de cargo fija, BACK: the back office moves validated cases through the
 // lifecycle and records what fulfilment produced. `estado` is this stage's
@@ -22,19 +25,21 @@ class NotaCargoFijaBackController extends Controller
 {
     public function index(Request $request): View
     {
-        $ano = (int) $request->integer('ano', now()->year);
-        $mes = (int) $request->integer('mes', now()->month);
-        $estado = $request->query('estado');
-        $filtroActivo = in_array($estado, NcFija::ESTADOS, true);
+        $filtro = FiltroPeriodo::desde($request, NcFija::ESTADOS);
 
         return view('notas-cargo.fija.back.index', [
-            'cargos' => $this->enSeguimiento($ano, $mes, $filtroActivo ? $estado : null),
+            'cargos' => $this->enSeguimiento($filtro)->orderByDesc('fecha_ingreso')->get(),
             'estados' => NcFija::ESTADOS,
-            'estado' => $filtroActivo ? $estado : null,
-            'ano' => $ano,
-            'mes' => $mes,
-            'anos' => range(now()->year, now()->year - 5),
+            'filtro' => $filtro,
         ]);
+    }
+
+    public function exportar(Request $request): StreamedResponse
+    {
+        return ReporteNotaCargoFija::descargar(
+            'notas-cargo-fija-back',
+            $this->enSeguimiento(FiltroPeriodo::desde($request, NcFija::ESTADOS)),
+        );
     }
 
     public function edit(NcFija $ncFija): View
@@ -75,15 +80,17 @@ class NotaCargoFijaBackController extends Controller
     /**
      * Validated cases in the period, windowed per estado by NcFijaBuilder.
      *
-     * @return Collection<int, NcFija>
+     * Returned unresolved so the screen and the export run the same filter. The
+     * screen adds its own ordering; the export streams by primary key, for the
+     * reason recorded on Reporte.
+     *
+     * @return NcFijaBuilder<NcFija>
      */
-    private function enSeguimiento(int $ano, int $mes, ?string $estado): Collection
+    private function enSeguimiento(FiltroPeriodo $filtro): NcFijaBuilder
     {
         return NcFija::query()
             ->with('cliente', 'ejecutivo', 'region')
             ->where('validacion', NcFija::VALIDACION_PROCEDE)
-            ->enPeriodo($ano, $mes, $estado)
-            ->orderByDesc('fecha_ingreso')
-            ->get();
+            ->enPeriodo($filtro->ano, $filtro->mes, $filtro->estado);
     }
 }

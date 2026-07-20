@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ReporteNotaCargoMovil;
+use App\Http\FiltroPeriodo;
 use App\Http\Requests\NotaCargoMovil\StoreNotaCargoMovilRequest;
 use App\Http\Requests\NotaCargoMovil\UpdateNotaCargoMovilRequest;
+use App\Models\Builders\NcMovilBuilder;
 use App\Models\Cartera;
 use App\Models\Cliente;
 use App\Models\NcMovil;
 use App\Models\Tienda;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 // Nota de cargo móvil, REGISTRO: an ejecutivo files a case against a client and
 // tracks their own. Validación and back are separate screens with their own
@@ -21,19 +24,21 @@ class NotaCargoMovilController extends Controller
 {
     public function index(Request $request): View
     {
-        $ano = (int) $request->integer('ano', now()->year);
-        $mes = (int) $request->integer('mes', now()->month);
-        $estado = $request->query('estado');
-        $filtroActivo = in_array($estado, NcMovil::ESTADOS, true);
+        $filtro = FiltroPeriodo::desde($request, NcMovil::ESTADOS);
 
         return view('notas-cargo.movil.index', [
-            'cargos' => $this->mias($request->user()->id_usuario, $ano, $mes, $filtroActivo ? $estado : null),
+            'cargos' => $this->mias($request->user()->id_usuario, $filtro)->orderByDesc('fecha_ingreso')->get(),
             'estados' => NcMovil::ESTADOS,
-            'estado' => $filtroActivo ? $estado : null,
-            'ano' => $ano,
-            'mes' => $mes,
-            'anos' => range(now()->year, now()->year - 5),
+            'filtro' => $filtro,
         ]);
+    }
+
+    public function exportar(Request $request): StreamedResponse
+    {
+        return ReporteNotaCargoMovil::descargar(
+            'mis-notas-cargo-movil',
+            $this->mias($request->user()->id_usuario, FiltroPeriodo::desde($request, NcMovil::ESTADOS)),
+        );
     }
 
     public function create(Request $request): View
@@ -95,16 +100,18 @@ class NotaCargoMovilController extends Controller
      * One ejecutivo's own cases for a period. Rejected cases are left out: the
      * ejecutivo cannot act on them and legacy excluded them from every branch.
      *
-     * @return Collection<int, NcMovil>
+     * Returned unresolved so the screen and the export run the same filter,
+     * including the scoping to the signed-in ejecutivo. Legacy's equivalent
+     * export took the user id from a hidden form field instead.
+     *
+     * @return NcMovilBuilder<NcMovil>
      */
-    private function mias(int $idUsuario, int $ano, int $mes, ?string $estado): Collection
+    private function mias(int $idUsuario, FiltroPeriodo $filtro): NcMovilBuilder
     {
         return NcMovil::query()
             ->with('cliente')
             ->where('id_usuario', $idUsuario)
             ->where('validacion', '<>', NcMovil::VALIDACION_RECHAZADO)
-            ->enPeriodo($ano, $mes, $estado)
-            ->orderByDesc('fecha_ingreso')
-            ->get();
+            ->enPeriodo($filtro->ano, $filtro->mes, $filtro->estado);
     }
 }
