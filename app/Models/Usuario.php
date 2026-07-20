@@ -110,6 +110,32 @@ class Usuario extends Authenticatable
         });
     }
 
+    /**
+     * Switches which of this user's existing assignments is the active one.
+     *
+     * The self-service half of sincronizarAsignaciones: an operator working two
+     * stores moves between them without an admin, but cannot assign themselves
+     * a tienda they were never given. Returns false when the tienda is not one
+     * of theirs, so the caller says so rather than silently doing nothing.
+     *
+     * Legacy did this with two blind UPDATEs and no membership check, so posting
+     * any id_tienda activated an assignment row that did not exist, leaving the
+     * operator with no active tienda and an empty queue.
+     */
+    public function activarTienda(int $idTienda): bool
+    {
+        return DB::transaction(function () use ($idTienda): bool {
+            if (! $this->asignaciones()->where('id_tienda', $idTienda)->exists()) {
+                return false;
+            }
+
+            $this->asignaciones()->update(['estado' => 1]);
+            $this->asignaciones()->where('id_tienda', $idTienda)->update(['estado' => 0]);
+
+            return true;
+        });
+    }
+
     public function hasPermiso(string $permiso): bool
     {
         // Strict compare: Collection's two-arg contains() uses loose ==, and

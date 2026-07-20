@@ -7,6 +7,7 @@ use App\Http\Controllers\PersonalController;
 use App\Http\Controllers\QuiebreRegistroController;
 use App\Http\Controllers\QuiebreValidacionController;
 use App\Http\Controllers\RolController;
+use App\Http\Controllers\TiendaActivaController;
 use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,10 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::view('/dashboard', 'dashboard')->name('dashboard');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+    // Part of the shell rather than a module: the control lives in the header and
+    // acts only on the caller's own assignments, so it carries no permiso.
+    Route::put('/tienda-activa', [TiendaActivaController::class, 'update'])->name('tienda-activa.update');
 
     Route::middleware('can:usuarios.manage')->group(function () {
         Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');

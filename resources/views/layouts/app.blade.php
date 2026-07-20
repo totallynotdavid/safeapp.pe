@@ -19,6 +19,7 @@
             <header class="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-6">
                 <h1 class="text-base font-semibold text-gray-700">@yield('title', 'Inicio')</h1>
                 <div class="flex items-center gap-4 text-sm">
+                    @include('partials.tienda-activa')
                     <span class="text-gray-600">{{ auth()->user()?->personal }}</span>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

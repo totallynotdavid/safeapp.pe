@@ -32,5 +32,10 @@ class AppServiceProvider extends ServiceProvider
             $user = Auth::user();
             $view->with('sidebarSections', $user ? Sidebar::forUser($user) : collect());
         });
+
+        View::composer('partials.tienda-activa', static function ($view): void {
+            $user = Auth::user();
+            $view->with('tiendasAsignadas', $user ? $user->asignaciones()->with('tienda')->get() : collect());
+        });
     }
 }
