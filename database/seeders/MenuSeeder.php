@@ -8,9 +8,9 @@ use Illuminate\Database\Seeder;
 /**
  * Explicit id_menu values keep the id_ref parent links stable across reseeds.
  *
- * permiso convention: section headers are null. A leaf owned by a ported module
- * gets a designed key (usuarios.manage). Every other leaf keeps a provisional
- * slug until its module is ported and renames it.
+ * permiso convention: section headers are null, and every leaf carries a designed
+ * key (usuarios.manage). Leaves used to keep a provisional slug named after the
+ * legacy page until their module ported; none is left, because no module is left.
  */
 class MenuSeeder extends Seeder
 {
@@ -28,7 +28,7 @@ class MenuSeeder extends Seeder
             [8,  'REPORTES',             'fa fa-download',   0,  null],
             [9,  'GESTION DIARIA',       'fa fa-area-chart', 8,  'seguimiento.equipo'],
             [10, 'AGREGAR CLIENTE',      'fa fa-plus',       1,  'clientes.crear'],
-            [11, 'CARGAR DATOS',         'fa fa-database',   5,  'mantDatos'],
+            [11, 'CARGAR DATOS',         'fa fa-database',   5,  'clientes.importar'],
             // The three AVANZADO leaves (legacy ids 23, 24, 25) and their report
             // (26) are not here. nc_avanzado has never held a row: its
             // AUTO_INCREMENT has never advanced, and the producto catalog the

@@ -29,6 +29,7 @@ class Sidebar
         'gestion.movil' => 'gestion.movil',
         'gestion.fija' => 'gestion.fija',
         'clientes.crear' => 'clientes.create',
+        'clientes.importar' => 'clientes.importar',
         'historico.ver' => 'historico.index',
         'seguimiento.equipo' => 'seguimiento.index',
         'produccion.ver' => 'produccion.index',

@@ -9,6 +9,7 @@ use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\DistribucionController;
 use App\Http\Controllers\GestionController;
 use App\Http\Controllers\HistoricoController;
+use App\Http\Controllers\ImportacionController;
 use App\Http\Controllers\ProduccionController;
 use App\Http\Controllers\SeguimientoController;
 use Illuminate\Support\Facades\Route;
@@ -47,6 +48,15 @@ Route::middleware('can:clientes.crear')->group(function () {
     Route::get('/clientes/nuevo', [ClienteController::class, 'create'])->name('clientes.create');
     Route::post('/clientes', [ClienteController::class, 'store'])->name('clientes.store');
     Route::post('/clientes/{cliente}/tomar', [ClienteController::class, 'tomar'])->name('clientes.tomar');
+});
+
+// The bulk door, next to the off-list one: both create clients, and keeping them
+// side by side is what makes it obvious that only this one loads a whole
+// campaign. Its own permiso, since loading a file for the whole operation is not
+// something an agent registering one RUC should be able to do.
+Route::middleware('can:clientes.importar')->group(function () {
+    Route::get('/clientes/importar', [ImportacionController::class, 'index'])->name('clientes.importar');
+    Route::post('/clientes/importar', [ImportacionController::class, 'store'])->name('clientes.importar.store');
 });
 
 Route::middleware('can:historico.ver')->group(function () {
