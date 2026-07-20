@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help setup dev fmt fmt-check lint analyze test db-up db-down db-dump db-reset db-status
+.PHONY: help setup dev fmt fmt-check lint analyze test db-up db-down db-dump db-reset db-legacy db-status
 
 MISE := mise exec --
 DB := ./scripts/db.sh
@@ -46,6 +46,9 @@ db-dump: ## Snapshot the local DB to a .sql file (FILE=path, default dev-dump.sq
 
 db-reset: db-up ## Wipe the dev DB and rebuild it from migrations + seeders
 	$(MISE) php artisan migrate:fresh --seed --ansi
+
+db-legacy: db-up ## Restore a production export into the cutover source DB (FILE=path)
+	$(DB) restore-legacy $(FILE)
 
 db-status: ## Show whether the local MariaDB instance is running
 	$(DB) status

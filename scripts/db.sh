@@ -145,11 +145,55 @@ cmd_stop() {
   fi
 }
 
-# Restoring the production dump lived here while the legacy app still ran and
-# needed the real schema to render against. It is gone along with that app: the
-# dump is the pre-rewrite schema (menu.url, not menu.permiso), so loading it
-# would produce a database this app cannot read. Dev databases come from
-# migrations and seeders, via `make db-reset`.
+# Loads a production export into its own scratch database, which is the source
+# `php artisan cutover:transform` reads. It is never the app's database: the
+# dump is the pre-rewrite schema (menu.url, not menu.permiso), so the app cannot
+# read it. Dev databases still come from migrations and seeders (`make db-reset`).
+#
+# phpMyAdmin exports open with CREATE DATABASE + USE naming the production
+# schema, which on this box is the same name the dev app uses. Running the file
+# as-is therefore drops tables into the app's own database, which is how this
+# was found. Both statements are stripped so the target is decided here and
+# nowhere else.
+cmd_restore_legacy() {
+  local dump="${1:-}"
+  if [ -z "$dump" ] || [ ! -f "$dump" ]; then
+    echo "Usage: $0 restore-legacy <dump.sql>" >&2
+    exit 1
+  fi
+
+  local target="${LEGACY_DB_DATABASE:-safeapp_legacy}"
+  if [ "$target" = "${DB_DATABASE:-}" ]; then
+    echo "LEGACY_DB_DATABASE must not be the app's own database (${target})" >&2
+    exit 1
+  fi
+
+  cmd_start
+  echo "Restoring ${dump} into ${target}..."
+  mdb -e "DROP DATABASE IF EXISTS \`${target}\`;
+          CREATE DATABASE \`${target}\` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+
+  # Stripped to a temp file rather than piped: the client reads a redirected
+  # file in about 20 seconds and a pipe in over ten minutes. The file holds real
+  # customer data, so it is mode 600 and removed on any exit. STRIPPED_DUMP is
+  # script-scoped because the EXIT trap fires after a local would be gone, and
+  # `set -u` turns that into an error on the way out of a successful run.
+  STRIPPED_DUMP="$(mktemp)"
+  chmod 600 "$STRIPPED_DUMP"
+  trap 'rm -f "${STRIPPED_DUMP:-}"' EXIT
+  sed -e '/^CREATE DATABASE /d' -e '/^USE `/d' "$dump" > "$STRIPPED_DUMP"
+  mdb "$target" < "$STRIPPED_DUMP"
+
+  # SELECT only. The transform reads this database and writes the app's, and the
+  # grant is what keeps that true even if a query is pointed at the wrong
+  # connection by mistake.
+  mdb -e "
+    GRANT SELECT ON \`${target}\`.* TO '${DB_USERNAME}'@'localhost';
+    GRANT SELECT ON \`${target}\`.* TO '${DB_USERNAME}'@'127.0.0.1';
+    FLUSH PRIVILEGES;
+  "
+  echo "Restored. Now: php artisan migrate:fresh && php artisan cutover:transform"
+}
 
 cmd_dump() {
   local file="${1:-${ROOT_DIR}/dev-dump.sql}"
@@ -173,9 +217,10 @@ case "${1:-}" in
   start)   cmd_start ;;
   stop)    cmd_stop ;;
   dump)    shift; cmd_dump "${1:-}" ;;
+  restore-legacy) shift; cmd_restore_legacy "${1:-}" ;;
   status)  cmd_status ;;
   *)
-    echo "Usage: $0 {install|init|start|stop|dump [file]|status}" >&2
+    echo "Usage: $0 {install|init|start|stop|dump [file]|restore-legacy <dump.sql>|status}" >&2
     exit 1
     ;;
 esac
