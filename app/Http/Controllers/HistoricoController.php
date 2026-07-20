@@ -42,7 +42,7 @@ class HistoricoController extends Controller
      */
     private function rango(Request $request): array
     {
-        $hoy = Carbon::now('America/Lima');
+        $hoy = now();
         $desde = $this->fecha($request->query('desde')) ?? $hoy->copy()->subDays(self::DIAS_POR_DEFECTO);
         $hasta = $this->fecha($request->query('hasta')) ?? $hoy;
 

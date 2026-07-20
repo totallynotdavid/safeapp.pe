@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -110,7 +109,7 @@ class Cliente extends Model
                 'razon_social' => $this->razon_social,
                 'tipo_data' => $this->tipo_data,
                 'gestion' => Respuesta::query()->whereKey($contacto['id_respuesta'])->value('tipo'),
-                'fecha' => Carbon::now('America/Lima'),
+                'fecha' => now(),
             ])->save();
 
             // The contact is also the freshest read on the client's line mix.

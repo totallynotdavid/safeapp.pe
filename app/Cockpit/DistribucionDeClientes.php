@@ -4,7 +4,6 @@ namespace App\Cockpit;
 
 use App\Models\Cliente;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -68,7 +67,7 @@ class DistribucionDeClientes
                 ->update([
                     'id_usuario' => $idAgente,
                     'id_tienda' => $idTienda,
-                    'fecha_asignacion' => Carbon::now('America/Lima')->toDateString(),
+                    'fecha_asignacion' => now()->toDateString(),
                 ]);
         });
     }
@@ -101,7 +100,7 @@ class DistribucionDeClientes
                 ->update([
                     'id_usuario' => $idAgente,
                     'id_tienda' => $idTienda,
-                    'fecha_asignacion' => Carbon::now('America/Lima')->toDateString(),
+                    'fecha_asignacion' => now()->toDateString(),
                 ]);
 
             return true;

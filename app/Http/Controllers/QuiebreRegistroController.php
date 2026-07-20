@@ -9,7 +9,6 @@ use App\Models\Quiebre;
 use App\Models\Tienda;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
@@ -72,7 +71,7 @@ class QuiebreRegistroController extends Controller
         $quiebre->id_supervisor = $user->id_supervisor ?? 0;
         $quiebre->id_validador = 0;
         $quiebre->ticket_atencion = Quiebre::requiereTicket($request->date('fecha_activacion')) ? 'SI' : 'NO';
-        $quiebre->fecha_registro = Carbon::now('America/Lima')->toDateString();
+        $quiebre->fecha_registro = now()->toDateString();
         $quiebre->save();
 
         return redirect()->route('quiebres.registro.index')->with('status', 'Quiebre registrado.');

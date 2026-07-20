@@ -116,10 +116,7 @@ class Quiebre extends Model
     // request and the controller consult this so the rule has one owner.
     public static function requiereTicket(?Carbon $fechaActivacion): bool
     {
-        return (
-            $fechaActivacion !== null
-            && $fechaActivacion->diffInDays(Carbon::now('America/Lima')) >= self::DIAS_PARA_TICKET
-        );
+        return $fechaActivacion !== null && $fechaActivacion->diffInDays(now()) >= self::DIAS_PARA_TICKET;
     }
 
     // The client the avería is reported for. Not nullable in practice: a quiebre

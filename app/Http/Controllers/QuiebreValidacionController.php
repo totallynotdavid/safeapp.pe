@@ -6,7 +6,6 @@ use App\Http\Requests\Quiebre\UpdateQuiebreValidacionRequest;
 use App\Models\Quiebre;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
@@ -56,7 +55,7 @@ class QuiebreValidacionController extends Controller
         // Validator identity comes from the session, never the form, and the
         // date is stamped server-side (legacy trusted a hidden field for both).
         $quiebre->id_validador = $request->user()->id_usuario;
-        $quiebre->fecha_validacion = Carbon::now('America/Lima')->toDateString();
+        $quiebre->fecha_validacion = now()->toDateString();
         $quiebre->save();
 
         return redirect()->route('quiebres.validacion.index')->with('status', 'Validación registrada.');

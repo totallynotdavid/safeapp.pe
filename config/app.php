@@ -58,13 +58,19 @@ return [
      | Application Timezone
      |--------------------------------------------------------------------------
      |
-     | Here you may specify the default timezone for your application, which
-     | will be used by the PHP date and date-time functions. The timezone
-     | is set to "UTC" by default as it is suitable for most use cases.
+     | The business runs in Peru and every date in the schema is a local business
+     | date, not an instant: legacy calls date_default_timezone_set('America/Lima')
+     | at the top of each write, so the production rows are already Lima dates.
+     | Leaving this on Laravel's UTC default meant now() and the hand-stamped
+     | Carbon::now('America/Lima') disagreed for the five hours between 19:00 Lima
+     | and midnight UTC, which is long enough to file a case under tomorrow and
+     | to hide today's contacts from a report whose range was built in Lima.
+     | Setting it here makes now() the one clock and removes the per-call-site
+     | timezone argument that was the workaround.
      |
      */
 
-    'timezone' => 'UTC',
+    'timezone' => 'America/Lima',
 
     /*
      |--------------------------------------------------------------------------
