@@ -55,8 +55,8 @@
                     @forelse ($cargos as $cargo)
                         <tr>
                             <td class="px-6 py-3 text-gray-600">{{ $cargo->fecha_actualizacion?->format('Y-m-d') }}</td>
-                            <td class="px-6 py-3 font-medium text-gray-800">{{ $cargo->ruc }}</td>
-                            <td class="px-6 py-3 text-gray-600">{{ $cargo->razon_social }}</td>
+                            <td class="px-6 py-3 font-medium text-gray-800">{{ $cargo->cliente?->ruc }}</td>
+                            <td class="px-6 py-3 text-gray-600">{{ $cargo->cliente?->razon_social }}</td>
                             <td class="px-6 py-3 text-gray-600">{{ $cargo->modalidad }}</td>
                             <td class="px-6 py-3 text-right text-gray-600">{{ $cargo->q_lineas }}</td>
                             <td class="px-6 py-3 text-gray-600">{{ $cargo->ejecutivo?->personal }}</td>

@@ -9,40 +9,7 @@
     <div class="mx-auto max-w-4xl space-y-6">
         <a href="{{ route('liquidaciones.index') }}" class="text-sm font-medium text-gray-600 hover:text-gray-800">&larr; Volver a la lista</a>
 
-        {{-- Producto y validación: read-only context the liquidador settles against. --}}
-        <div class="rounded-lg border border-gray-200 bg-white p-6">
-            <h2 class="mb-4 text-lg font-semibold text-gray-800">Nota de cargo móvil</h2>
-            <dl class="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
-                @include('partials.campo', ['label' => 'Fecha ingreso', 'value' => $cargo->fecha_ingreso?->format('Y-m-d')])
-                @include('partials.campo', ['label' => 'Actualización', 'value' => $cargo->fecha_actualizacion?->format('Y-m-d')])
-                @include('partials.campo', ['label' => 'Estado', 'value' => $cargo->estado])
-                @include('partials.campo', ['label' => 'RUC', 'value' => $cargo->ruc])
-                @include('partials.campo', ['label' => 'Razón social', 'value' => $cargo->razon_social])
-                @include('partials.campo', ['label' => 'Región', 'value' => $cargo->tienda?->nombre])
-                @include('partials.campo', ['label' => 'Modalidad', 'value' => $cargo->modalidad])
-                @include('partials.campo', ['label' => 'Q líneas', 'value' => $cargo->q_lineas])
-                @include('partials.campo', ['label' => 'Cargo fijo', 'value' => $cargo->cargo_fijo])
-                {{-- Two different people: the app user who registered the case, and
-                     the carrier account executive it is attributed to. --}}
-                @include('partials.campo', ['label' => 'Ejecutivo', 'value' => $cargo->ejecutivo?->personal])
-                @include('partials.campo', ['label' => 'Supervisor', 'value' => $cargo->supervisor?->nombre])
-                @include('partials.campo', ['label' => 'Ejecutivo TDP', 'value' => $cargo->cartera?->propietario])
-                @include('partials.campo', ['label' => 'Cartera', 'value' => $cargo->cartera?->nombre])
-                @include('partials.campo', ['label' => 'Oportunidad', 'value' => $cargo->oportunidad])
-                @include('partials.campo', ['label' => 'Nodo', 'value' => $cargo->nodo])
-                @include('partials.campo', ['label' => 'Comentario ejecutivo', 'value' => $cargo->comentario_ejecutivo])
-            </dl>
-            <div class="mt-4 border-t border-gray-100 pt-4">
-                <dl class="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
-                    @include('partials.campo', ['label' => 'Validación', 'value' => $cargo->validacion])
-                    @include('partials.campo', ['label' => 'Fecha validación', 'value' => $cargo->fecha_validacion?->format('Y-m-d')])
-                    @include('partials.campo', ['label' => 'Validador', 'value' => $cargo->validador?->personal])
-                </dl>
-                <div class="mt-4">
-                    @include('partials.campo', ['label' => 'Comentario del validador', 'value' => $cargo->comentario_validador])
-                </div>
-            </div>
-        </div>
+        @include('notas-cargo.movil.partials.detalle')
 
         <div class="rounded-lg border border-gray-200 bg-white p-6">
             <h2 class="mb-4 text-lg font-semibold text-gray-800">Registrar liquidación</h2>

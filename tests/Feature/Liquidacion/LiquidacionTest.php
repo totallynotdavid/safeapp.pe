@@ -26,7 +26,7 @@ class LiquidacionTest extends LiquidacionTestCase
 
     public function test_settling_leaves_the_upstream_estado_alone(): void
     {
-        $cargo = $this->enCola(['estado' => 'ACTIVADO']);
+        $cargo = $this->enCola(null, ['estado' => 'ACTIVADO']);
 
         $this->actingAs($this->liquidador())->put(route('liquidaciones.update', $cargo), [
             'comision' => '100',

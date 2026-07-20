@@ -29,24 +29,29 @@ class MenuSeeder extends Seeder
             [9,  'GESTION DIARIA',         'fa fa-area-chart', 8,  'repseguimiento'],
             [10, 'AGREGAR CLIENTE',        'fa fa-plus',       1,  'clientes.crear'],
             [11, 'CARGAR DATOS',           'fa fa-database',   5,  'mantDatos'],
+            // The three AVANZADO leaves (legacy ids 23, 24, 25) and their report
+            // (26) are not here. nc_avanzado has never held a row: its
+            // AUTO_INCREMENT has never advanced, and the producto catalog the
+            // registro form reads has no AVANZADO entry, so the form's product
+            // dropdowns come up empty and the screen cannot be submitted. It is
+            // not lightly used, it has never worked.
             [12, 'NOTA DE CARGO',          'fa fa-file',       0,  null],
             [13, 'FIJA',                   'fa fa-wifi',       12, 'notacargo_fija'],
             [14, 'VALIDACION FIJA',        'fa fa-wifi',       12, 'notacargo_fija_validacion'],
             [15, 'BACK FIJA',              'fa fa-wifi',       12, 'notacargo_fija_back'],
-            [16, 'MOVIL',                  'fa fa-mobile',     12, 'notacargo_movil'],
-            [17, 'VALIDACION MOVIL',       'fa fa-mobile',     12, 'notacargo_movil_validacion'],
-            [18, 'BACK MOVIL',             'fa fa-mobile',     12, 'notacargo_movil_back'],
+            [16, 'MOVIL',                  'fa fa-mobile',     12, 'notacargo.movil.registrar'],
             [19, 'REPORTE BACK FIJA',      'fa fa-wifi',       8,  'repbackfija'],
             [20, 'REPORTE BACK MOVIL',     'fa fa-mobile',     8,  'repbackmovil'],
             [21, 'BACK FIJA GLOBAL',       'fa fa-wifi',       12, 'notacargo_fija_back_global'],
             [22, 'VALIDACION FIJA GLOBAL', 'fa fa-wifi',       12, 'notacargo_fija_validacion_global'],
-            [23, 'AVANZADO',               'fa fa-wifi',       12, 'notacargo_fija_avanzado'],
-            [24, 'VALIDACION AVZ GLOBAL',  'fa fa-wifi',       12, 'notacargo_fija_avanzado_validacion_global'],
-            [25, 'BACK AVZ GLOBAL',        'fa fa-wifi',       12, 'notacargo_fija_avanzado_back_global'],
-            [26, 'REPORTE BACK AVZ',       'fa fa-wifi',       8,  'repbackavanzado'],
             [27, 'REPORTE FIJA GLOBAL',    'fa fa-wifi',       8,  'repbackfijaglobal'],
-            [28, 'BACK MOVIL GLOBAL',      'fa fa-mobile',     12, 'notacargo_movil_back_global'],
-            [29, 'VALIDA MOVIL GLOBAL',    'fa fa-mobile',     12, 'notacargo_movil_validacion_global'],
+            // Legacy ids 28 and 29 (the "GLOBAL" copies), kept because they are
+            // the leaves the real reviewers hold. Their tienda-filtered twins
+            // (17, 18) are gone: the four users who held them also hold these,
+            // which show a superset of the same rows, and the column they
+            // filtered on is the case's región rather than the reviewer's store.
+            [28, 'BACK MOVIL',             'fa fa-mobile',     12, 'notacargo.movil.back'],
+            [29, 'VALIDACION MOVIL',       'fa fa-mobile',     12, 'notacargo.movil.validar'],
             [30, 'REPORTE MOVIL GLOBAL',   'fa fa-mobile',     8,  'repbackmovilglobal'],
             [31, 'DASHBOARD EJE REAL',     'fa fa-download',   8,  'dashboard'],
             [32, 'AVERIAS',                'fa fa-file',       0,  null],

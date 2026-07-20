@@ -2,24 +2,63 @@
 
 namespace App\Models;
 
+use App\Models\Builders\NcMovilBuilder;
 use Database\Factories\NcMovilFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-// A nota de cargo móvil. The full lifecycle (producto → validación → back →
-// liquidación) lives on this one row; the liquidación stage is the only one
-// ported so far, so this model exposes just that stage's write surface and the
-// relations that stage reads.
+// A nota de cargo móvil. The whole lifecycle lives on this one row and each
+// stage owns a disjoint set of columns: registro (the ejecutivo) writes the
+// case, validación writes the decision, back writes `estado` and the fulfilment
+// fields, liquidación writes the settlement. No stage writes another's columns,
+// which is why the three screens assign explicitly instead of sharing $fillable.
 class NcMovil extends Model
 {
     /** @use HasFactory<NcMovilFactory> */
     use HasFactory;
 
-    // Only cases the validator passed reach the liquidación queue.
+    public const VALIDACION_PENDIENTE = 'PENDIENTE';
+
     public const VALIDACION_PROCEDE = 'PROCEDE';
 
     public const VALIDACION_RECHAZADO = 'RECHAZADO';
+
+    /** The validador's three-way decision; a case starts PENDIENTE. */
+    public const VALIDACIONES = [self::VALIDACION_PENDIENTE, self::VALIDACION_PROCEDE, self::VALIDACION_RECHAZADO];
+
+    /**
+     * The lifecycle, owned by the back office. Every one of the 8 estados
+     * present in the 2,006 production rows is in here; BOLSA and SALIDAANTICIPADA
+     * are offered by the legacy screen and have never been recorded.
+     */
+    public const ESTADOS = [
+        'PENDIENTE',
+        'PROCESANDO',
+        'INGRESADO',
+        'DELIVERY',
+        'ACTIVADO',
+        'CAIDA',
+        'BOLSA',
+        'SALIDAANTICIPADA',
+        'LIQUIDADO',
+        'ADR',
+    ];
+
+    /**
+     * Estados that mean the case is still moving. These are dated by
+     * fecha_ingreso with no month bound, so an in-flight case never falls off
+     * the queue just because it is old. See scopeEnPeriodo.
+     */
+    public const ESTADOS_EN_CURSO = [
+        'INGRESADO',
+        'PROCESANDO',
+        'PENDIENTE',
+        'DELIVERY',
+        'BOLSA',
+        'SALIDAANTICIPADA',
+        'ADR',
+    ];
 
     /**
      * Estados a validated case can still be settled from.
@@ -53,16 +92,64 @@ class NcMovil extends Model
      */
     public const OBSERVACIONES = ['DEUDA', 'BAJA', 'BAJA PARCIAL', 'PORT OUT', 'SUSPENSION', 'ACUERDO COMERCIAL'];
 
+    public const MODALIDADES = ['ALTA', 'PORTABILIDAD', 'BAM'];
+
+    public const TIPOS_PRODUCTO = ['M4', 'COMBO', 'M4/COMBO'];
+
+    public const ETAPAS = [
+        'F1-PERDIDA',
+        'F1-GANADA',
+        'F2-GESTION',
+        'F3-NEGOCIACION',
+        'F4-DISENO',
+        'F5-DEFINICION',
+    ];
+
+    /**
+     * Probability of closing, as a percentage. Legacy's dropdown offered these
+     * four plus CAIDA, which is an estado and not a probability; no row carries
+     * it and the back office owns estado, so the option is gone.
+     */
+    public const NIVELES_NEGOCIACION = ['25', '50', '75', '100'];
+
     public $timestamps = false;
 
     protected $table = 'nc_movil';
 
     protected $primaryKey = 'id_cargo';
 
-    // The liquidación stage writes only these five columns; every other column
-    // belongs to an upstream stage and is set by the seeder/factory or the
-    // still-legacy screens, never mass-assigned here.
+    /**
+     * Every column a screen may write, across all four stages.
+     *
+     * The per-stage boundary is the form request, not this list: each screen
+     * fills from its own validated() payload, which is already an allowlist of
+     * that stage's columns. This list only keeps unvalidated input out, so the
+     * columns no screen ever writes (both estados, the identity and date stamps)
+     * stay off it and are assigned by name where a stage owns them.
+     */
     protected $fillable = [
+        // Registro.
+        'id_cliente',
+        'zonal',
+        'q_lineas',
+        'cargo_fijo',
+        'modalidad',
+        'contacto',
+        'telefono1',
+        'telefono2',
+        'nivel_negociacion',
+        'fecha_estimada',
+        'tipo_producto',
+        'etapa',
+        'oportunidad',
+        'comentario_ejecutivo',
+        // Back.
+        'comentario_back',
+        'nodo',
+        'casofwa',
+        'ciclo',
+        'cuenta_financiera',
+        // Liquidación.
         'comision',
         'observacion',
         'descuento',
@@ -70,17 +157,23 @@ class NcMovil extends Model
         'comentario_liquidador',
     ];
 
-    protected function casts(): array
+    // Still awaiting a decision, so the ejecutivo may amend it and the validador
+    // may rule on it. Both screens ask this before writing.
+    public function esEditable(): bool
     {
-        return [
-            'fecha_ingreso' => 'date',
-            'fecha_validacion' => 'date',
-            'fecha_actualizacion' => 'date',
-            'fecha_estimada' => 'date',
-            'fecha_liquidacion' => 'date',
-            'cargo_fijo' => 'decimal:2',
-            'q_lineas' => 'integer',
-        ];
+        return $this->validacion === self::VALIDACION_PENDIENTE;
+    }
+
+    // Passed validación, so the back office has something to fulfil. A rejected
+    // or undecided case never reaches that stage.
+    public function esValidado(): bool
+    {
+        return $this->validacion === self::VALIDACION_PROCEDE;
+    }
+
+    public function cliente(): BelongsTo
+    {
+        return $this->belongsTo(Cliente::class, 'id_cliente', 'id_cliente');
     }
 
     public function ejecutivo(): BelongsTo
@@ -93,13 +186,18 @@ class NcMovil extends Model
         return $this->belongsTo(Usuario::class, 'id_validador', 'id_usuario');
     }
 
-    public function tienda(): BelongsTo
+    /**
+     * The región the case is for, not the ejecutivo's own tienda. The two differ
+     * in 1,390 of the 2,006 production rows, so naming this `tienda` would
+     * assert something the data denies. Tienda is the región catalog.
+     */
+    public function region(): BelongsTo
     {
         return $this->belongsTo(Tienda::class, 'zonal', 'id_tienda');
     }
 
     // The carrier account executive the case is attributed to. Optional:
-    // id_cartera stays 0 until the producto or back-office screen picks one.
+    // id_cartera stays 0 until the registro or back screen picks one.
     public function cartera(): BelongsTo
     {
         return $this->belongsTo(Cartera::class, 'id_cartera', 'id_cartera');
@@ -110,5 +208,26 @@ class NcMovil extends Model
     public function supervisor(): BelongsTo
     {
         return $this->belongsTo(Supervisor::class, 'id_supervisor', 'id_supervisor');
+    }
+
+    /**
+     * @return NcMovilBuilder<self>
+     */
+    public function newEloquentBuilder($query): NcMovilBuilder
+    {
+        return new NcMovilBuilder($query);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'fecha_ingreso' => 'date',
+            'fecha_validacion' => 'date',
+            'fecha_actualizacion' => 'date',
+            'fecha_estimada' => 'date',
+            'fecha_liquidacion' => 'date',
+            'cargo_fijo' => 'decimal:2',
+            'q_lineas' => 'integer',
+        ];
     }
 }

@@ -34,7 +34,7 @@ class LiquidacionController extends Controller
     public function edit(NcMovil $ncMovil): View
     {
         return view('liquidaciones.edit', [
-            'cargo' => $ncMovil->load('ejecutivo', 'validador', 'tienda', 'cartera', 'supervisor'),
+            'cargo' => $ncMovil->load('cliente', 'ejecutivo', 'supervisor', 'validador', 'region', 'cartera'),
             'observaciones' => NcMovil::OBSERVACIONES,
         ]);
     }
@@ -62,7 +62,7 @@ class LiquidacionController extends Controller
     private function porLiquidar(int $ano, ?string $estado): Collection
     {
         return NcMovil::query()
-            ->with('ejecutivo')
+            ->with('cliente', 'ejecutivo')
             ->where('validacion', NcMovil::VALIDACION_PROCEDE)
             ->whereIn('estado', NcMovil::ESTADOS_LIQUIDABLES)
             ->whereYear('fecha_actualizacion', $ano)

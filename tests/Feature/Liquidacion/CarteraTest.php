@@ -11,18 +11,29 @@ use App\Models\Tienda;
 // screen displays from it.
 class CarteraTest extends LiquidacionTestCase
 {
-    public function test_only_active_executives_of_the_tienda_are_selectable(): void
+    public function test_only_active_executives_are_selectable(): void
     {
-        $tienda = Tienda::factory()->create();
-        $otra = Tienda::factory()->create();
+        $activa = Cartera::factory()->create(['id_tienda' => Tienda::factory(), 'propietario' => 'ANA VIGIL']);
+        Cartera::factory()->retirada()->create(['propietario' => 'LUIS RETIRADO']);
 
-        $activa = Cartera::factory()->create(['id_tienda' => $tienda->id_tienda, 'propietario' => 'ANA VIGIL']);
-        Cartera::factory()->retirada()->create(['id_tienda' => $tienda->id_tienda, 'propietario' => 'LUIS RETIRADO']);
-        Cartera::factory()->create(['id_tienda' => $otra->id_tienda, 'propietario' => 'JOSE AJENO']);
+        $this->assertSame(
+            [$activa->id_cartera],
+            Cartera::query()->seleccionables()->pluck('id_cartera')->all(),
+        );
+    }
 
-        $seleccionables = Cartera::query()->seleccionables($tienda->id_tienda)->get();
+    public function test_executives_of_every_region_are_offered(): void
+    {
+        // Legacy filtered this list by the case's región, and all 22 production
+        // carteras sit in one of the seven, so six regiones saw an empty
+        // dropdown and 1,430 of 2,006 cases were left unattributed.
+        Cartera::factory()->create(['id_tienda' => Tienda::factory(), 'propietario' => 'ANA LIMA']);
+        Cartera::factory()->create(['id_tienda' => Tienda::factory(), 'propietario' => 'JOSE PIURA']);
 
-        $this->assertSame([$activa->id_cartera], $seleccionables->pluck('id_cartera')->all());
+        $this->assertSame(
+            ['ANA LIMA', 'JOSE PIURA'],
+            Cartera::query()->seleccionables()->pluck('propietario')->all(),
+        );
     }
 
     public function test_a_retired_executive_still_names_their_old_cases(): void

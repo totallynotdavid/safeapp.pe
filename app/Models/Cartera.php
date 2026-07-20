@@ -27,19 +27,23 @@ class Cartera extends Model
     protected $fillable = ['nombre', 'propietario', 'id_tienda', 'estado', 'DNI'];
 
     /**
-     * The executives a form may offer for a tienda. Retired executives stay in
-     * the table because notas de cargo they own still display their name, so
-     * every form that builds a choice list has to go through here.
+     * The executives a form may offer. Retired executives stay in the table
+     * because notas de cargo they own still display their name, so every form
+     * that builds a choice list has to go through here.
+     *
+     * The catalog is deliberately not filtered by the case's región. Legacy
+     * filtered on id_tienda, but all 22 production carteras sit in REGION LIMA,
+     * so that filter returns an empty dropdown for the other six regiones. It is
+     * why the ejecutivo TDP is unset in 1,430 of the 2,006 notas de cargo móvil:
+     * a case filed for Piura had nobody to choose. The column stays because it
+     * records where an executive sits, but it is not a selection gate.
      *
      * @param  Builder<Cartera>  $query
      * @return Builder<Cartera>
      */
-    public function scopeSeleccionables(Builder $query, int $idTienda): Builder
+    public function scopeSeleccionables(Builder $query): Builder
     {
-        return $query
-            ->where('id_tienda', $idTienda)
-            ->where('estado', self::ACTIVA)
-            ->orderBy('propietario');
+        return $query->where('estado', self::ACTIVA)->orderBy('propietario');
     }
 
     public function tienda(): BelongsTo

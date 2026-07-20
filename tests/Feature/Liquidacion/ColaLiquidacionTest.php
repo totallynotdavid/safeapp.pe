@@ -16,8 +16,8 @@ class ColaLiquidacionTest extends LiquidacionTestCase
 
     public function test_lists_only_validated_cases(): void
     {
-        $this->enCola(['ruc' => '20111111111']);
-        NcMovil::factory()->rechazada()->create(['ruc' => '20999999999', 'fecha_actualizacion' => now()]);
+        $this->enCola('20111111111');
+        NcMovil::factory()->rechazada()->deRuc('20999999999')->create(['fecha_actualizacion' => now()]);
 
         $this
             ->actingAs($this->liquidador())
@@ -29,10 +29,10 @@ class ColaLiquidacionTest extends LiquidacionTestCase
 
     public function test_a_validated_case_that_fell_through_is_not_settleable(): void
     {
-        $this->enCola(['ruc' => '20111111111']);
+        $this->enCola('20111111111');
         // CAIDA passes validación but is a quarter of production, so leaving it
         // in the queue would put fallen cases in front of the liquidador.
-        NcMovil::factory()->caida()->create(['ruc' => '20999999999', 'fecha_actualizacion' => now()]);
+        NcMovil::factory()->caida()->deRuc('20999999999')->create(['fecha_actualizacion' => now()]);
 
         $this
             ->actingAs($this->liquidador())
@@ -44,8 +44,8 @@ class ColaLiquidacionTest extends LiquidacionTestCase
 
     public function test_filters_by_estado(): void
     {
-        $this->enCola(['estado' => 'ACTIVADO', 'ruc' => '20000000001']);
-        $this->enCola(['estado' => 'DELIVERY', 'ruc' => '20000000002']);
+        $this->enCola('20000000001', ['estado' => 'ACTIVADO']);
+        $this->enCola('20000000002', ['estado' => 'DELIVERY']);
 
         $this
             ->actingAs($this->liquidador())
@@ -71,7 +71,7 @@ class ColaLiquidacionTest extends LiquidacionTestCase
 
     public function test_excludes_cases_from_other_years(): void
     {
-        $this->enCola(['ruc' => '20222222222', 'fecha_actualizacion' => now()->subYears(2)]);
+        $this->enCola('20222222222', ['fecha_actualizacion' => now()->subYears(2)]);
 
         $this
             ->actingAs($this->liquidador())
