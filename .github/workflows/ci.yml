@@ -11,48 +11,43 @@ concurrency:
 
 jobs:
   php:
-    name: Formato, lint y pruebas
+    name: Format, lint, tests
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v7
 
-      # mise builds PHP from source and silently omits any extension whose
-      # library is absent, so these go in before mise install rather than after.
-      # libzip-dev is the one that bites: without it there is no ext-zip, and
-      # every spreadsheet export fails at runtime instead of at build time.
-      - name: Instalar las librerías que compila el PHP de mise
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            autoconf bison re2c pkg-config libxml2-dev libssl-dev libicu-dev \
-            libzip-dev libonig-dev libcurl4-openssl-dev libpng-dev libjpeg-dev \
-            libfreetype6-dev libwebp-dev libgmp-dev libsodium-dev \
-            libreadline-dev libbz2-dev
+      # ext-zip is named explicitly because every spreadsheet export fails at
+      # runtime without it. The versions here duplicate mise.toml; nothing
+      # checks that the two agree.
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.5.8"
+          extensions: zip
+          coverage: none
 
-      # mise.toml is the only place the PHP and Mago versions are written. CI
-      # reads it rather than repeating them here, so the two cannot drift.
-      - uses: jdx/mise-action@v4
+      - name: Install Mago
+        uses: nhedger/setup-mago@v2
+        with:
+          version: "1.44.0"
 
-      - name: Cachear las descargas de Composer
-        uses: actions/cache@v6
+      - uses: actions/cache@v6
         with:
           path: ~/.cache/composer
-          key: composer-${{ hashFiles('composer.lock') }}
-          restore-keys: composer-
+          key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            composer-${{ runner.os }}-
 
-      # composer install is also the platform gate: it fails outright if the
-      # PHP that mise built is missing ext-zip or any other required extension.
-      - name: Instalar dependencias PHP
-        run: mise exec -- composer install --no-interaction --no-progress --prefer-dist
+      - run: composer install --no-interaction --no-progress --prefer-dist
 
       # artisan boots before any test runs, and it needs an APP_KEY to do it.
-      # The database settings here are unused: phpunit.xml points the suite at
-      # an in-memory SQLite connection.
-      - name: Preparar el entorno
+      # The database settings in .env.example are unused: phpunit.xml points
+      # the suite at an in-memory SQLite connection.
+      - name: Prepare environment
         run: |
           cp .env.example .env
-          mise exec -- php artisan key:generate
+          php artisan key:generate
 
       - run: make fmt-check
       - run: make lint
