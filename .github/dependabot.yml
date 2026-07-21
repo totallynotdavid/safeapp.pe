@@ -4,9 +4,6 @@ version: 2
 # a dozen PRs that all say the same thing. Patch and minor releases arrive as one
 # PR per ecosystem, which CI either passes or does not. Majors stay separate
 # because each one needs its upgrade guide read.
-#
-# Note this runs against the default branch, not against whichever branch the
-# rewrite is currently on.
 updates:
   - package-ecosystem: composer
     directory: /
@@ -17,7 +14,7 @@ updates:
       php-menores:
         update-types: [minor, patch]
 
-  - package-ecosystem: npm
+  - package-ecosystem: bun
     directory: /
     schedule:
       interval: weekly
