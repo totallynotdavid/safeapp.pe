@@ -1,92 +1,152 @@
 # safeapp.pe
 
-PHP call center and debt collection system for Entel operations.
+[![CI](https://github.com/totallynotdavid/safeapp.pe/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/totallynotdavid/safeapp.pe/actions/workflows/ci.yml)
 
-## Prerequisites
+SafeApp supports Entel sales and service operations. It manages campaign data,
+agent queues, customer contacts, charge notes, outage cases, settlement,
+reporting, staff assignments, and access control.
 
-- [mise](https://mise.jdx.dev/getting-started.html): installs and pins PHP, Node
-  and Mago for this project. `mise.toml` is the only place those versions are
-  written; CI reads the same file.
-- The system headers mise's PHP build links against. It compiles from source and
-  silently omits any extension whose library is missing, so install these
-  **before** `mise install`. Without `libzip-dev` you get a PHP with no
-  `ext-zip`, and every spreadsheet export fails at runtime:
+SafeApp is a Laravel monolith. The server renders Blade views, MariaDB stores
+application data, and Vite builds the Tailwind CSS and JavaScript assets.
 
-  ```sh
-  sudo apt-get install build-essential autoconf bison re2c pkg-config \
-      libxml2-dev libssl-dev libicu-dev libzip-dev libonig-dev \
-      libcurl4-openssl-dev libpng-dev libjpeg-dev libfreetype6-dev \
-      libwebp-dev libgmp-dev libsodium-dev libreadline-dev libbz2-dev
-  ```
+## Repository map
 
-## Setup
+- [`app/Cockpit/`](app/Cockpit/) owns campaign imports, customer registration,
+  queue distribution, and contact handling.
+- [`app/Http/`](app/Http/) contains controllers, request validation, and shared
+  HTTP filters.
+- [`app/Models/`](app/Models/) contains the application data model and query
+  builders.
+- [`app/Policies/`](app/Policies/) enforces record-level authorization. Route
+  permissions protect each operational module.
+- [`app/Exports/`](app/Exports/) builds spreadsheet reports from the same
+  queries used by the application screens.
+- [`routes/`](routes/) groups the application shell, cockpit, and charge-note
+  routes.
+- [`database/`](database/) contains the schema, factories, and development
+  data.
+- [`tests/`](tests/) contains unit and feature tests for the operational
+  workflows.
+
+## Requirements
+
+Local development requires Linux or WSL on x86-64. The database helper
+downloads a Linux MariaDB binary and keeps its server and data files under
+`.mariadb/`.
+
+[mise](https://mise.jdx.dev/getting-started.html) installs the pinned PHP, Bun,
+and Mago versions from [`mise.toml`](mise.toml). PHP is built locally and needs
+the system development libraries installed first. On Ubuntu or Debian, run:
 
 ```sh
-git clone https://github.com/totallynotdavid/safeapp.pe.git
-cd safeapp.pe
+sudo apt-get install build-essential autoconf bison re2c pkg-config \
+    libxml2-dev libssl-dev libicu-dev libzip-dev libonig-dev \
+    libcurl4-openssl-dev libpng-dev libjpeg-dev libfreetype6-dev \
+    libwebp-dev libgmp-dev libsodium-dev libreadline-dev libbz2-dev
+```
 
+## Get started
+
+Install the toolchain and dependencies:
+
+```sh
+mise install
+bun install
+```
+
+Create the local environment file:
+
+```sh
 cp .env.example .env
 ```
 
-Edit `.env` and set `DB_USERNAME` and `DB_PASSWORD`. Any local values work;
-`scripts/db.sh` creates that account. `DB_HOST`, `DB_PORT` and `DB_DATABASE`
-work as provided.
+Set `DB_USERNAME` and `DB_PASSWORD` in `.env`. Any local values work. Keep the
+provided `DB_HOST`, `DB_PORT`, and `DB_DATABASE` unless the local database needs
+a different port or database name.
+
+Install the PHP dependencies, generate the application key, start MariaDB, and
+build the development database:
 
 ```sh
-make setup           # composer install, .env, app key, MariaDB, migrate + seed
-make dev             # starts the Laravel dev server at /
+make setup
 ```
 
-`make setup` builds a fresh dev database from migrations and seeders, including
-a known admin login (`admin` / `admin`). `make db-reset` rebuilds it from
-scratch.
+The seeders create an administrator account with username `admin` and password
+`admin`. This account and the seeded operational data are for local development.
 
-`make help` lists the full command set. Code quality runs through Mago (one
-toolchain, scoped to the Laravel app via `mago.toml`): `fmt`/`fmt-check` and
-`lint` are clean gates; `analyze` (static type analysis) is advisory, since it
-is not Laravel-magic-aware. `test` runs the Laravel test suite.
-
-GitHub Actions runs `fmt-check`, `lint` and `test` on every push and pull
-request, plus the asset build, so the gates are the same locally and in CI.
-Dependabot opens weekly grouped updates for Composer, npm and the workflow's own
-actions.
-
-## Local database
-
-`scripts/db.sh` downloads and runs a MariaDB instance under `.mariadb/`, with
-its own datadir, socket, and port. It does not touch any system MySQL/MariaDB
-install or Hostinger's production database.
-
-`make db-reset` wipes the dev database and rebuilds it from migrations and
-seeders. Migrations are the schema's source of truth; a dev database is never
-restored from a dump.
-
-## Loading a production export
-
-The pre-rewrite export does not load into this schema, so it is restored into a
-scratch database of its own and carried across row by row:
+Start Laravel:
 
 ```sh
-make db-legacy FILE=export.sql            # restores into safeapp_legacy, read-only
-php artisan migrate:fresh --drop-views    # build the target schema, without --seed
-php artisan cutover:transform             # carry the rows across
+make dev
 ```
 
-`--drop-views` is not optional. The database being transformed is the legacy one,
-and `migrate:fresh` drops tables while leaving views standing, so legacy's
-`reporteusu_excel` would outlive the columns it selects. An invalid view makes
-`mysqldump` fail for the entire database, which means the first thing it breaks
-is the backup. The transform refuses to run while any view is left, rather than
-letting that reach production.
+Laravel serves the application at `http://127.0.0.1:8000` by default. Run
+`make help` to list the available maintenance commands.
 
-The transform reports what it wrote and what it deliberately dropped. It refuses
-a database that already holds rows, so a second run means resetting first. What
-each rule does and why is in `app/Cutover`; the reasoning behind the numbers
-those comments cite is in the plan.
+## Database development
 
-`make db-legacy` strips the export's own `CREATE DATABASE` and `USE`
-statements. Both name the production schema, which is the same name the dev app
-uses, so running the file directly drops legacy tables into the app's database.
+[`scripts/db.sh`](scripts/db.sh) downloads and runs an isolated MariaDB server.
+It reads the database name and credentials from `.env`, stores its data under
+`.mariadb/`, and does not use a system MariaDB installation.
 
-`scripts/db.sh` currently only supports Linux and WSL: it downloads a
-`linux-systemd-x86_64` MariaDB binary.
+Start, stop, or inspect the local server with:
+
+```sh
+make db-up
+make db-down
+make db-status
+```
+
+Migrations are the schema source of truth. Rebuild the local database and load
+the development seed data with:
+
+```sh
+make db-reset
+```
+
+`make db-reset` deletes all data in the configured development database. The
+test suite uses an in-memory SQLite database and does not use the local MariaDB
+data.
+
+## Quality checks
+
+Run the same PHP checks used by CI:
+
+```sh
+make fmt-check
+make lint
+make test
+```
+
+Build the frontend assets with:
+
+```sh
+bun run build
+```
+
+`make fmt` updates PHP formatting. `make analyze` runs Mago static analysis; it
+is not a CI gate.
+
+## Production data cutover
+
+The cutover command imports a pre-rewrite production export into the current
+schema. Restore the export into the separate `safeapp_legacy` database:
+
+```sh
+make db-legacy FILE=/path/to/export.sql
+```
+
+Build an empty destination schema and run the transform:
+
+```sh
+php artisan migrate:fresh --drop-views
+php artisan cutover:transform
+```
+
+The restore command removes the export's `CREATE DATABASE` and `USE` statements
+and grants the application account read-only access to the source database. The
+transform refuses to run when the destination contains application rows or
+database views.
+
+Transformation rules live in [`app/Cutover/`](app/Cutover/). Their feature
+coverage lives in [`tests/Feature/Cutover/`](tests/Feature/Cutover/).
