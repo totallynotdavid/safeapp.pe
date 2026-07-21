@@ -20,11 +20,18 @@
                 <h1 class="text-base font-semibold text-gray-700">@yield('title', 'Inicio')</h1>
                 <div class="flex items-center gap-4 text-sm">
                     @include('partials.tienda-activa')
-                    <span class="text-gray-600">{{ auth()->user()?->personal }}</span>
+                    {{-- Name over cargo, which is what the old header's user menu
+                         showed. Several screens scope on the role, so it is worth
+                         having in view rather than a click away. --}}
+                    <div class="leading-tight">
+                        <div class="font-medium text-gray-700">{{ auth()->user()?->personal }}</div>
+                        <div class="text-xs text-gray-500">{{ auth()->user()?->rol?->nombre_rol }}</div>
+                    </div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="rounded-md bg-gray-100 px-3 py-1.5 font-medium text-gray-700 hover:bg-gray-200">
-                            Salir
+                        <button type="submit" class="flex items-center gap-2 rounded-md bg-gray-100 px-3 py-1.5 font-medium text-gray-700 hover:bg-gray-200">
+                            <x-heroicon-o-power class="size-4" />
+                            Cerrar sesión
                         </button>
                     </form>
                 </div>
