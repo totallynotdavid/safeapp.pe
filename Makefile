@@ -1,7 +1,9 @@
 .DEFAULT_GOAL := help
-.PHONY: help setup dev fmt fmt-check lint analyze test db-up db-down db-dump db-reset db-legacy db-status
 
-MISE := mise exec --
+.PHONY: help setup dev fmt fmt-check lint analyze test \
+	db-up db-down db-dump db-reset db-legacy db-status
+
+MISE := $(shell command -v mise >/dev/null 2>&1 && echo 'mise exec --')
 DB := ./scripts/db.sh
 FILE ?=
 
