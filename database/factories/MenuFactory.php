@@ -16,7 +16,9 @@ class MenuFactory extends Factory
     {
         return [
             'descripcion' => mb_strtoupper(fake()->unique()->words(2, true)),
-            'icono' => 'fa fa-circle',
+            // One of the values Sidebar::ICONOS maps, so a factory-built row
+            // renders like a seeded one.
+            'icono' => 'fa fa-users',
             // estado 0 = visible, inverted from usuario.estado.
             'estado' => 0,
             'id_ref' => 0,

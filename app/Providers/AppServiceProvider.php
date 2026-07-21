@@ -6,6 +6,7 @@ use App\Models\Usuario;
 use App\Navigation\Sidebar;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -30,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer('layouts.app', static function ($view): void {
             $user = Auth::user();
-            $view->with('sidebarSections', $user ? Sidebar::forUser($user) : collect());
+            $view->with('sidebarSections', $user ? Sidebar::forUser($user, Route::currentRouteName()) : collect());
         });
 
         View::composer('partials.tienda-activa', static function ($view): void {
