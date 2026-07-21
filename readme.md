@@ -5,7 +5,18 @@ PHP call center and debt collection system for Entel operations.
 ## Prerequisites
 
 - [mise](https://mise.jdx.dev/getting-started.html): installs and pins PHP
-  8.2.31 for this project.
+  8.5.8 for this project.
+- The system headers mise's PHP build links against. It compiles from source and
+  silently omits any extension whose library is missing, so install these
+  **before** `mise install`. Without `libzip-dev` you get a PHP with no
+  `ext-zip`, and every spreadsheet export fails at runtime:
+
+  ```sh
+  sudo apt-get install build-essential autoconf bison re2c pkg-config \
+      libxml2-dev libssl-dev libicu-dev libzip-dev libonig-dev \
+      libcurl4-openssl-dev libpng-dev libjpeg-dev libfreetype6-dev \
+      libwebp-dev libgmp-dev libsodium-dev libreadline-dev libbz2-dev
+  ```
 
 ## Setup
 

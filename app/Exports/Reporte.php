@@ -38,6 +38,15 @@ final class Reporte
 {
     private const POR_LOTE = 500;
 
+    // OpenSpout 5 made Style readonly, so a style is built once and shared
+    // rather than rebuilt per cell. Every date cell used to allocate its own.
+    private readonly Style $fecha;
+
+    private function __construct()
+    {
+        $this->fecha = (new Style)->withFormat('dd/mm/yyyy');
+    }
+
     /**
      * Streams the query as an .xlsx download.
      *
@@ -73,7 +82,14 @@ final class Reporte
     {
         $writer = new Writer;
         $writer->openToFile('php://output');
-        $writer->addRow(Row::fromValues($encabezados, (new Style)->setFontBold()));
+        // OpenSpout 5 dropped the row-level default style, so the header's bold
+        // is carried by its cells. StringCell for the same reason celda() uses
+        // it: a title is text, never a formula.
+        $negrita = (new Style)->withFontBold(true);
+        $writer->addRow(new Row(array_map(
+            static fn (string $titulo): Cell => new StringCell($titulo, $negrita),
+            $encabezados,
+        )));
 
         foreach ($consulta->lazyById(self::POR_LOTE) as $modelo) {
             $writer->addRow(new Row(array_map($this->celda(...), $fila($modelo))));
@@ -95,7 +111,7 @@ final class Reporte
     private function celda(bool|DateTimeInterface|float|int|string|null $valor): Cell
     {
         if ($valor instanceof DateTimeInterface) {
-            return Cell::fromValue($valor, (new Style)->setFormat('dd/mm/yyyy'));
+            return Cell::fromValue($valor, $this->fecha);
         }
 
         // Cell::fromValue promotes any string starting with '=' to a live
