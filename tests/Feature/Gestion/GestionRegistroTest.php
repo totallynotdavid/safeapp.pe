@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Gestion;
 
+use App\Cockpit\Operadores;
 use App\Models\Dato;
 use App\Models\Llamada;
 
@@ -83,11 +84,11 @@ class GestionRegistroTest extends GestionTestCase
             'q_entel' => 9,
         ]);
 
-        $this
-            ->actingAs($agente)
-            ->get(route('gestion.show', $dato))
-            ->assertOk()
-            ->assertViewHas('mezcla', static fn ($mezcla): bool => $mezcla->propias() === 9);
+        $texto = $this->textoVisible(
+            $this->actingAs($agente)->get(route('gestion.show', $dato))->assertOk(),
+        );
+
+        $this->assertStringContainsString('Líneas '.Operadores::PROPIO.' 9', $texto);
     }
 
     public function test_the_channel_comes_from_the_chosen_respuesta(): void

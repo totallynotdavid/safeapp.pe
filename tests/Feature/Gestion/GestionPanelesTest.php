@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Gestion;
 
-use App\Cockpit\MezclaDeLineas;
 use App\Cockpit\Operadores;
 use App\Models\Llamada;
 
@@ -102,24 +101,28 @@ class GestionPanelesTest extends GestionTestCase
 
     public function test_the_record_panel_lists_every_operator_line_count(): void
     {
+        $lineas = ['MOVISTAR' => 3, 'ENTEL' => 5, 'CLARO' => 2, 'BITEL' => 1];
+
         $agente = $this->agente('gestion.movil');
         $dato = $this->datoDe($agente, 'MOVIL', [
-            'q_movistar' => 3,
-            'q_entel' => 5,
-            'q_claro' => 2,
-            'q_bitel' => 1,
+            'q_movistar' => $lineas['MOVISTAR'],
+            'q_entel' => $lineas['ENTEL'],
+            'q_claro' => $lineas['CLARO'],
+            'q_bitel' => $lineas['BITEL'],
         ]);
 
-        $respuesta = $this->actingAs($agente)->get(route('gestion.show', $dato))->assertOk();
-
-        foreach (Operadores::TODOS as $operador) {
-            $respuesta->assertSee($operador);
-        }
+        $texto = $this->textoVisible(
+            $this->actingAs($agente)->get(route('gestion.show', $dato))->assertOk(),
+        );
 
         // Nobody has called yet, so the file's counts are what the screen reads.
-        $respuesta->assertViewHas(
-            'mezcla',
-            static fn (MezclaDeLineas $mezcla): bool => $mezcla->propias() === 5 && $mezcla->competencia() === 6,
-        );
+        foreach (Operadores::TODOS as $operador) {
+            $this->assertStringContainsString($operador.' '.$lineas[$operador], $texto);
+        }
+
+        // And the same numbers again as the split the agent actually negotiates
+        // against: ours, and everyone else's added up.
+        $this->assertStringContainsString('Líneas '.Operadores::PROPIO.' 5', $texto);
+        $this->assertStringContainsString('Líneas competencia 6', $texto);
     }
 }

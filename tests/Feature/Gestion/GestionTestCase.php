@@ -10,6 +10,7 @@ use Database\Seeders\RespuestaSeeder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 // Shared fixture for the cockpit tests: a seeded disposition catalog and agents
@@ -58,6 +59,18 @@ abstract class GestionTestCase extends TestCase
             ->tipoData($tipoData)
             ->asignadoA($agente->id_usuario, $this->tienda->id_tienda)
             ->create($atributos);
+    }
+
+    /**
+     * The page as text, tags stripped and whitespace collapsed.
+     *
+     * Lets a test assert on the label and the value a user reads together
+     * ("Líneas ENTEL 5") without pinning the markup that puts them side by side,
+     * which a bare assertSee on the number alone cannot do.
+     */
+    protected function textoVisible(TestResponse $respuesta): string
+    {
+        return trim((string) preg_replace('/\s+/u', ' ', strip_tags($respuesta->getContent())));
     }
 
     /**

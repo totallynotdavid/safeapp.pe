@@ -7,10 +7,12 @@ use App\Models\Rol;
 use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Concerns\LeeFormulario;
 use Tests\TestCase;
 
 class RolManagementTest extends TestCase
 {
+    use LeeFormulario;
     use RefreshDatabase;
 
     // A user holding the roles.manage grant, the gate the whole module hangs off.
@@ -55,19 +57,22 @@ class RolManagementTest extends TestCase
 
     public function test_renders_the_edit_form_with_current_grants_checked(): void
     {
-        ['header' => $header, 'leaves' => [$leaf]] = $this->section(1);
+        ['header' => $header, 'leaves' => [$otorgado, $libre]] = $this->section();
         $rol = Rol::factory()->create();
         DB::table('accesoxrol')->insert([
             ['id_rol' => $rol->id_rol, 'id_menu' => $header->id_menu],
-            ['id_rol' => $rol->id_rol, 'id_menu' => $leaf->id_menu],
+            ['id_rol' => $rol->id_rol, 'id_menu' => $otorgado->id_menu],
         ]);
 
-        $this
-            ->actingAs($this->manager())
-            ->get(route('roles.edit', $rol))
-            ->assertOk()
-            ->assertSee('name="menus[]" value="'.$leaf->id_menu.'"', false)
-            ->assertSee('checked', false);
+        $respuesta = $this->actingAs($this->manager())->get(route('roles.edit', $rol))->assertOk();
+
+        // Both leaves are offered and only the granted one arrives ticked. The
+        // header is granted too but renders as a legend rather than a checkbox,
+        // so asking only "is anything ticked" would pass on the wrong box.
+        $this->assertEquals(
+            [(string) $otorgado->id_menu => true, (string) $libre->id_menu => false],
+            $this->casillas($respuesta, 'menus[]'),
+        );
     }
 
     public function test_creating_a_role_grants_selected_leaves_and_their_headers(): void

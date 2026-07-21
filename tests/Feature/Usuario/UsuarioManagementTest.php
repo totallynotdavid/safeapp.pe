@@ -30,9 +30,18 @@ class UsuarioManagementTest extends TestCase
         $this->actingAs($sinPermiso)->get(route('usuarios.index'))->assertForbidden();
     }
 
-    public function test_lists_users_for_a_manager(): void
+    public function test_the_list_names_each_account_and_the_rol_it_answers_to(): void
     {
-        $this->actingAs($this->manager())->get(route('usuarios.index'))->assertOk();
+        $rol = Rol::factory()->create(['nombre_rol' => 'SUPERVISOR']);
+        Usuario::factory()->create(['usuario' => 'jperez', 'personal' => 'JUAN PEREZ', 'id_rol' => $rol->id_rol]);
+
+        $this
+            ->actingAs($this->manager())
+            ->get(route('usuarios.index'))
+            ->assertOk()
+            ->assertSee('jperez')
+            ->assertSee('JUAN PEREZ')
+            ->assertSee('SUPERVISOR');
     }
 
     public function test_creating_a_user_copies_the_roles_acceso_template(): void

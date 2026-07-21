@@ -12,9 +12,13 @@ class LoginTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_login_screen_renders(): void
+    public function test_the_login_screen_offers_the_two_fields_it_authenticates_on(): void
     {
-        $this->get('/login')->assertOk()->assertViewIs('auth.login');
+        $this
+            ->get('/login')
+            ->assertOk()
+            ->assertSee('Usuario')
+            ->assertSee('Contraseña');
     }
 
     public function test_authenticates_with_a_correct_bcrypt_password(): void
