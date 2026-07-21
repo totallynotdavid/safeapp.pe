@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Database\Factories\AsignaFactory;
+use Database\Factories\AsignacionTiendaFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,16 +10,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 // User -> tienda assignment. estado 0 is the active assignment. The asignacion
 // module owns the write side; operational screens read it to scope their rows
 // to the operator's tienda via Usuario::tiendaAsignada().
-class Asigna extends Model
+class AsignacionTienda extends Model
 {
-    /** @use HasFactory<AsignaFactory> */
+    /** @use HasFactory<AsignacionTiendaFactory> */
     use HasFactory;
 
     public $timestamps = false;
 
     protected $table = 'asignacion_tienda';
 
-    // No natural primary key in the legacy table; reads go through the
+    // The table has no natural primary key; reads go through the
     // (id_usuario, estado) index, never by row id.
     protected $primaryKey = null;
 

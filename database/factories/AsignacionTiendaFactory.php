@@ -2,17 +2,17 @@
 
 namespace Database\Factories;
 
-use App\Models\Asigna;
+use App\Models\AsignacionTienda;
 use App\Models\Tienda;
 use App\Models\Usuario;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Asigna>
+ * @extends Factory<AsignacionTienda>
  */
-class AsignaFactory extends Factory
+class AsignacionTiendaFactory extends Factory
 {
-    protected $model = Asigna::class;
+    protected $model = AsignacionTienda::class;
 
     public function definition(): array
     {

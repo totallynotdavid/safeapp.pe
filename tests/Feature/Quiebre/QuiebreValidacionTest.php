@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Quiebre;
 
-use App\Models\Asigna;
+use App\Models\AsignacionTienda;
 use App\Models\Menu;
 use App\Models\Quiebre;
 use App\Models\Tienda;
@@ -21,7 +21,7 @@ class QuiebreValidacionTest extends TestCase
         $menu = Menu::factory()->create(['permiso' => 'quiebre.validar']);
         $user = Usuario::factory()->create();
         $user->menus()->attach($menu);
-        Asigna::factory()->create([
+        AsignacionTienda::factory()->create([
             'id_usuario' => $user->id_usuario,
             'id_tienda' => $tienda->id_tienda,
             'estado' => 0,

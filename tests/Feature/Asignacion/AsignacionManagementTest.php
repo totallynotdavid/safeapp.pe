@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Asignacion;
 
-use App\Models\Asigna;
+use App\Models\AsignacionTienda;
 use App\Models\Menu;
 use App\Models\Tienda;
 use App\Models\Usuario;
@@ -33,7 +33,7 @@ class AsignacionManagementTest extends TestCase
     {
         $tienda = Tienda::factory()->create(['nombre' => 'LIMA CENTRO']);
         $agente = Usuario::factory()->create(['personal' => 'AGENTE ACTIVO']);
-        Asigna::factory()->create([
+        AsignacionTienda::factory()->create([
             'id_usuario' => $agente->id_usuario,
             'id_tienda' => $tienda->id_tienda,
             'estado' => 0,
@@ -64,7 +64,7 @@ class AsignacionManagementTest extends TestCase
             ->assertRedirect(route('asignacion.index'));
 
         $this->assertSame($norte->id_tienda, $agente->fresh()->tiendaAsignada());
-        $this->assertSame(2, Asigna::query()->where('id_usuario', $agente->id_usuario)->count());
+        $this->assertSame(2, AsignacionTienda::query()->where('id_usuario', $agente->id_usuario)->count());
     }
 
     public function test_keeps_a_single_active_tienda_when_the_active_one_changes(): void
@@ -83,7 +83,10 @@ class AsignacionManagementTest extends TestCase
             ->assertRedirect(route('asignacion.index'));
 
         $this->assertSame($norte->id_tienda, $agente->fresh()->tiendaAsignada());
-        $this->assertSame(1, Asigna::query()->where('id_usuario', $agente->id_usuario)->where('estado', 0)->count());
+        $this->assertSame(
+            1,
+            AsignacionTienda::query()->where('id_usuario', $agente->id_usuario)->where('estado', 0)->count(),
+        );
     }
 
     public function test_removing_a_tienda_deletes_its_assignment(): void
@@ -102,7 +105,7 @@ class AsignacionManagementTest extends TestCase
             ->assertRedirect(route('asignacion.index'));
 
         $this->assertSame($centro->id_tienda, $agente->fresh()->tiendaAsignada());
-        $this->assertSame(1, Asigna::query()->where('id_usuario', $agente->id_usuario)->count());
+        $this->assertSame(1, AsignacionTienda::query()->where('id_usuario', $agente->id_usuario)->count());
     }
 
     public function test_clears_every_assignment_when_no_tienda_is_chosen(): void
@@ -117,7 +120,7 @@ class AsignacionManagementTest extends TestCase
             ->assertRedirect(route('asignacion.index'));
 
         $this->assertNull($agente->fresh()->tiendaAsignada());
-        $this->assertSame(0, Asigna::query()->where('id_usuario', $agente->id_usuario)->count());
+        $this->assertSame(0, AsignacionTienda::query()->where('id_usuario', $agente->id_usuario)->count());
     }
 
     public function test_rejects_an_active_tienda_outside_the_assigned_set(): void
@@ -134,7 +137,7 @@ class AsignacionManagementTest extends TestCase
             ])
             ->assertSessionHasErrors('activa');
 
-        $this->assertSame(0, Asigna::query()->where('id_usuario', $agente->id_usuario)->count());
+        $this->assertSame(0, AsignacionTienda::query()->where('id_usuario', $agente->id_usuario)->count());
     }
 
     public function test_requires_an_active_tienda_when_tiendas_are_chosen(): void

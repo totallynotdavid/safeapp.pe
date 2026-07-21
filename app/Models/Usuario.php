@@ -69,12 +69,12 @@ class Usuario extends Authenticatable
 
     public function asignaciones(): HasMany
     {
-        return $this->hasMany(Asigna::class, 'id_usuario', 'id_usuario');
+        return $this->hasMany(AsignacionTienda::class, 'id_usuario', 'id_usuario');
     }
 
     public function asignacionActiva(): HasOne
     {
-        return $this->hasOne(Asigna::class, 'id_usuario', 'id_usuario')->where('estado', 0);
+        return $this->hasOne(AsignacionTienda::class, 'id_usuario', 'id_usuario')->where('estado', 0);
     }
 
     // The one place that resolves "which tienda is this operator working".
