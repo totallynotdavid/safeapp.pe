@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [master, migration]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  php:
+    name: Formato, lint y pruebas
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # mise builds PHP from source and silently omits any extension whose
+      # library is absent, so these go in before mise install rather than after.
+      # libzip-dev is the one that bites: without it there is no ext-zip, and
+      # every spreadsheet export fails at runtime instead of at build time.
+      - name: Instalar las librerías que compila el PHP de mise
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            autoconf bison re2c pkg-config libxml2-dev libssl-dev libicu-dev \
+            libzip-dev libonig-dev libcurl4-openssl-dev libpng-dev libjpeg-dev \
+            libfreetype6-dev libwebp-dev libgmp-dev libsodium-dev \
+            libreadline-dev libbz2-dev
+
+      # mise.toml is the only place the PHP and Mago versions are written. CI
+      # reads it rather than repeating them here, so the two cannot drift.
+      - uses: jdx/mise-action@v4
+
+      - name: Cachear las descargas de Composer
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      # composer install is also the platform gate: it fails outright if the
+      # PHP that mise built is missing ext-zip or any other required extension.
+      - name: Instalar dependencias PHP
+        run: mise exec -- composer install --no-interaction --no-progress --prefer-dist
+
+      # artisan boots before any test runs, and it needs an APP_KEY to do it.
+      # The database settings here are unused: phpunit.xml points the suite at
+      # an in-memory SQLite connection.
+      - name: Preparar el entorno
+        run: |
+          cp .env.example .env
+          mise exec -- php artisan key:generate
+
+      - run: make fmt-check
+      - run: make lint
+      - run: make test
+
+  assets:
+    name: Compilación de assets
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # Only Node here. Installing the whole mise.toml would rebuild PHP from
+      # source for a job that never runs it.
+      - uses: jdx/mise-action@v4
+        with:
+          install_args: node
+
+      - uses: actions/cache@v6
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-
+
+      - run: mise exec -- npm ci
+      - run: mise exec -- npm run build

@@ -4,8 +4,9 @@ PHP call center and debt collection system for Entel operations.
 
 ## Prerequisites
 
-- [mise](https://mise.jdx.dev/getting-started.html): installs and pins PHP
-  8.5.8 for this project.
+- [mise](https://mise.jdx.dev/getting-started.html): installs and pins PHP, Node
+  and Mago for this project. `mise.toml` is the only place those versions are
+  written; CI reads the same file.
 - The system headers mise's PHP build links against. It compiles from source and
   silently omits any extension whose library is missing, so install these
   **before** `mise install`. Without `libzip-dev` you get a PHP with no
@@ -44,6 +45,11 @@ scratch.
 toolchain, scoped to the Laravel app via `mago.toml`): `fmt`/`fmt-check` and
 `lint` are clean gates; `analyze` (static type analysis) is advisory, since it
 is not Laravel-magic-aware. `test` runs the Laravel test suite.
+
+GitHub Actions runs `fmt-check`, `lint` and `test` on every push and pull
+request, plus the asset build, so the gates are the same locally and in CI.
+Dependabot opens weekly grouped updates for Composer, npm and the workflow's own
+actions.
 
 ## Local database
 
