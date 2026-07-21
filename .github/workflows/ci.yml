@@ -2,8 +2,12 @@ name: CI
 
 on:
   push:
-    branches: [master, migration]
+    branches:
+      - master
   pull_request:
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
