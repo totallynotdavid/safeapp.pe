@@ -5,11 +5,14 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 // Baseline schema for the averías/quiebre cluster and the assignment lookup the
-// validation screen scopes on. Only the validation screen is being ported now;
-// the REGISTRO screen (which writes most quiebre columns) is still legacy, so
-// those registration-owned columns are modeled nullable here and will be
-// tightened when that screen ports. Like the auth baseline, these CREATEs only
-// run against fresh databases (tests, from-scratch dev), never the prod dump.
+// validation screen scopes on.
+//
+// Most quiebre columns are nullable because they were written first by a legacy
+// REGISTRO screen this migration predated. That screen is ported now, and
+// StoreQuiebreRegistroRequest requires most of them, so the nullability is
+// looser than the app. Tightening it is deliberately left until after the
+// cutover: the 10 production rows are carried across by cutover:transform, and
+// a NOT NULL added now would only change what the transform has to backfill.
 return new class extends Migration {
     public function up(): void
     {
@@ -19,9 +22,8 @@ return new class extends Migration {
         });
 
         // User -> tienda assignment. estado 0 means the active assignment; the
-        // validation screen reads the current user's active tienda from here.
-        // The assignment module (not yet ported) owns writes and the final
-        // shape; this is the minimal read surface plus an index for the lookup.
+        // screens that scope on a tienda read it from here. AsignacionController
+        // owns the write side.
         Schema::create('asignacion_tienda', static function (Blueprint $table) {
             $table->unsignedInteger('id_tienda');
             $table->unsignedInteger('id_usuario');
@@ -39,8 +41,7 @@ return new class extends Migration {
             $table->string('caso_sf', 50)->nullable();
             $table->text('comentario_validador')->nullable();
 
-            // Registration-owned columns, written by the still-legacy REGISTRO
-            // screen. Nullable until that port tightens them.
+            // Registration-owned columns, written by QuiebreRegistroController.
             $table->unsignedInteger('id_usuario');
             $table->unsignedInteger('id_supervisor')->default(0);
             // Legacy stored this as text holding an id_tienda; it is a tienda FK,

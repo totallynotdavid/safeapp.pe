@@ -11,8 +11,8 @@ use Illuminate\View\View;
 
 // Liquidación: a liquidador settles validated notas de cargo móvil, recording
 // the commission, discount, and settlement outcome. Registration and validation
-// live in the still-legacy notacargo_movil screens; this screen reads the case
-// and writes only the settlement fields. Legacy passed a tienda but never
+// live in the notas de cargo móvil screens; this screen reads the case and
+// writes only the settlement fields. Legacy passed a tienda but never
 // filtered on it, so this is a global queue with no per-row scoping.
 class LiquidacionController extends Controller
 {

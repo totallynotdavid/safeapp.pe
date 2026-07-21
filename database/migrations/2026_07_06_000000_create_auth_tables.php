@@ -4,10 +4,10 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-// Baseline schema for the legacy auth/RBAC tables, so fresh databases (the
-// test suite, a from-scratch build) have the tables the Eloquent models map
-// onto. The shared dev/prod database is loaded from the SQL dump and never
-// migrated, so these CREATE statements only ever run against new databases.
+// Auth and RBAC: accounts, roles, the menu tree, and the two grant tables.
+// Column names and the id-based menu tree are inherited from the pre-rewrite
+// schema so the cutover stays a column-for-column copy, but this migration is
+// the definition of them, not a description of a table loaded from elsewhere.
 return new class extends Migration {
     public function up(): void
     {

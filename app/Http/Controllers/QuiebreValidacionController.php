@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 // Averías → Seguimiento: a validator reviews quiebres registered against their
-// assigned tienda and records a decision. Registration lives in the still-legacy
-// REGISTRO screen; this screen only reads and validates.
+// assigned tienda and records a decision. Registration lives in
+// QuiebreRegistroController; this screen only reads and validates.
 class QuiebreValidacionController extends Controller
 {
     public function index(Request $request): View
