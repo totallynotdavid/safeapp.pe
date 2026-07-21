@@ -2,23 +2,16 @@
 
 namespace Tests\Feature\Exports;
 
-use App\Models\Menu;
 use App\Models\NcFija;
 use App\Models\Tienda;
 use App\Models\Usuario;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
-use Tests\Concerns\LeeLibro;
-use Tests\TestCase;
 
-// The export owner: what lands in the workbook, and what must not.
-class ExportacionTest extends TestCase
+// Notas de cargo fija as a spreadsheet: what lands in the workbook, and what
+// must not. The format and formula rules here are Reporte's, so they hold for
+// every export and are not repeated in the móvil and contacto suites.
+class ExportacionFijaTest extends ExportacionTestCase
 {
-    use LeeLibro;
-    use RefreshDatabase;
-
-    private const RUC = '20123456789';
-
     public function test_the_export_is_a_real_workbook_not_an_html_table(): void
     {
         // Legacy served every one of these as an HTML <table> under a
@@ -89,7 +82,7 @@ class ExportacionTest extends TestCase
         // absent from the download exactly as it is absent from the list.
         NcFija::factory()->liquidadaEsteMes()->deRuc(self::RUC)->create();
         NcFija::factory()
-            ->deRuc('20999999999')
+            ->deRuc(self::RUC_AJENO)
             ->create([
                 'fecha_ingreso' => now()->subMonths(4),
                 'fecha_actualizacion' => now()->subMonths(4),
@@ -99,14 +92,14 @@ class ExportacionTest extends TestCase
         $hoja = $this->hoja($this->exportarBackFija());
 
         $this->assertStringContainsString(self::RUC, $hoja);
-        $this->assertStringNotContainsString('20999999999', $hoja);
+        $this->assertStringNotContainsString(self::RUC_AJENO, $hoja);
     }
 
     public function test_an_unvalidated_case_is_no_more_exportable_than_it_is_listable(): void
     {
-        NcFija::factory()->rechazada()->liquidadaEsteMes()->deRuc('20999999999')->create();
+        NcFija::factory()->rechazada()->liquidadaEsteMes()->deRuc(self::RUC_AJENO)->create();
 
-        $this->assertStringNotContainsString('20999999999', $this->hoja($this->exportarBackFija()));
+        $this->assertStringNotContainsString(self::RUC_AJENO, $this->hoja($this->exportarBackFija()));
     }
 
     public function test_the_screens_permiso_gates_the_export(): void
@@ -127,22 +120,14 @@ class ExportacionTest extends TestCase
         $otro = $this->usuarioCon('notacargo.fija.registrar');
 
         NcFija::factory()->registrada()->deRuc(self::RUC)->create(['id_usuario' => $ejecutivo->id_usuario]);
-        NcFija::factory()->registrada()->deRuc('20999999999')->create(['id_usuario' => $otro->id_usuario]);
+        NcFija::factory()->registrada()->deRuc(self::RUC_AJENO)->create(['id_usuario' => $otro->id_usuario]);
 
         $hoja = $this->hoja(
             $this->actingAs($ejecutivo)->get(route('notas-cargo.fija.exportar')),
         );
 
         $this->assertStringContainsString(self::RUC, $hoja);
-        $this->assertStringNotContainsString('20999999999', $hoja);
-    }
-
-    private function usuarioCon(string $permiso): Usuario
-    {
-        $user = Usuario::factory()->create();
-        $user->menus()->attach(Menu::factory()->create(['permiso' => $permiso]));
-
-        return $user;
+        $this->assertStringNotContainsString(self::RUC_AJENO, $hoja);
     }
 
     private function exportarBackFija(): TestResponse

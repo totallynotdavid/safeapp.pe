@@ -46,7 +46,10 @@ final class ReporteContacto
                     Operadores::TODOS,
                 ),
             ],
-            $consulta->with('agente', 'respuesta'),
+            // Every relation a row reads, declared here rather than left to the
+            // caller. Both screens happen to load cliente already; a third that
+            // did not would get one query per contact and nothing would say so.
+            $consulta->with('agente', 'respuesta', 'cliente'),
             self::fila(...),
         );
     }
