@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Cockpit\AccesoAClientes;
 use App\Http\Requests\Quiebre\StoreQuiebreRegistroRequest;
 use App\Http\Requests\Quiebre\UpdateQuiebreSeguimientoRequest;
 use App\Models\Cliente;
@@ -47,7 +48,7 @@ class QuiebreRegistroController extends Controller
 
         return view('quiebres.registro.create', [
             'ruc' => $ruc === '' ? null : $ruc,
-            'cliente' => $ruc === '' ? null : Cliente::porRuc($ruc),
+            'cliente' => $ruc === '' ? null : Cliente::visiblePara($request->user())->where('ruc', $ruc)->first(),
             'tiendas' => Tienda::query()->orderBy('nombre')->get(),
             'servicios' => Quiebre::SERVICIOS,
             'tiposAveria' => Quiebre::TIPOS_AVERIA,
@@ -62,7 +63,6 @@ class QuiebreRegistroController extends Controller
 
         $quiebre = new Quiebre($data);
         $quiebre->id_cliente = (int) $data['id_cliente'];
-        // One "inicio de avería" input feeds both legacy date columns.
         $quiebre->fecha_inicio = $data['fecha_inicio_averia'] ?? null;
         // Owner, workflow state, and dates are server-owned: a case always opens
         // PENDIENTE, unvalidated, owned by the acting user, stamped today.
@@ -73,6 +73,7 @@ class QuiebreRegistroController extends Controller
         $quiebre->ticket_atencion = Quiebre::requiereTicket($request->date('fecha_activacion')) ? 'SI' : 'NO';
         $quiebre->fecha_registro = now()->toDateString();
         $quiebre->save();
+        AccesoAClientes::otorgar((int) $quiebre->id_cliente, $user);
 
         return redirect()->route('quiebres.registro.index')->with('status', 'Quiebre registrado.');
     }

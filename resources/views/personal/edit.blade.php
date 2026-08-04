@@ -1,55 +1,66 @@
-@extends('layouts.app')
+@extends('layouts.settings')
 
-@section('title', 'Editar datos personal')
+@section('title', 'Editar datos personales')
+@section('page', 'true')
 
 @section('content')
-    @php($field = 'mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none')
-    @php($label = 'block text-sm font-medium text-gray-700')
+    <x-ui.settings-page title="Editar datos personales" :description="$usuario->usuario.' · '.($usuario->rol?->nombre_rol ?? 'Sin rol')" max-width="960px">
+                            <x-ui.grid :min-width="320" gap="10">
+                                <x-ui.stack direction="vertical" gap="1">
+                                    <x-ui.heading level="3">Datos personales</x-ui.heading>
+                                    <x-ui.text type="supporting" color="secondary">
+                                        Actualiza la información de contacto de {{ $usuario->usuario }} · {{ $usuario->rol?->nombre_rol ?? 'Sin rol' }}.
+                                    </x-ui.text>
+                                </x-ui.stack>
 
-    <div class="max-w-xl rounded-lg border border-gray-200 bg-white p-6">
-        <h2 class="mb-1 text-lg font-semibold text-gray-800">Editar datos personal</h2>
-        <p class="mb-4 text-sm text-gray-500">{{ $usuario->usuario }} · {{ $usuario->rol?->nombre_rol ?? 'Sin rol' }}</p>
+                                <form method="POST" action="{{ route('personal.update', $usuario) }}">
+                                    @csrf
+                                    @method('PUT')
+                                    <x-ui.form-layout>
+                                        <x-ui.text-input
+                                            name="personal"
+                                            label="Nombre completo"
+                                            :value="old('personal', $usuario->personal)"
+                                            :error="$errors->first('personal')"
+                                            required
+                                            autofocus
+                                            maxlength="50"
+                                        />
+                                        <x-ui.date-input
+                                            name="fecha_nacimiento"
+                                            label="Fecha de nacimiento"
+                                            :value="old('fecha_nacimiento', $usuario->fecha_nacimiento?->format('Y-m-d'))"
+                                            :error="$errors->first('fecha_nacimiento')"
+                                            optional
+                                            has-clear
+                                        />
+                                        <x-ui.text-input
+                                            name="telefono"
+                                            label="Teléfono"
+                                            type="tel"
+                                            :value="old('telefono', $usuario->telefono)"
+                                            :error="$errors->first('telefono')"
+                                            optional
+                                            maxlength="20"
+                                            autocomplete="tel"
+                                        />
+                                        <x-ui.text-input
+                                            name="correo"
+                                            label="Correo"
+                                            type="email"
+                                            :value="old('correo', $usuario->correo)"
+                                            :error="$errors->first('correo')"
+                                            optional
+                                            maxlength="100"
+                                            autocomplete="email"
+                                        />
 
-        @if ($errors->any())
-            <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800">
-                <ul class="list-disc pl-4">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        <form method="POST" action="{{ route('personal.update', $usuario) }}" class="space-y-4">
-            @csrf
-            @method('PUT')
-
-            <div>
-                <label for="personal" class="{{ $label }}">Nombre completo</label>
-                <input id="personal" name="personal" value="{{ old('personal', $usuario->personal) }}" required class="{{ $field }}">
-            </div>
-
-            <div>
-                <label for="fecha_nacimiento" class="{{ $label }}">Fecha de nacimiento</label>
-                <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $usuario->fecha_nacimiento?->format('Y-m-d')) }}" class="{{ $field }}">
-            </div>
-
-            <div>
-                <label for="telefono" class="{{ $label }}">Teléfono</label>
-                <input id="telefono" name="telefono" value="{{ old('telefono', $usuario->telefono) }}" class="{{ $field }}">
-            </div>
-
-            <div>
-                <label for="correo" class="{{ $label }}">Correo</label>
-                <input type="email" id="correo" name="correo" value="{{ old('correo', $usuario->correo) }}" class="{{ $field }}">
-            </div>
-
-            <div class="flex items-center gap-3 pt-2">
-                <button type="submit" class="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">
-                    Guardar
-                </button>
-                <a href="{{ route('personal.index') }}" class="text-sm font-medium text-gray-600 hover:text-gray-800">Cancelar</a>
-            </div>
-        </form>
-    </div>
+                                        <div class="stack" data-direction="horizontal" data-gap="2" data-h-align="start" data-v-align="center">
+                                            <x-ui.button type="submit" variant="primary">Guardar</x-ui.button>
+                                            <x-ui.button href="{{ route('personal.index') }}" variant="secondary">Cancelar</x-ui.button>
+                                        </div>
+                                    </x-ui.form-layout>
+                                </form>
+                            </x-ui.grid>
+    </x-ui.settings-page>
 @endsection

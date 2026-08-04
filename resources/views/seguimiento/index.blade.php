@@ -1,72 +1,166 @@
 @extends('layouts.app')
 
 @section('title', 'Gestión diaria')
+@section('page', 'true')
 
 @section('content')
-    @php($field = 'mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none')
+    @php
+        $supervisorOptions = $supervisores->map(fn ($opcion) => [
+            'value' => (string) $opcion->id_supervisor,
+            'label' => $opcion->nombre,
+        ])->all();
+    @endphp
 
-    <div class="space-y-6">
-        <h1 class="text-xl font-semibold text-gray-800">Gestión del equipo</h1>
+    <x-ui.table-page title="Gestión del equipo">
+        <x-slot:actions>
+            <x-ui.icon-button
+                type="submit"
+                label="Exportar gestión del equipo"
+                variant="ghost"
+                form="seguimiento-filtros"
+                formaction="{{ route('seguimiento.exportar') }}"
+            >
+                <x-ui.icon name="arrow-down-tray" />
+            </x-ui.icon-button>
+        </x-slot:actions>
 
-        {{-- Exportar is a second submit on this form, so the download always
-             carries exactly the supervisor and range on screen. --}}
-        <form method="GET" action="{{ route('seguimiento.index') }}" class="flex flex-wrap items-end gap-3 rounded-lg border border-gray-200 bg-white p-4">
-            <div>
-                <label for="supervisor" class="block text-sm font-medium text-gray-700">Supervisor</label>
-                <select id="supervisor" name="supervisor" class="{{ $field }}">
-                    <option value="">Elegir</option>
-                    @foreach ($supervisores as $opcion)
-                        <option value="{{ $opcion->id_supervisor }}" @selected($supervisor === $opcion->id_supervisor)>{{ $opcion->nombre }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label for="desde" class="block text-sm font-medium text-gray-700">Desde</label>
-                <input id="desde" name="desde" type="date" value="{{ $rango->desde->toDateString() }}" class="{{ $field }}">
-            </div>
-            <div>
-                <label for="hasta" class="block text-sm font-medium text-gray-700">Hasta</label>
-                <input id="hasta" name="hasta" type="date" value="{{ $rango->hasta->toDateString() }}" class="{{ $field }}">
-            </div>
-            <button type="submit" class="rounded-md bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">Filtrar</button>
-            <button type="submit" formaction="{{ route('seguimiento.exportar') }}"
-                class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Exportar</button>
-        </form>
+        <x-ui.text type="supporting" color="secondary">
+            Revisa y exporta los contactos registrados por el equipo de un supervisor.
+        </x-ui.text>
 
-        <div class="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-            <table class="min-w-full divide-y divide-gray-200 text-sm">
-                <thead class="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
+        {{-- The visible supervisor/range and export remain one GET form. --}}
+        <x-ui.stack
+            id="seguimiento-filtros"
+            as="form"
+            method="GET"
+            action="{{ route('seguimiento.index') }}"
+            direction="horizontal"
+            v-align="end"
+            gap="3"
+            wrap="wrap"
+        >
+            <input type="hidden" name="buscar" value="{{ $busqueda }}">
+            <x-ui.selector
+                name="supervisor"
+                label="Supervisor"
+                :options="$supervisorOptions"
+                :value="$supervisor === null ? '' : (string) $supervisor"
+                placeholder="Elegir supervisor"
+            />
+            <x-ui.date-input
+                name="desde"
+                label="Desde"
+                :value="$rango->desde->toDateString()"
+                :max="$rango->hasta->toDateString()"
+                required
+            />
+            <x-ui.date-input
+                name="hasta"
+                label="Hasta"
+                :value="$rango->hasta->toDateString()"
+                :min="$rango->desde->toDateString()"
+                required
+            />
+            <x-ui.button type="submit" variant="primary">Filtrar</x-ui.button>
+        </x-ui.stack>
+
+        @if ($supervisor !== null)
+            <x-ui.table-search
+                :action="route('seguimiento.index')"
+                :value="$busqueda"
+                placeholder="Buscar por cliente, RUC, contacto o teléfono…"
+                :result-count="$contactos->total()"
+                label="Buscar en la gestión del equipo"
+                :preserve="[
+                    'supervisor' => (string) $supervisor,
+                    'desde' => $rango->desde->toDateString(),
+                    'hasta' => $rango->hasta->toDateString(),
+                ]"
+            />
+        @endif
+
+        @php
+            $contactosPorDia = $contactos->getCollection()->groupBy(
+                fn ($contacto) => $contacto->fecha?->toDateString() ?? 'sin-fecha',
+            );
+            $agruparPorDia = $contactosPorDia->count() > 1;
+        @endphp
+
+        <x-ui.table label="Gestión diaria del equipo" :truncate="true">
+            <colgroup>
+                <col class="col-client">
+                <col class="col-contact">
+                <col class="col-response">
+                <col class="col-name">
+                <col class="col-date">
+                <col class="col-comment">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th scope="col">Cliente</th>
+                    <th scope="col">Contacto</th>
+                    <th scope="col">Respuesta</th>
+                    <th scope="col">Personal</th>
+                    <th scope="col">{{ $agruparPorDia ? 'Hora' : 'Fecha' }}</th>
+                    <th scope="col">Comentario</th>
+                </tr>
+            </thead>
+            @if ($contactos->isEmpty())
+                <tbody>
                     <tr>
-                        <th class="px-6 py-3 text-left">Fecha</th>
-                        <th class="px-6 py-3 text-left">Personal</th>
-                        <th class="px-6 py-3 text-left">Cliente</th>
-                        <th class="px-6 py-3 text-left">Contacto</th>
-                        <th class="px-6 py-3 text-left">Respuesta</th>
-                        <th class="px-6 py-3 text-left">Comentario</th>
+                        <td colspan="6">
+                            <x-ui.empty-state
+                                :title="$supervisor === null ? 'Elige un supervisor' : 'No hay gestiones en este período'"
+                                :description="$supervisor === null ? 'Selecciona un equipo para consultar su actividad.' : 'Prueba con un rango de fechas diferente.'"
+                                compact
+                            />
+                        </td>
                     </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    @forelse ($contactos as $contacto)
-                        <tr>
-                            <td class="whitespace-nowrap px-6 py-3 text-gray-600">{{ $contacto->fecha?->format('Y-m-d H:i') }}</td>
-                            <td class="px-6 py-3 text-gray-600">{{ $contacto->agente?->personal }}</td>
-                            <td class="px-6 py-3">
-                                <span class="font-medium text-gray-800">{{ $contacto->razon_social }}</span>
-                                <span class="block text-xs text-gray-500">{{ $contacto->cliente?->ruc }}</span>
-                            </td>
-                            <td class="px-6 py-3 text-gray-600">{{ $contacto->gestion }}</td>
-                            <td class="px-6 py-3 text-gray-600">{{ $contacto->respuesta?->descripcion }}</td>
-                            <td class="px-6 py-3 text-gray-600">{{ $contacto->comentario }}</td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="px-6 py-6 text-center text-gray-500">
-                                {{ $supervisor === null ? 'Elija un supervisor.' : 'Sin gestiones en el rango elegido.' }}
-                            </td>
-                        </tr>
-                    @endforelse
                 </tbody>
-            </table>
-        </div>
-    </div>
+            @elseif ($agruparPorDia)
+                @foreach ($contactosPorDia as $dia => $contactosDelDia)
+                    <x-ui.grouped-table-section
+                        id="seguimiento-dia-{{ $dia }}"
+                        :label="$dia === 'sin-fecha' ? 'Sin fecha registrada' : \Illuminate\Support\Carbon::parse($dia)->format('d/m/Y')"
+                        :count="$contactosDelDia->count()"
+                        :columns="6"
+                    >
+                        @foreach ($contactosDelDia as $contacto)
+                            <tr>
+                                <td>
+                                    <div class="table__primary">{{ $contacto->razon_social }}</div>
+                                    <div class="table__secondary">{{ $contacto->cliente?->ruc ?? '—' }}</div>
+                                </td>
+                                <td>{{ $contacto->gestion ?? '—' }}</td>
+                                <td>{{ $contacto->respuesta?->descripcion ?? '—' }}</td>
+                                <td class="table__primary">{{ $contacto->agente?->personal ?? '—' }}</td>
+                                <td class="table__secondary">{{ $contacto->fecha?->format('H:i') ?? '—' }}</td>
+                                <td>{{ $contacto->comentario ?? '—' }}</td>
+                            </tr>
+                        @endforeach
+                    </x-ui.grouped-table-section>
+                @endforeach
+            @else
+                <tbody>
+                    @foreach ($contactos as $contacto)
+                        <tr>
+                            <td>
+                                <div class="table__primary">{{ $contacto->razon_social }}</div>
+                                <div class="table__secondary">{{ $contacto->cliente?->ruc ?? '—' }}</div>
+                            </td>
+                            <td>{{ $contacto->gestion ?? '—' }}</td>
+                            <td>{{ $contacto->respuesta?->descripcion ?? '—' }}</td>
+                            <td class="table__primary">{{ $contacto->agente?->personal ?? '—' }}</td>
+                            <td class="table__secondary">{{ $contacto->fecha?->format('Y-m-d H:i') }}</td>
+                            <td>{{ $contacto->comentario ?? '—' }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            @endif
+        </x-ui.table>
+
+        @if ($contactos->hasPages())
+            <x-ui.pagination :paginator="$contactos" label="Páginas de gestión del equipo" />
+        @endif
+    </x-ui.table-page>
 @endsection

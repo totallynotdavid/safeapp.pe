@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Cockpit\BackfillDeAccesosClientes;
 use App\Cutover\MapaDeClientes;
 use App\Cutover\Traslado;
 use App\Cutover\TrasladoDeAverias;
@@ -61,6 +62,7 @@ class CutoverTransform extends Command
      */
     private const TABLAS_DESTINO = [
         'cliente',
+        'cliente_acceso',
         'datos',
         'asignacion_datos',
         'llamada',
@@ -111,6 +113,8 @@ class CutoverTransform extends Command
         foreach ($this->pasos($clientes) as $paso) {
             $resumen = [...$resumen, ...$paso->ejecutar()];
         }
+
+        BackfillDeAccesosClientes::ejecutar();
 
         $this->newLine();
         $this->table(

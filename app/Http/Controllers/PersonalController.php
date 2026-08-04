@@ -44,6 +44,6 @@ class PersonalController extends Controller
         $usuario->correo = $data['correo'] ?? null;
         $usuario->save();
 
-        return redirect()->route('personal.index')->with('status', 'Datos personales actualizados.');
+        return redirect()->route('equipo.show', $usuario)->with('status', 'Datos personales actualizados.');
     }
 }

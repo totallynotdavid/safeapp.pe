@@ -28,15 +28,7 @@ class NcFija extends Model
     use Validable;
 
     /**
-     * The lifecycle, owned by the back office.
-     *
-     * A case opens XINGRESAR. Of these ten, four (AGENDADO, INICIADO, BOLSA,
-     * ADR) appear in no production row in four years and are kept for the same
-     * reason móvil's unused two are: the vocabulary is the business's, not one
-     * inferred from current stock. The legacy screens disagreed about it, the
-     * per-tienda copies omitting ARBITRAJE and ADR that the global ones offered,
-     * so a case the back office set to ARBITRAJE was unfilterable on one of the
-     * two screens showing it.
+     * The lifecycle, owned by the back office. Cases open as XINGRESAR.
      */
     public const ESTADOS = [
         'XINGRESAR',
@@ -72,10 +64,7 @@ class NcFija extends Model
 
     public const MODALIDADES = ['ALTA', 'PORTABILIDAD', 'FUNNEL'];
 
-    /**
-     * The access technology. Legacy typed this free-hand and produced 27
-     * spellings of these three; see the create_nc_fija_table migration.
-     */
+    /** The access technology. */
     public const TECNOLOGIAS = ['FTTH', 'HFC', 'GPON'];
 
     /** Where the line sits in the network plan. */

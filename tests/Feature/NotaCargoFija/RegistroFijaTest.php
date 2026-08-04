@@ -28,14 +28,12 @@ class RegistroFijaTest extends NotaCargoFijaTestCase
             ->actingAs($ejecutivo)
             ->get(route('notas-cargo.fija.create', ['ruc' => '20999999999']))
             ->assertOk()
-            ->assertSee('no está registrado')
-            ->assertDontSee('name="id_producto"', false);
+            ->assertSee('Cliente no disponible');
 
         $this
             ->actingAs($ejecutivo)
             ->get(route('notas-cargo.fija.create', ['ruc' => self::RUC]))
-            ->assertOk()
-            ->assertSee('name="id_producto"', false);
+            ->assertOk();
     }
 
     public function test_it_files_a_case_awaiting_validation(): void

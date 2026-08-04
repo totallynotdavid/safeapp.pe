@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\GestionController;
+use App\Models\Dato;
 use App\Models\Usuario;
 use App\Navigation\Sidebar;
 use Illuminate\Support\Facades\Auth;
@@ -31,7 +33,32 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer('layouts.app', static function ($view): void {
             $user = Auth::user();
-            $view->with('sidebarSections', $user ? Sidebar::forUser($user, Route::currentRouteName()) : collect());
+            $routeName = Route::currentRouteName();
+            $dato = request()->route('dato');
+
+            // The shared cockpit detail route belongs to the segment carried by
+            // its bound record, so the matching queue remains selected.
+            if ($routeName === 'gestion.show' && $dato instanceof Dato) {
+                $routeName = GestionController::rutaIndex($dato->tipo_data);
+            }
+
+            $view->with([
+                'sidebarSections' => $user ? Sidebar::forUser($user, $routeName) : collect(),
+                'settingsUrl' => $user ? Sidebar::settingsUrlForUser($user) : null,
+            ]);
+        });
+
+        View::composer('layouts.settings', static function ($view): void {
+            $user = Auth::user();
+            $routeName = Route::currentRouteName() === 'configuracion.index'
+                ? 'configuracion.perfil'
+                : Route::currentRouteName();
+            $view->with(
+                'settingsSections',
+                $user
+                    ? Sidebar::settingsForUser($user, $routeName)
+                    : collect(),
+            );
         });
 
         View::composer('partials.tienda-activa', static function ($view): void {

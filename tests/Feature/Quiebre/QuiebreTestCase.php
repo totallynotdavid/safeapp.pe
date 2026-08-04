@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Quiebre;
 
+use App\Cockpit\AccesoAClientes;
 use App\Models\Cliente;
 use App\Models\Menu;
 use App\Models\Tienda;
@@ -18,10 +19,13 @@ abstract class QuiebreTestCase extends TestCase
 
     protected const RUC = '20123456789';
 
+    protected ?Usuario $ejecutivoActual = null;
+
     protected function ejecutivo(): Usuario
     {
         $user = Usuario::factory()->create();
         $user->menus()->attach(Menu::factory()->create(['permiso' => 'quiebre.registrar']));
+        $this->ejecutivoActual = $user;
 
         return $user;
     }
@@ -32,8 +36,13 @@ abstract class QuiebreTestCase extends TestCase
      */
     protected function payload(Tienda $tienda, array $overrides = []): array
     {
+        $cliente = Cliente::factory()->create(['ruc' => self::RUC]);
+        if ($this->ejecutivoActual !== null) {
+            AccesoAClientes::otorgar($cliente, $this->ejecutivoActual);
+        }
+
         return array_merge([
-            'id_cliente' => Cliente::factory()->create(['ruc' => self::RUC])->id_cliente,
+            'id_cliente' => $cliente->id_cliente,
             'zonal_telefonica' => $tienda->id_tienda,
             'servicio' => 'FIJA',
             'tipo_averia' => 'SIN TV',

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Cockpit\AccesoAClientes;
 use App\Exports\ReporteNotaCargoMovil;
 use App\Http\FiltroPeriodo;
 use App\Http\Requests\NotaCargoMovil\StoreNotaCargoMovilRequest;
@@ -47,7 +48,7 @@ class NotaCargoMovilController extends Controller
 
         return view('notas-cargo.movil.create', [
             'ruc' => $ruc === '' ? null : $ruc,
-            'cliente' => $ruc === '' ? null : Cliente::porRuc($ruc),
+            'cliente' => $ruc === '' ? null : Cliente::visiblePara($request->user())->where('ruc', $ruc)->first(),
             'regiones' => Tienda::query()->orderBy('nombre')->get(),
             'carteras' => Cartera::query()->seleccionables()->get(),
             'modalidades' => NcMovil::MODALIDADES,
@@ -61,13 +62,13 @@ class NotaCargoMovilController extends Controller
     {
         $cargo = new NcMovil($request->safe()->except('id_cartera'));
 
-        // Owner, supervisor and date come from the session and the clock. Legacy
-        // posted all three as hidden form fields.
+        // Owner, supervisor and date are server-assigned from session and clock.
         $cargo->id_usuario = $request->user()->id_usuario;
         $cargo->id_supervisor = $request->user()->id_supervisor;
         $cargo->fecha_ingreso = now()->toDateString();
         $cargo->id_cartera = (int) $request->input('id_cartera', 0);
         $cargo->save();
+        AccesoAClientes::otorgar((int) $cargo->id_cliente, $request->user());
 
         return redirect()
             ->route('notas-cargo.movil.index')

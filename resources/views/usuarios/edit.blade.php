@@ -1,45 +1,46 @@
-@extends('layouts.app')
+@extends('layouts.settings')
 
 @section('title', 'Editar usuario')
+@section('page', 'true')
 
 @section('content')
-    <div class="max-w-xl rounded-lg border border-gray-200 bg-white p-6">
-        <h2 class="mb-1 text-lg font-semibold text-gray-800">Editar usuario</h2>
-        <p class="mb-4 text-sm text-gray-500">{{ $usuario->usuario }} · {{ $usuario->rol?->nombre_rol ?? 'Sin rol' }}</p>
+    <x-ui.settings-page title="Editar cuenta" :description="$usuario->usuario.' · '.($usuario->rol?->nombre_rol ?? 'Sin rol')" max-width="960px">
+                            <x-ui.grid :min-width="320" gap="10">
+                                <x-ui.stack direction="vertical" gap="1">
+                                    <x-ui.heading level="3">Datos de la cuenta</x-ui.heading>
+                                    <x-ui.text type="supporting" color="secondary">{{ $usuario->usuario }} · {{ $usuario->rol?->nombre_rol ?? 'Sin rol' }}</x-ui.text>
+                                </x-ui.stack>
 
-        @if ($errors->any())
-            <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800">
-                <ul class="list-disc pl-4">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+                                <form method="POST" action="{{ route('usuarios.update', $usuario) }}">
+                                    @csrf
+                                    @method('PUT')
+                                    <x-ui.form-layout>
+                                        <x-ui.text-input
+                                            name="personal"
+                                            label="Nombre completo"
+                                            :value="old('personal', $usuario->personal)"
+                                            :error="$errors->first('personal')"
+                                            required
+                                            autofocus
+                                            maxlength="50"
+                                        />
+                                        <x-ui.text-input
+                                            name="clave"
+                                            label="Nueva contraseña"
+                                            type="password"
+                                            value=""
+                                            description="Déjala en blanco para conservar la contraseña actual."
+                                            :error="$errors->first('clave')"
+                                            optional
+                                            autocomplete="new-password"
+                                        />
 
-        <form method="POST" action="{{ route('usuarios.update', $usuario) }}" class="space-y-4">
-            @csrf
-            @method('PUT')
-
-            <div>
-                <label for="personal" class="block text-sm font-medium text-gray-700">Nombre</label>
-                <input id="personal" name="personal" value="{{ old('personal', $usuario->personal) }}" required
-                    class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none">
-            </div>
-
-            <div>
-                <label for="clave" class="block text-sm font-medium text-gray-700">Contraseña</label>
-                <input id="clave" name="clave" type="password" autocomplete="new-password"
-                    class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none">
-                <p class="mt-1 text-xs text-gray-500">Dejar en blanco para conservar la contraseña actual.</p>
-            </div>
-
-            <div class="flex items-center gap-3 pt-2">
-                <button type="submit" class="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">
-                    Guardar
-                </button>
-                <a href="{{ route('usuarios.index') }}" class="text-sm font-medium text-gray-600 hover:text-gray-800">Cancelar</a>
-            </div>
-        </form>
-    </div>
+                                        <div class="stack" data-direction="horizontal" data-gap="2" data-h-align="start" data-v-align="center">
+                                            <x-ui.button type="submit" variant="primary">Guardar</x-ui.button>
+                                            <x-ui.button href="{{ route('usuarios.index') }}" variant="secondary">Cancelar</x-ui.button>
+                                        </div>
+                                    </x-ui.form-layout>
+                                </form>
+                            </x-ui.grid>
+    </x-ui.settings-page>
 @endsection

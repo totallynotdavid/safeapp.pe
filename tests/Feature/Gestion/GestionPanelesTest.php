@@ -49,6 +49,32 @@ class GestionPanelesTest extends GestionTestCase
             ->assertDontSee('CONTACTO AJENO');
     }
 
+    public function test_history_and_phones_never_show_another_executives_work(): void
+    {
+        $agente = $this->agente('gestion.movil');
+        $otro = $this->agente('gestion.movil');
+        $dato = $this->datoDe($agente);
+
+        Llamada::factory()->create([
+            'id_cliente' => $dato->id_cliente,
+            'id_usuario' => $agente->id_usuario,
+            'telefono' => '911111111',
+            'comentario' => 'CONTACTO PROPIO',
+        ]);
+        Llamada::factory()->create([
+            'id_cliente' => $dato->id_cliente,
+            'id_usuario' => $otro->id_usuario,
+            'telefono' => '922222222',
+            'comentario' => 'CONTACTO PRIVADO',
+        ]);
+
+        $respuesta = $this->actingAs($agente)->get(route('gestion.show', $dato))->assertOk();
+
+        $respuesta->assertSee('CONTACTO PROPIO')->assertDontSee('CONTACTO PRIVADO');
+        $this->assertStringContainsString('911111111', $respuesta->getContent());
+        $this->assertStringNotContainsString('922222222', $respuesta->getContent());
+    }
+
     public function test_known_phones_are_derived_from_the_contacts(): void
     {
         $agente = $this->agente('gestion.movil');

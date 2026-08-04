@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\ClienteFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -30,16 +31,25 @@ class Cliente extends Model
 
     protected $fillable = ['ruc', 'razon_social'];
 
-    /**
-     * The single way a workflow resolves a RUC to a customer.
-     *
-     * Legacy had four copies of this (the quiebre and three notacargo screens),
-     * each its own AJAX endpoint, because each of those forms was a modal with
-     * no customer in hand. `ruc` is unique, so this is one row or nothing.
-     */
+    /** Internal lookup for imports and non-executive data work. */
     public static function porRuc(string $ruc): ?self
     {
         return self::query()->where('ruc', $ruc)->first();
+    }
+
+    /**
+     * The only customer query executive-facing lookup flows may use.  A grant
+     * is durable history, while the operational rows it exposes remain private
+     * to their respective owner queries.
+     *
+     * @return Builder<self>
+     */
+    public function scopeVisiblePara(Builder $query, Usuario $usuario): Builder
+    {
+        return $query->whereHas(
+            'accesos',
+            static fn (Builder $accesos): Builder => $accesos->where('id_usuario', $usuario->id_usuario),
+        );
     }
 
     /**
@@ -88,6 +98,20 @@ class Cliente extends Model
             ->get();
     }
 
+    /** @return Collection<int, object{telefono: string, veces: int, ultimo_contacto: string}> */
+    public function telefonosConocidosPara(Usuario $usuario): Collection
+    {
+        return $this
+            ->llamadas()
+            ->where('id_usuario', $usuario->id_usuario)
+            ->selectRaw('telefono, COUNT(*) as veces, MAX(fecha) as ultimo_contacto')
+            ->whereNotNull('telefono')
+            ->where('telefono', '<>', '')
+            ->groupBy('telefono')
+            ->orderByDesc('ultimo_contacto')
+            ->get();
+    }
+
     public function datos(): HasMany
     {
         return $this->hasMany(Dato::class, 'id_cliente', 'id_cliente');
@@ -96,5 +120,10 @@ class Cliente extends Model
     public function llamadas(): HasMany
     {
         return $this->hasMany(Llamada::class, 'id_cliente', 'id_cliente');
+    }
+
+    public function accesos(): HasMany
+    {
+        return $this->hasMany(AccesoCliente::class, 'id_cliente', 'id_cliente');
     }
 }

@@ -3,8 +3,8 @@
 namespace App\Cockpit;
 
 use App\Models\AsignacionDato;
-use App\Models\Cliente;
 use App\Models\Dato;
+use App\Models\Usuario;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -32,14 +32,14 @@ class AltaDeClientes
      * existing gestión form logs the first contact and advances the estado, so
      * there is exactly one write path for "a contact happened".
      *
-     * @param  array<string, mixed>  $payload  validated payload from StoreClienteRequest
+     * @param  array<string, mixed>  $payload  validated payload from StoreGestionClienteRequest
      */
-    public static function registrar(array $payload, int $idAgente, int $idTienda): Dato
+    public static function registrar(array $payload, string $tipoData, Usuario $agente, int $idTienda): Dato
     {
-        return DB::transaction(static function () use ($payload, $idAgente, $idTienda): Dato {
+        return DB::transaction(static function () use ($payload, $tipoData, $agente, $idTienda): Dato {
             // Identity may already exist even when no campaign delivered it: a
             // charge note or an avería resolves the same customer.
-            $cliente = Cliente::resolver($payload['ruc'], $payload['razon_social']);
+            $cliente = AccesoAClientes::resolverOcrear($agente, $payload['ruc'], $payload['razon_social']);
 
             // Idempotent on the campaign record's natural key, so a double
             // submit returns the record the agent already has instead of
@@ -47,7 +47,7 @@ class AltaDeClientes
             $clave = [
                 'id_cliente' => $cliente->id_cliente,
                 'origen' => self::ORIGEN,
-                'tipo_data' => $payload['tipo_data'],
+                'tipo_data' => $tipoData,
             ];
 
             $dato = Dato::query()->where($clave)->first() ?? new Dato;
@@ -58,14 +58,14 @@ class AltaDeClientes
             // record already gestionado.
             $dato->forceFill([
                 ...$clave,
-                ...array_diff_key($payload, array_flip(['ruc', 'razon_social', 'tipo_data'])),
+                ...array_diff_key($payload, array_flip(['ruc', 'razon_social'])),
                 'estado' => $dato->exists ? $dato->estado : Dato::ESTADO_PENDIENTE,
             ])->save();
 
             if ($dato->asignacionActiva === null) {
                 AsignacionDato::query()->create([
                     'id_dato' => $dato->id_dato,
-                    'id_usuario' => $idAgente,
+                    'id_usuario' => $agente->id_usuario,
                     'id_tienda' => $idTienda,
                     'fecha_asignacion' => now()->toDateString(),
                     'activa' => AsignacionDato::ACTIVA,

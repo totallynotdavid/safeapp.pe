@@ -12,9 +12,7 @@ final class Operadores
     public const TODOS = ['MOVISTAR', 'ENTEL', 'CLARO', 'BITEL'];
 
     // The carrier the business trades as. Never encode this in a column name, a
-    // screen, or a report: the per-carrier counts are facts that outlive a
-    // rebrand, and deriving ownership from here keeps the next one a one-line
-    // change. Legacy made it structural and a rebrand invalidated the schema.
+    // screen, or a report: the per-carrier counts are facts that outlive a rebrand.
     public const PROPIO = 'ENTEL';
 
     /**

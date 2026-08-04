@@ -1,50 +1,37 @@
 {{--
-    Período and estado filter for a nota de cargo queue. Every registro and back
-    screen uses it, over both productos: they list the same rows over the same
-    window (NotaCargoBuilder::enPeriodo) and differ only in whose cases they show
-    and which estado vocabulary they offer, which is what $estados carries.
-
-    Exportar is a second submit on this same form rather than a link, so the
-    download always carries exactly the filter on screen. Legacy gave the export
-    its own form with its own copy of the period inputs, which is one of the ways
-    the two came apart.
-
-    Expects: $ruta, $rutaExportar, $filtro, $estados.
+    One GET form owns both the visible query and export submission so every
+    nota-de-cargo queue exports exactly the period and state shown on screen.
+    Expects: $ruta, $rutaExportar, $filtro, $estados, $formId.
 --}}
-@php($control = 'mt-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-gray-500 focus:outline-none')
-@php($meses = ['01' => 'Enero', '02' => 'Febrero', '03' => 'Marzo', '04' => 'Abril', '05' => 'Mayo', '06' => 'Junio', '07' => 'Julio', '08' => 'Agosto', '09' => 'Setiembre', '10' => 'Octubre', '11' => 'Noviembre', '12' => 'Diciembre'])
+@php
+    $meses = [
+        '01' => 'Enero', '02' => 'Febrero', '03' => 'Marzo', '04' => 'Abril',
+        '05' => 'Mayo', '06' => 'Junio', '07' => 'Julio', '08' => 'Agosto',
+        '09' => 'Setiembre', '10' => 'Octubre', '11' => 'Noviembre', '12' => 'Diciembre',
+    ];
+    $yearOptions = collect($filtro->anos())
+        ->map(fn ($option) => ['value' => (string) $option, 'label' => (string) $option])
+        ->all();
+    $monthOptions = collect($meses)
+        ->map(fn ($label, $value) => ['value' => $value, 'label' => $label])
+        ->values()
+        ->all();
+    $statusOptions = collect([['value' => '', 'label' => 'Todos los estados']])
+        ->concat(\App\Support\EtiquetasDeDominio::opciones($estados, 'estado'))
+        ->all();
+@endphp
 
-<form method="GET" action="{{ route($ruta) }}" class="flex flex-wrap items-end gap-3">
-    <div>
-        <label for="ano" class="block text-xs font-medium text-gray-500">Año</label>
-        <select id="ano" name="ano" class="{{ $control }}">
-            @foreach ($filtro->anos() as $opcion)
-                <option value="{{ $opcion }}" @selected($filtro->ano === $opcion)>{{ $opcion }}</option>
-            @endforeach
-        </select>
-    </div>
-    <div>
-        <label for="mes" class="block text-xs font-medium text-gray-500">Mes</label>
-        <select id="mes" name="mes" class="{{ $control }}">
-            @foreach ($meses as $valor => $nombre)
-                <option value="{{ $valor }}" @selected($filtro->mes === (int) $valor)>{{ $nombre }}</option>
-            @endforeach
-        </select>
-    </div>
-    <div>
-        <label for="estado" class="block text-xs font-medium text-gray-500">Estado</label>
-        <select id="estado" name="estado" class="{{ $control }}">
-            <option value="">Todos</option>
-            @foreach ($estados as $opcion)
-                <option value="{{ $opcion }}" @selected($filtro->estado === $opcion)>{{ $opcion }}</option>
-            @endforeach
-        </select>
-    </div>
-    <button type="submit" class="rounded-md bg-gray-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-700">
-        Filtrar
-    </button>
-    <button type="submit" formaction="{{ route($rutaExportar) }}"
-        class="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+<x-ui.stack id="{{ $formId }}" as="form" method="GET" action="{{ route($ruta) }}"
+    direction="horizontal" v-align="end" gap="3" wrap="wrap">
+    <x-ui.selector id="{{ $formId }}-ano" name="ano" label="Año"
+        :options="$yearOptions" :value="(string) $filtro->ano" />
+    <x-ui.selector id="{{ $formId }}-mes" name="mes" label="Mes"
+        :options="$monthOptions" :value="str_pad((string) $filtro->mes, 2, '0', STR_PAD_LEFT)" />
+    <x-ui.selector id="{{ $formId }}-estado" name="estado" label="Estado"
+        :options="$statusOptions" :value="$filtro->estado ?? ''" />
+    <x-ui.button type="submit" variant="primary">Aplicar filtros</x-ui.button>
+    <x-ui.button type="submit" variant="secondary" formaction="{{ route($rutaExportar) }}">
+        <x-slot:icon><x-ui.icon name="arrow-down-tray" /></x-slot:icon>
         Exportar
-    </button>
-</form>
+    </x-ui.button>
+</x-ui.stack>

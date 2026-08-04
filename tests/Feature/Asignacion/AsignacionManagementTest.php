@@ -61,7 +61,7 @@ class AsignacionManagementTest extends TestCase
                 'tiendas' => [$centro->id_tienda, $norte->id_tienda],
                 'activa' => $norte->id_tienda,
             ])
-            ->assertRedirect(route('asignacion.index'));
+            ->assertRedirect(route('equipo.show', $agente));
 
         $this->assertSame($norte->id_tienda, $agente->fresh()->tiendaAsignada());
         $this->assertSame(2, AsignacionTienda::query()->where('id_usuario', $agente->id_usuario)->count());
@@ -80,7 +80,7 @@ class AsignacionManagementTest extends TestCase
                 'tiendas' => [$centro->id_tienda, $norte->id_tienda],
                 'activa' => $norte->id_tienda,
             ])
-            ->assertRedirect(route('asignacion.index'));
+            ->assertRedirect(route('equipo.show', $agente));
 
         $this->assertSame($norte->id_tienda, $agente->fresh()->tiendaAsignada());
         $this->assertSame(
@@ -102,7 +102,7 @@ class AsignacionManagementTest extends TestCase
                 'tiendas' => [$centro->id_tienda],
                 'activa' => $centro->id_tienda,
             ])
-            ->assertRedirect(route('asignacion.index'));
+            ->assertRedirect(route('equipo.show', $agente));
 
         $this->assertSame($centro->id_tienda, $agente->fresh()->tiendaAsignada());
         $this->assertSame(1, AsignacionTienda::query()->where('id_usuario', $agente->id_usuario)->count());
@@ -117,7 +117,7 @@ class AsignacionManagementTest extends TestCase
         $this
             ->actingAs($this->gestor())
             ->put(route('asignacion.update', $agente), [])
-            ->assertRedirect(route('asignacion.index'));
+            ->assertRedirect(route('equipo.show', $agente));
 
         $this->assertNull($agente->fresh()->tiendaAsignada());
         $this->assertSame(0, AsignacionTienda::query()->where('id_usuario', $agente->id_usuario)->count());

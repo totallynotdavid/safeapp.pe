@@ -1,43 +1,42 @@
-@extends('layouts.app')
+@extends('layouts.settings')
 
 @section('title', 'Editar rol')
+@section('page', 'true')
 
 @section('content')
-    <div class="max-w-3xl rounded-lg border border-gray-200 bg-white p-6">
-        <h2 class="mb-4 text-lg font-semibold text-gray-800">Editar rol</h2>
+    <x-ui.settings-page title="Editar rol" description="Actualiza el nombre y la plantilla de permisos." max-width="960px">
+                            <x-ui.grid :min-width="320" gap="10">
+                                <x-ui.stack direction="vertical" gap="1">
+                                    <x-ui.heading level="3">Información del rol</x-ui.heading>
+                                    <x-ui.text type="supporting" color="secondary">Actualiza el nombre y la plantilla de permisos del rol.</x-ui.text>
+                                </x-ui.stack>
 
-        @if ($errors->any())
-            <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800">
-                <ul class="list-disc pl-4">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+                                <form method="POST" action="{{ route('roles.update', $rol) }}">
+                                    @csrf
+                                    @method('PUT')
+                                    <x-ui.form-layout>
+                                        <x-ui.text-input
+                                            name="nombre_rol"
+                                            label="Nombre del rol"
+                                            :value="old('nombre_rol', $rol->nombre_rol)"
+                                            :error="$errors->first('nombre_rol')"
+                                            required
+                                            autofocus
+                                            maxlength="50"
+                                        />
 
-        <form method="POST" action="{{ route('roles.update', $rol) }}" class="space-y-5">
-            @csrf
-            @method('PUT')
+                                        <x-ui.stack direction="vertical" gap="1">
+                                            <x-ui.heading level="3">Permisos</x-ui.heading>
+                                            <x-ui.text type="supporting" color="secondary">Los cambios actualizan la plantilla del rol. Los accesos ya copiados a usuarios pueden diferir.</x-ui.text>
+                                        </x-ui.stack>
+                                        @include('roles.permisos')
 
-            <div>
-                <label for="nombre_rol" class="block text-sm font-medium text-gray-700">Nombre del rol</label>
-                <input id="nombre_rol" name="nombre_rol" value="{{ old('nombre_rol', $rol->nombre_rol) }}" required
-                    class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none">
-            </div>
-
-            <div>
-                <span class="block text-sm font-medium text-gray-700">Permisos</span>
-                <p class="mb-2 text-xs text-gray-500">Cambiar esto no afecta a los usuarios existentes: sus accesos se copiaron al crearlos y pueden diferir a propósito.</p>
-                @include('roles.permisos')
-            </div>
-
-            <div class="flex items-center gap-3 pt-2">
-                <button type="submit" class="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">
-                    Guardar
-                </button>
-                <a href="{{ route('roles.index') }}" class="text-sm font-medium text-gray-600 hover:text-gray-800">Cancelar</a>
-            </div>
-        </form>
-    </div>
+                                        <div class="stack" data-direction="horizontal" data-gap="2" data-h-align="start" data-v-align="center">
+                                            <x-ui.button type="submit" variant="primary">Guardar</x-ui.button>
+                                            <x-ui.button href="{{ route('roles.index') }}" variant="secondary">Cancelar</x-ui.button>
+                                        </div>
+                                    </x-ui.form-layout>
+                                </form>
+                            </x-ui.grid>
+    </x-ui.settings-page>
 @endsection

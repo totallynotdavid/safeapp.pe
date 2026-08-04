@@ -5,6 +5,7 @@ namespace App\Cockpit;
 use App\Models\Cliente;
 use App\Models\Dato;
 use App\Support\LectorCsv;
+use App\Support\LectorXlsx;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -47,21 +48,27 @@ final class ImportacionDeClientes
      * and rejecting the file is only meaningful if nothing was written before the
      * last row was checked.
      */
-    public static function desdeArchivo(string $ruta): ResultadoImportacion
+    public static function desdeArchivo(string $ruta, string $extension): ResultadoImportacion
     {
-        $errores = self::errores($ruta);
+        try {
+            $errores = self::errores($ruta, $extension);
+        } catch (\Throwable) {
+            return ResultadoImportacion::rechazada([
+                'No se pudo leer el archivo. Descarga una plantilla nueva e inténtalo otra vez.',
+            ]);
+        }
 
         return $errores === []
-            ? self::cargar($ruta)
+            ? self::cargar($ruta, $extension)
             : ResultadoImportacion::rechazada($errores);
     }
 
     /**
      * @return list<string>
      */
-    private static function errores(string $ruta): array
+    private static function errores(string $ruta, string $extension): array
     {
-        $lector = LectorCsv::abrir($ruta);
+        $lector = self::lector($ruta, $extension);
 
         $faltantes = array_diff(FormatoDeImportacion::obligatorias(), $lector->encabezados);
         if ($faltantes !== []) {
@@ -105,13 +112,13 @@ final class ImportacionDeClientes
         return $errores;
     }
 
-    private static function cargar(string $ruta): ResultadoImportacion
+    private static function cargar(string $ruta, string $extension): ResultadoImportacion
     {
         $nuevos = 0;
         $actualizados = 0;
 
-        DB::transaction(static function () use ($ruta, &$nuevos, &$actualizados): void {
-            foreach (self::lotes($ruta) as $lote) {
+        DB::transaction(static function () use ($ruta, $extension, &$nuevos, &$actualizados): void {
+            foreach (self::lotes($ruta, $extension) as $lote) {
                 $campana = self::registrosDeCampana($lote);
 
                 $repetidos = self::yaCargados($campana);
@@ -193,11 +200,11 @@ final class ImportacionDeClientes
     /**
      * @return iterable<int, list<array<string, string>>>
      */
-    private static function lotes(string $ruta): iterable
+    private static function lotes(string $ruta, string $extension): iterable
     {
         $lote = [];
 
-        foreach (LectorCsv::abrir($ruta)->filas() as $fila) {
+        foreach (self::lector($ruta, $extension)->filas() as $fila) {
             $lote[] = $fila;
 
             if (count($lote) === self::POR_LOTE) {
@@ -209,5 +216,12 @@ final class ImportacionDeClientes
         if ($lote !== []) {
             yield $lote;
         }
+    }
+
+    private static function lector(string $ruta, string $extension): LectorCsv|LectorXlsx
+    {
+        return strtolower($extension) === 'xlsx'
+            ? LectorXlsx::abrir($ruta)
+            : LectorCsv::abrir($ruta);
     }
 }

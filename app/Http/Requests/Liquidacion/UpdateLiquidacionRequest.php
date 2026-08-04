@@ -20,8 +20,8 @@ class UpdateLiquidacionRequest extends FormRequest
      */
     public function rules(): array
     {
-        // comision and descuento stay strings to match the free-form legacy
-        // columns; observación is a closed set and the settlement date is required.
+        // comision and descuento are strings. observación is a closed set;
+        // settlement date is required.
         return [
             'comision' => ['required', 'string', 'max:50'],
             'observacion' => ['required', Rule::in(NcMovil::OBSERVACIONES)],

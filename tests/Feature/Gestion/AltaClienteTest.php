@@ -2,145 +2,87 @@
 
 namespace Tests\Feature\Gestion;
 
+use App\Cockpit\AccesoAClientes;
 use App\Cockpit\AltaDeClientes;
 use App\Models\Cliente;
 use App\Models\Dato;
 
-// Registering a customer the import never delivered. Resolving a RUC that is
-// already known belongs to BusquedaClienteTest.
 class AltaClienteTest extends GestionTestCase
 {
-    /**
-     * @return array<string, mixed>
-     */
+    /** @return array<string, mixed> */
     private function datosValidos(array $overrides = []): array
     {
         return array_merge([
             'ruc' => '20123456789',
             'razon_social' => 'CLIENTE NUEVO SAC',
-            'tipo_data' => 'MOVIL',
             'zonal' => 'LIMA',
             'q_entel' => 4,
             'q_claro' => 2,
         ], $overrides);
     }
 
-    public function test_registering_creates_a_pendiente_record_held_by_the_agent(): void
+    public function test_contextual_intake_creates_a_private_movil_record(): void
     {
-        $agente = $this->agente('clientes.crear', 'gestion.movil');
+        $agente = $this->agente('gestion.movil');
 
         $this
             ->actingAs($agente)
-            ->post(route('clientes.store'), $this->datosValidos())
+            ->post(route('gestion.movil.agregar.store'), $this->datosValidos(['tipo_data' => 'FIJA']))
             ->assertRedirect();
 
-        $dato = $this->datoRegistrado();
-
-        $this->assertSame($agente->id_usuario, $dato->asignacionActiva?->id_usuario);
-        $this->assertSame($this->tienda->id_tienda, $dato->asignacionActiva?->id_tienda);
-        // Registering is not contacting: the first contact is logged on the
-        // record's own screen, which is what advances the estado.
-        $this->assertSame(Dato::ESTADO_PENDIENTE, $dato->estado);
-        $this->assertSame(4, $dato->q_entel);
-        $this->assertSame('CLIENTE NUEVO SAC', $dato->cliente->razon_social);
-    }
-
-    public function test_provenance_is_recorded_in_origen_and_never_in_the_segment(): void
-    {
-        $agente = $this->agente('clientes.crear');
-
-        $this->actingAs($agente)->post(route('clientes.store'), $this->datosValidos(['tipo_data' => 'FIJA']));
-
-        $dato = $this->datoRegistrado();
-
+        $dato = Dato::query()->with(['cliente', 'asignacionActiva'])->sole();
+        $this->assertSame('MOVIL', $dato->tipo_data);
         $this->assertSame(AltaDeClientes::ORIGEN, $dato->origen);
-        // The regression that stranded 2,677 legacy clients: provenance written
-        // into the column the queue filters on.
-        $this->assertSame('FIJA', $dato->tipo_data);
-        $this->assertContains($dato->tipo_data, Dato::TIPOS_DATA);
+        $this->assertSame(Dato::ESTADO_PENDIENTE, $dato->estado);
+        $this->assertSame($agente->id_usuario, $dato->asignacionActiva?->id_usuario);
+        $this->assertDatabaseHas('cliente_acceso', [
+            'id_cliente' => $dato->id_cliente,
+            'id_usuario' => $agente->id_usuario,
+        ]);
     }
 
-    public function test_a_segment_without_a_queue_is_rejected(): void
+    public function test_intake_is_gated_by_the_route_owned_segment(): void
     {
-        $this
-            ->actingAs($this->agente('clientes.crear'))
-            ->post(route('clientes.store'), $this->datosValidos(['tipo_data' => 'CONVERGENTE']))
-            ->assertSessionHasErrors('tipo_data');
+        $agente = $this->agente('gestion.movil');
 
-        $this->assertDatabaseCount('datos', 0);
+        $this->actingAs($agente)->get(route('gestion.fija.agregar'))->assertForbidden();
+        $this->actingAs($agente)->post(route('gestion.fija.agregar.store'), $this->datosValidos())->assertForbidden();
     }
 
-    public function test_the_segment_is_required(): void
+    public function test_posted_segment_is_not_part_of_the_intake_contract(): void
     {
-        $datos = $this->datosValidos();
-        unset($datos['tipo_data']);
-
-        $this
-            ->actingAs($this->agente('clientes.crear'))
-            ->post(route('clientes.store'), $datos)
-            ->assertSessionHasErrors('tipo_data');
-    }
-
-    /**
-     * Registering the same RUC twice is a double submit, not an error to show
-     * an agent. It resolves to the record they already hold rather than
-     * colliding with the natural key on `datos`.
-     */
-    public function test_registering_the_same_ruc_twice_returns_the_same_record(): void
-    {
-        $agente = $this->agente('clientes.crear');
-
-        $this->actingAs($agente)->post(route('clientes.store'), $this->datosValidos());
-        $this->actingAs($agente)->post(route('clientes.store'), $this->datosValidos())->assertSessionHasNoErrors();
-
-        $this->assertDatabaseCount('cliente', 1);
-        $this->assertDatabaseCount('datos', 1);
-        $this->assertDatabaseCount('asignacion_datos', 1);
-    }
-
-    /**
-     * The customer exists but no campaign ever delivered them, which is the
-     * normal state for someone first met through a charge note or an avería.
-     * The old unique-RUC rule made this unregisterable.
-     */
-    public function test_a_customer_known_only_from_another_workflow_can_be_registered(): void
-    {
-        $agente = $this->agente('clientes.crear');
-        Cliente::resolver('20123456789', 'CLIENTE DE NOTA DE CARGO');
+        $agente = $this->agente('gestion.fija');
 
         $this
             ->actingAs($agente)
-            ->post(route('clientes.store'), $this->datosValidos())
-            ->assertSessionHasNoErrors();
+            ->post(route('gestion.fija.agregar.store'), $this->datosValidos(['tipo_data' => 'MOVIL']))
+            ->assertRedirect();
 
-        $this->assertDatabaseCount('cliente', 1);
-        $this->assertSame($agente->id_usuario, $this->datoRegistrado()->asignacionActiva?->id_usuario);
-        // Identity already on file is never overwritten by a later mention.
-        $this->assertSame('CLIENTE DE NOTA DE CARGO', Cliente::porRuc('20123456789')?->razon_social);
+        $this->assertSame('FIJA', Dato::query()->sole()->tipo_data);
     }
 
-    /**
-     * Two segments of the same customer are two jobs, so both are workable and
-     * neither displaces the other.
-     */
-    public function test_the_same_customer_can_be_registered_in_both_segments(): void
+    public function test_manual_intake_cannot_claim_an_inaccessible_identity(): void
     {
-        $agente = $this->agente('clientes.crear');
+        $otro = $this->agente('gestion.movil');
+        $cliente = Cliente::factory()->create(['ruc' => '20999999999', 'razon_social' => 'IDENTIDAD PRIVADA']);
+        AccesoAClientes::otorgar($cliente, $otro);
+        $agente = $this->agente('gestion.movil');
 
-        $this->actingAs($agente)->post(route('clientes.store'), $this->datosValidos());
-        $this->actingAs($agente)->post(route('clientes.store'), $this->datosValidos(['tipo_data' => 'FIJA']));
+        $this
+            ->actingAs($agente)
+            ->post(
+                route('gestion.movil.agregar.store'),
+                $this->datosValidos([
+                    'ruc' => $cliente->ruc,
+                    'razon_social' => 'NOMBRE ENVIADO',
+                ]),
+            )
+            ->assertSessionHas('error', 'El cliente no está disponible para esta gestión.');
 
-        $this->assertDatabaseCount('cliente', 1);
-        $this->assertDatabaseCount('datos', 2);
-    }
-
-    private function datoRegistrado(): Dato
-    {
-        return Cliente::query()
-            ->where('ruc', '20123456789')
-            ->firstOrFail()
-            ->datos()
-            ->with(['asignacionActiva', 'cliente'])
-            ->sole();
+        $this->assertDatabaseCount('datos', 0);
+        $this->assertDatabaseMissing('cliente_acceso', [
+            'id_cliente' => $cliente->id_cliente,
+            'id_usuario' => $agente->id_usuario,
+        ]);
     }
 }

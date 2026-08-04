@@ -22,17 +22,12 @@ class Quiebre extends Model
     // still amend its contact/comentario fields; once validated it is frozen.
     public const ESTADOS_EDITABLES = ['PENDIENTE', 'PROCESANDO'];
 
-    // The two segments the rest of the app has. Legacy offered AVANZADO as a
-    // third, but no AVANZADO product has ever existed in the catalog and all 10
-    // legacy quiebre rows are FIJA (9) or MOVIL (1), so the option only ever
-    // filed a case under a service nobody sells.
     public const SERVICIOS = ['FIJA', 'MOVIL'];
 
     public const DETALLES_EQUIPO = ['DECO', 'BAM', 'MODEM', 'CELULAR', 'TELEFONO', 'OTROS'];
 
-    // Averia classifications, stored value => display label. A few legacy values
-    // differ from their label (e.g. "AJUSTE FACTURACION" shows "AJUSTE DE
-    // FACTURACIÓN"); the stored value is preserved so cutover data still maps.
+    // Averia classifications. Stored values may differ from display labels
+    // (e.g., stored as "AJUSTE FACTURACION", displayed as "AJUSTE DE FACTURACIÓN").
     public const TIPOS_AVERIA = [
         'SIN TV' => 'SIN TV',
         'SIN DATOS' => 'SIN DATOS',

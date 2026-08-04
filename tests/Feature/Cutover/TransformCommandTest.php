@@ -54,8 +54,18 @@ class TransformCommandTest extends CutoverTestCase
         // Nothing to carry across, but the menu and the disposition catalog are
         // the app's own reference data and a database without them is not one
         // it can run on.
-        $this->assertDatabaseCount('menu', 28);
+        $this->assertDatabaseCount('menu', 27);
         $this->assertDatabaseCount('respuesta', 29);
         $this->assertDatabaseCount('cliente', 0);
+    }
+
+    public function test_cutover_grants_a_held_customers_identity_to_the_holding_executive(): void
+    {
+        $this->usuarioLegado(7);
+        $this->datoLegado(['id_usuario' => 7, 'id_tienda' => 1]);
+
+        $this->transformar();
+
+        $this->assertDatabaseHas('cliente_acceso', ['id_usuario' => 7, 'id_cliente' => 1]);
     }
 }

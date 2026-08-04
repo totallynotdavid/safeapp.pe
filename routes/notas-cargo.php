@@ -13,6 +13,7 @@
 // REPORTE BACK leaves were the back screen a third and fourth time, with an
 // Excel button bolted on.
 
+use App\Http\Controllers\ClienteIdentidadController;
 use App\Http\Controllers\NotaCargoFijaBackController;
 use App\Http\Controllers\NotaCargoFijaController;
 use App\Http\Controllers\NotaCargoFijaValidacionController;
@@ -30,6 +31,9 @@ Route::middleware('can:notacargo.movil.registrar')->group(function () {
         ->name('notas-cargo.movil.create');
     Route::post('/notas-cargo/movil', [NotaCargoMovilController::class, 'store'])
         ->name('notas-cargo.movil.store');
+    Route::post('/notas-cargo/movil/cliente', [ClienteIdentidadController::class, 'store'])
+        ->defaults('origen', 'movil')
+        ->name('notas-cargo.movil.cliente.store');
     Route::get('/notas-cargo/movil/{ncMovil}/editar', [NotaCargoMovilController::class, 'edit'])
         ->name('notas-cargo.movil.edit');
     Route::put('/notas-cargo/movil/{ncMovil}', [NotaCargoMovilController::class, 'update'])
@@ -65,6 +69,9 @@ Route::middleware('can:notacargo.fija.registrar')->group(function () {
         ->name('notas-cargo.fija.create');
     Route::post('/notas-cargo/fija', [NotaCargoFijaController::class, 'store'])
         ->name('notas-cargo.fija.store');
+    Route::post('/notas-cargo/fija/cliente', [ClienteIdentidadController::class, 'store'])
+        ->defaults('origen', 'fija')
+        ->name('notas-cargo.fija.cliente.store');
     Route::get('/notas-cargo/fija/{ncFija}/editar', [NotaCargoFijaController::class, 'edit'])
         ->name('notas-cargo.fija.edit');
     Route::put('/notas-cargo/fija/{ncFija}', [NotaCargoFijaController::class, 'update'])

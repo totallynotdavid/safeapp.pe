@@ -5,11 +5,9 @@
 // contact, off-list intake), and because web.php was becoming a single closure
 // holding every module in the app.
 
-use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\DistribucionController;
 use App\Http\Controllers\GestionController;
 use App\Http\Controllers\HistoricoController;
-use App\Http\Controllers\ImportacionController;
 use App\Http\Controllers\ProduccionController;
 use App\Http\Controllers\SeguimientoController;
 use Illuminate\Support\Facades\Route;
@@ -28,6 +26,12 @@ Route::middleware('can:gestion.movil')->group(function () {
     Route::post('/gestion/movil/liberar', [DistribucionController::class, 'liberar'])
         ->defaults('tipo', 'MOVIL')
         ->name('gestion.movil.liberar');
+    Route::get('/gestion/movil/agregar', [GestionController::class, 'create'])
+        ->defaults('tipo', 'MOVIL')
+        ->name('gestion.movil.agregar');
+    Route::post('/gestion/movil/agregar', [GestionController::class, 'storeCliente'])
+        ->defaults('tipo', 'MOVIL')
+        ->name('gestion.movil.agregar.store');
 });
 
 Route::middleware('can:gestion.fija')->group(function () {
@@ -40,23 +44,12 @@ Route::middleware('can:gestion.fija')->group(function () {
     Route::post('/gestion/fija/liberar', [DistribucionController::class, 'liberar'])
         ->defaults('tipo', 'FIJA')
         ->name('gestion.fija.liberar');
-});
-
-// The off-list door. Registering a client only creates it; the first contact
-// is logged on the client's own screen, so gestión stays the single write.
-Route::middleware('can:clientes.crear')->group(function () {
-    Route::get('/clientes/nuevo', [ClienteController::class, 'create'])->name('clientes.create');
-    Route::post('/clientes', [ClienteController::class, 'store'])->name('clientes.store');
-    Route::post('/datos/{dato}/tomar', [ClienteController::class, 'tomar'])->name('clientes.tomar');
-});
-
-// The bulk door, next to the off-list one: both create clients, and keeping them
-// side by side is what makes it obvious that only this one loads a whole
-// campaign. Its own permiso, since loading a file for the whole operation is not
-// something an agent registering one RUC should be able to do.
-Route::middleware('can:clientes.importar')->group(function () {
-    Route::get('/clientes/importar', [ImportacionController::class, 'index'])->name('clientes.importar');
-    Route::post('/clientes/importar', [ImportacionController::class, 'store'])->name('clientes.importar.store');
+    Route::get('/gestion/fija/agregar', [GestionController::class, 'create'])
+        ->defaults('tipo', 'FIJA')
+        ->name('gestion.fija.agregar');
+    Route::post('/gestion/fija/agregar', [GestionController::class, 'storeCliente'])
+        ->defaults('tipo', 'FIJA')
+        ->name('gestion.fija.agregar.store');
 });
 
 Route::middleware('can:historico.ver')->group(function () {

@@ -47,6 +47,7 @@ class GestionDistribucionTest extends GestionTestCase
             fn (Dato $d): bool => $d->asignacionActiva->id_tienda === $this->tienda->id_tienda,
         ));
         $this->assertTrue($mios->every(static fn (Dato $d): bool => $d->asignacionActiva->fecha_asignacion !== null));
+        $this->assertSame(5, \App\Models\AccesoCliente::query()->where('id_usuario', $agente->id_usuario)->count());
     }
 
     public function test_a_batch_is_capped_and_never_crosses_segments(): void

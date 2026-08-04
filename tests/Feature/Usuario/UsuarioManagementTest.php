@@ -44,6 +44,17 @@ class UsuarioManagementTest extends TestCase
             ->assertSee('SUPERVISOR');
     }
 
+    public function test_the_create_screen_exposes_available_roles(): void
+    {
+        $rol = Rol::factory()->create(['nombre_rol' => 'OPERADOR']);
+
+        $this
+            ->actingAs($this->manager())
+            ->get(route('usuarios.create'))
+            ->assertOk()
+            ->assertSee('OPERADOR');
+    }
+
     public function test_creating_a_user_copies_the_roles_acceso_template(): void
     {
         $rol = Rol::factory()->create();

@@ -9,9 +9,8 @@ use Illuminate\Validation\Rule;
 // The validador passes or rejects a case. Their identity and the decision date
 // come from the session and the clock, never the form.
 //
-// Unlike móvil, nothing on the case is theirs to correct: legacy's fija write
-// touched only the decision (its avanzado twin corrected the charge, and that
-// screen is gone). A figure the validador disagrees with is a rejection.
+// Unlike móvil, the validador only decides, not corrects.
+// A disagreed figure is a rejection.
 class UpdateValidacionFijaRequest extends FormRequest
 {
     public function rules(): array

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Cockpit\AccesoAClientes;
 use App\Exports\ReporteNotaCargoFija;
 use App\Http\FiltroPeriodo;
 use App\Http\Requests\NotaCargoFija\StoreNotaCargoFijaRequest;
@@ -47,7 +48,7 @@ class NotaCargoFijaController extends Controller
 
         return view('notas-cargo.fija.create', [
             'ruc' => $ruc === '' ? null : $ruc,
-            'cliente' => $ruc === '' ? null : Cliente::porRuc($ruc),
+            'cliente' => $ruc === '' ? null : Cliente::visiblePara($request->user())->where('ruc', $ruc)->first(),
             'regiones' => Tienda::query()->orderBy('nombre')->get(),
             'catalogo' => Producto::catalogoFija(),
             'modalidades' => NcFija::MODALIDADES,
@@ -68,12 +69,12 @@ class NotaCargoFijaController extends Controller
         $cargo->descripcion = $producto->descripcion;
         $cargo->cargo_fijo = $request->input('cargo_fijo') ?? $producto->cargo_fijo;
 
-        // Owner, supervisor and date come from the session and the clock. Legacy
-        // posted all three as hidden form fields.
+        // Owner, supervisor and date are server-assigned from session and clock.
         $cargo->id_usuario = $request->user()->id_usuario;
         $cargo->id_supervisor = $request->user()->id_supervisor;
         $cargo->fecha_ingreso = now()->toDateString();
         $cargo->save();
+        AccesoAClientes::otorgar((int) $cargo->id_cliente, $request->user());
 
         return redirect()
             ->route('notas-cargo.fija.index')

@@ -1,69 +1,85 @@
-@extends('layouts.app')
+@extends('layouts.settings')
 
-@section('title', 'Nuevo usuario')
+@section('title', 'Crear usuario')
+@section('page', 'true')
 
 @section('content')
-    <div class="max-w-xl rounded-lg border border-gray-200 bg-white p-6">
-        <h2 class="mb-4 text-lg font-semibold text-gray-800">Nuevo usuario</h2>
+    @php
+        $roleOptions = $roles->map(static fn ($rol): array => [
+            'value' => $rol->id_rol,
+            'label' => $rol->nombre_rol,
+        ])->all();
+        $sexOptions = [
+            ['value' => 'M', 'label' => 'Masculino'],
+            ['value' => 'F', 'label' => 'Femenino'],
+        ];
+    @endphp
 
-        @if ($errors->any())
-            <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800">
-                <ul class="list-disc pl-4">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+    <x-ui.settings-page title="Crear integrante" description="Crea las credenciales y asigna la plantilla inicial de acceso." max-width="960px">
+                            <x-ui.grid :min-width="320" gap="10">
+                                <x-ui.stack direction="vertical" gap="1">
+                                    <x-ui.heading level="3">Datos de la cuenta</x-ui.heading>
+                                    <x-ui.text type="supporting" color="secondary">Crea las credenciales y asigna la plantilla inicial de acceso.</x-ui.text>
+                                </x-ui.stack>
 
-        <form method="POST" action="{{ route('usuarios.store') }}" class="space-y-4">
-            @csrf
+                                <form method="POST" action="{{ route('usuarios.store') }}">
+                                    @csrf
+                                    <x-ui.form-layout>
+                                        <x-ui.text-input
+                                            name="usuario"
+                                            label="Usuario"
+                                            :value="old('usuario')"
+                                            :error="$errors->first('usuario')"
+                                            required
+                                            autofocus
+                                            maxlength="50"
+                                            autocomplete="username"
+                                        />
+                                        <x-ui.text-input
+                                            name="personal"
+                                            label="Nombre completo"
+                                            :value="old('personal')"
+                                            :error="$errors->first('personal')"
+                                            required
+                                            maxlength="50"
+                                            autocomplete="name"
+                                        />
+                                        <x-ui.text-input
+                                            name="clave"
+                                            label="Contraseña"
+                                            type="password"
+                                            value=""
+                                            description="Usa al menos 6 caracteres."
+                                            :error="$errors->first('clave')"
+                                            required
+                                            minlength="6"
+                                            autocomplete="new-password"
+                                        />
+                                        <x-ui.selector
+                                            name="id_rol"
+                                            label="Rol"
+                                            :options="$roleOptions"
+                                            :value="old('id_rol', '')"
+                                            placeholder="Seleccionar un rol…"
+                                            :error="$errors->first('id_rol')"
+                                            required
+                                        />
+                                        <x-ui.radio-list
+                                            name="sexo"
+                                            label="Sexo"
+                                            :options="$sexOptions"
+                                            :value="old('sexo', '')"
+                                            :error="$errors->first('sexo')"
+                                            orientation="horizontal"
+                                            required
+                                        />
 
-            <div>
-                <label for="usuario" class="block text-sm font-medium text-gray-700">Usuario</label>
-                <input id="usuario" name="usuario" value="{{ old('usuario') }}" required
-                    class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none">
-            </div>
-
-            <div>
-                <label for="personal" class="block text-sm font-medium text-gray-700">Nombre</label>
-                <input id="personal" name="personal" value="{{ old('personal') }}" required
-                    class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none">
-            </div>
-
-            <div>
-                <label for="clave" class="block text-sm font-medium text-gray-700">Contraseña</label>
-                <input id="clave" name="clave" type="password" required
-                    class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none">
-            </div>
-
-            <div>
-                <label for="id_rol" class="block text-sm font-medium text-gray-700">Rol</label>
-                <select id="id_rol" name="id_rol" required
-                    class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none">
-                    <option value="">-- Elegir --</option>
-                    @foreach ($roles as $rol)
-                        <option value="{{ $rol->id_rol }}" @selected(old('id_rol') == $rol->id_rol)>{{ $rol->nombre_rol }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div>
-                <label for="sexo" class="block text-sm font-medium text-gray-700">Sexo</label>
-                <select id="sexo" name="sexo" required
-                    class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none">
-                    <option value="">-- Elegir --</option>
-                    <option value="M" @selected(old('sexo') === 'M')>Masculino</option>
-                    <option value="F" @selected(old('sexo') === 'F')>Femenino</option>
-                </select>
-            </div>
-
-            <div class="flex items-center gap-3 pt-2">
-                <button type="submit" class="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">
-                    Crear
-                </button>
-                <a href="{{ route('usuarios.index') }}" class="text-sm font-medium text-gray-600 hover:text-gray-800">Cancelar</a>
-            </div>
-        </form>
-    </div>
+                                        <div class="stack" data-direction="horizontal" data-gap="2" data-h-align="start" data-v-align="center">
+                                            <x-ui.button type="submit" variant="primary">Crear</x-ui.button>
+                                            <x-ui.button href="{{ route('usuarios.index') }}" variant="secondary">Cancelar</x-ui.button>
+                                        </div>
+                                    </x-ui.form-layout>
+                                </form>
+                            </x-ui.grid>
+    </x-ui.settings-page>
 @endsection

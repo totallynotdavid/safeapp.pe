@@ -7,7 +7,7 @@ agent queues, customer contacts, charge notes, outage cases, settlement,
 reporting, staff assignments, and access control.
 
 SafeApp is a Laravel monolith. The server renders Blade views, MariaDB stores
-application data, and Vite builds the Tailwind CSS and JavaScript assets.
+application data, and Vite builds the CSS and JavaScript assets.
 
 ## Repository map
 

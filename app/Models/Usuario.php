@@ -47,6 +47,7 @@ class Usuario extends Authenticatable
         return [
             'estado' => 'boolean',
             'fecha_nacimiento' => 'date',
+            'correo_verificado_en' => 'datetime',
         ];
     }
 
@@ -70,6 +71,21 @@ class Usuario extends Authenticatable
     public function asignaciones(): HasMany
     {
         return $this->hasMany(AsignacionTienda::class, 'id_usuario', 'id_usuario');
+    }
+
+    public function preferenciasNotificacion(): HasOne
+    {
+        return $this->hasOne(PreferenciaNotificacionUsuario::class, 'id_usuario', 'id_usuario');
+    }
+
+    public function notificaciones(): HasMany
+    {
+        return $this->hasMany(NotificacionUsuario::class, 'id_usuario', 'id_usuario');
+    }
+
+    public function accesosClientes(): HasMany
+    {
+        return $this->hasMany(AccesoCliente::class, 'id_usuario', 'id_usuario');
     }
 
     public function asignacionActiva(): HasOne

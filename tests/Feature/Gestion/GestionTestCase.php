@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Gestion;
 
+use App\Cockpit\AccesoAClientes;
 use App\Models\Dato;
 use App\Models\Menu;
 use App\Models\Tienda;
@@ -55,10 +56,14 @@ abstract class GestionTestCase extends TestCase
      */
     protected function datoDe(Usuario $agente, string $tipoData = 'MOVIL', array $atributos = []): Dato
     {
-        return Dato::factory()
+        $dato = Dato::factory()
             ->tipoData($tipoData)
             ->asignadoA($agente->id_usuario, $this->tienda->id_tienda)
             ->create($atributos);
+
+        AccesoAClientes::otorgar($dato->id_cliente, $agente);
+
+        return $dato;
     }
 
     /**

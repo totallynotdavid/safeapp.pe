@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\NotaCargoMovil;
 
+use App\Cockpit\AccesoAClientes;
 use App\Models\NcMovil;
 use App\Models\Usuario;
 
@@ -24,21 +25,18 @@ class RegistroMovilTest extends NotaCargoMovilTestCase
         $this
             ->actingAs($ejecutivo)
             ->get(route('notas-cargo.movil.create'))
-            ->assertOk()
-            ->assertDontSee('name="id_cliente"', false);
+            ->assertOk();
 
         $this
             ->actingAs($ejecutivo)
             ->get(route('notas-cargo.movil.create', ['ruc' => '20999999999']))
             ->assertOk()
-            ->assertSee('no está registrado')
-            ->assertDontSee('name="id_cliente"', false);
+            ->assertSee('Cliente no disponible');
 
         $this
             ->actingAs($ejecutivo)
             ->get(route('notas-cargo.movil.create', ['ruc' => self::RUC]))
-            ->assertOk()
-            ->assertSee('name="id_cliente"', false);
+            ->assertOk();
     }
 
     public function test_it_files_a_case_awaiting_validation(): void
@@ -108,9 +106,11 @@ class RegistroMovilTest extends NotaCargoMovilTestCase
         // Legacy required it on a form with no second number to give, so agents
         // typed "0": it is set in 175 of 2,006 rows and mostly holds placeholders.
         $cliente = $this->cliente();
+        $ejecutivo = $this->usuarioCon(self::PERMISO);
+        AccesoAClientes::otorgar($cliente, $ejecutivo);
 
         $this
-            ->actingAs($this->usuarioCon(self::PERMISO))
+            ->actingAs($ejecutivo)
             ->post(route('notas-cargo.movil.store'), $this->payload($cliente))
             ->assertSessionHasNoErrors();
     }

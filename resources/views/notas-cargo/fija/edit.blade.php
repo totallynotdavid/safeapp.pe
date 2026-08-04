@@ -1,89 +1,77 @@
 @extends('layouts.app')
 
-@section('title', 'Nota de cargo fija')
+@section('title', 'Nota de cargo fija #'.$cargo->id_cargo)
+@section('page', true)
 
 @section('content')
-    @php($field = 'mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none')
-    @php($label = 'block text-sm font-medium text-gray-700')
+    <x-ui.detail-page title="Nota de cargo fija #{{ $cargo->id_cargo }}"
+        :subtitle="$cargo->cliente?->razon_social"
+        :back-href="route('notas-cargo.fija.index')" back-label="Volver a mis notas de cargo">
+        <x-slot:metadata>
+            <x-ui.text type="supporting" color="secondary">・ RUC {{ $cargo->cliente?->ruc }}</x-ui.text>
+            <x-ui.text type="supporting" color="secondary">・</x-ui.text>
+            <x-ui.badge>{{ \App\Support\EtiquetasDeDominio::texto($cargo->estado, 'estado') }}</x-ui.badge>
+            <x-ui.text type="supporting" color="secondary">・ {{ $cargo->fecha_ingreso?->format('d/m/Y') }}</x-ui.text>
+        </x-slot:metadata>
 
-    <div class="mx-auto max-w-4xl space-y-6">
-        <a href="{{ route('notas-cargo.fija.index') }}" class="text-sm font-medium text-gray-600 hover:text-gray-800">&larr; Volver a la lista</a>
-
-        @include('notas-cargo.fija.partials.detalle')
+        @include('notas-cargo.fija.partials.detalle', [
+            'mostrarSeguimientoEjecutivo' => ! $cargo->esEditable(),
+        ])
 
         @if ($cargo->esEditable())
-            <div class="rounded-lg border border-gray-200 bg-white p-6">
-                <h2 class="mb-4 text-lg font-semibold text-gray-800">Actualizar la nota de cargo</h2>
-
-                @if ($errors->any())
-                    <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800">
-                        <ul class="list-disc pl-4">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                {{-- The product, the price and the región are not here: they are
-                     what the case is, and changing them would make it a
-                     different case. What an ejecutivo genuinely corrects before
-                     validación is how to reach the client and where to install.
-                     --}}
-                <form method="POST" action="{{ route('notas-cargo.fija.update', $cargo) }}" class="space-y-4">
+            <x-ui.card padding="6">
+                <form method="POST" action="{{ route('notas-cargo.fija.update', $cargo) }}">
                     @csrf
                     @method('PUT')
 
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                        <div>
-                            <label for="contacto" class="{{ $label }}">Contacto</label>
-                            <input id="contacto" name="contacto" value="{{ old('contacto', $cargo->contacto) }}" required class="{{ $field }}">
-                        </div>
-                        <div>
-                            <label for="telefono1" class="{{ $label }}">Teléfono 1</label>
-                            <input id="telefono1" name="telefono1" value="{{ old('telefono1', $cargo->telefono1) }}" required class="{{ $field }}">
-                        </div>
-                        <div>
-                            <label for="telefono2" class="{{ $label }}">Teléfono 2 (opcional)</label>
-                            <input id="telefono2" name="telefono2" value="{{ old('telefono2', $cargo->telefono2) }}" class="{{ $field }}">
-                        </div>
-                        <div class="sm:col-span-2">
-                            <label for="direccion" class="{{ $label }}">Dirección</label>
-                            <input id="direccion" name="direccion" value="{{ old('direccion', $cargo->direccion) }}" required class="{{ $field }}">
-                        </div>
-                        <div>
-                            <label for="coordenadas" class="{{ $label }}">Coordenadas (opcional)</label>
-                            <input id="coordenadas" name="coordenadas" value="{{ old('coordenadas', $cargo->coordenadas) }}" class="{{ $field }}">
-                        </div>
-                        <div>
-                            <label for="tecnologia" class="{{ $label }}">Tecnología</label>
-                            <select id="tecnologia" name="tecnologia" required class="{{ $field }}">
-                                @foreach ($tecnologias as $opcion)
-                                    <option value="{{ $opcion }}" @selected(old('tecnologia', $cargo->tecnologia) === $opcion)>{{ $opcion }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
+                    <x-ui.form-layout>
+                        <x-ui.stack direction="vertical" gap="0.5">
+                            <x-ui.heading level="2">Actualizar coordinación</x-ui.heading>
+                            <x-ui.text type="supporting" color="secondary">Corrija el contacto y la instalación mientras la nota siga pendiente de validación.</x-ui.text>
+                        </x-ui.stack>
 
-                    <div>
-                        <label for="comentario" class="{{ $label }}">Comentario</label>
-                        <textarea id="comentario" name="comentario" rows="4" class="{{ $field }}">{{ old('comentario', $cargo->comentario) }}</textarea>
-                    </div>
+                        <x-ui.stack direction="vertical" gap="3">
+                            <x-ui.stack direction="vertical" gap="0.5">
+                                <x-ui.heading level="3">Contacto</x-ui.heading>
+                                <x-ui.text type="supporting" color="secondary">Persona con quien se coordinará la atención.</x-ui.text>
+                            </x-ui.stack>
+                            <x-ui.text-input name="contacto" label="Nombre del contacto" maxlength="100"
+                                :value="old('contacto', $cargo->contacto)" :error="$errors->first('contacto')" required />
+                            <x-ui.grid min-width="180" repeat="fit" gap="3">
+                                <x-ui.text-input name="telefono1" label="Teléfono principal" maxlength="50"
+                                    :value="old('telefono1', $cargo->telefono1)" :error="$errors->first('telefono1')" required />
+                                <x-ui.text-input name="telefono2" label="Teléfono adicional" maxlength="50"
+                                    :value="old('telefono2', $cargo->telefono2)" :error="$errors->first('telefono2')" optional />
+                            </x-ui.grid>
+                        </x-ui.stack>
 
-                    <div class="flex items-center gap-3 pt-2">
-                        <button type="submit" class="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">
-                            Guardar
-                        </button>
-                        <a href="{{ route('notas-cargo.fija.index') }}" class="text-sm font-medium text-gray-600 hover:text-gray-800">Cancelar</a>
-                    </div>
+                        <x-ui.divider />
+
+                        <x-ui.stack direction="vertical" gap="3">
+                            <x-ui.stack direction="vertical" gap="0.5">
+                                <x-ui.heading level="3">Instalación</x-ui.heading>
+                                <x-ui.text type="supporting" color="secondary">Tecnología y ubicación que revisará el equipo validador.</x-ui.text>
+                            </x-ui.stack>
+                            <x-ui.selector name="tecnologia" label="Tecnología" :options="\App\Support\EtiquetasDeDominio::opciones($tecnologias, 'tecnologia')"
+                                :value="old('tecnologia', $cargo->tecnologia)" :error="$errors->first('tecnologia')" required />
+                            <x-ui.text-input name="direccion" label="Dirección de instalación"
+                                :value="old('direccion', $cargo->direccion)" :error="$errors->first('direccion')" required />
+                            <x-ui.text-input name="coordenadas" label="Coordenadas" maxlength="100"
+                                :value="old('coordenadas', $cargo->coordenadas)" :error="$errors->first('coordenadas')" optional />
+                            <x-ui.text-area name="comentario" label="Comentario del ejecutivo"
+                                :value="old('comentario', $cargo->comentario)" :error="$errors->first('comentario')" rows="4" optional />
+                        </x-ui.stack>
+
+                        <x-ui.stack direction="horizontal" gap="2" h-align="end" wrap="wrap">
+                            <x-ui.button :href="route('notas-cargo.fija.index')" variant="secondary">Cancelar</x-ui.button>
+                            <x-ui.button type="submit" variant="primary">Guardar cambios</x-ui.button>
+                        </x-ui.stack>
+                    </x-ui.form-layout>
                 </form>
-            </div>
+            </x-ui.card>
         @else
-            {{-- Once the validador has ruled, the case is frozen. Legacy showed
-                 the form anyway and enforced this in JavaScript. --}}
-            <div class="rounded-md border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
-                Esta nota de cargo ya fue validada y no admite cambios.
-            </div>
+            <x-ui.banner status="warning" title="Solicitud cerrada"
+                description="Esta nota ya fue validada. La información registrada por el ejecutivo se conserva en modo de solo lectura." />
         @endif
-    </div>
+    </x-ui.detail-page>
 @endsection

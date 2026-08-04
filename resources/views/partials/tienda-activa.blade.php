@@ -1,20 +1,30 @@
-{{-- Only shown to operators with somewhere to switch to. One tienda (or none)
-     means there is no choice to make, so the control would be noise. --}}
+{{-- Only shown when there is a real choice. Selector source:
+     packages/core/src/Selector/{Selector.tsx,Selector.doc.mjs,Selector.test.tsx}
+     @ 9da0792516e4a551494e2d212f0a03909a8ffd71. --}}
 @if ($tiendasAsignadas->count() > 1)
-    <form method="POST" action="{{ route('tienda-activa.update') }}" class="flex items-center gap-2">
+    @php
+        $controlId = ($idPrefix ?? '').'id_tienda';
+        $storeOptions = $tiendasAsignadas->map(fn ($asignacion) => [
+            'value' => (string) $asignacion->id_tienda,
+            'label' => $asignacion->tienda?->nombre ?? 'Tienda '.$asignacion->id_tienda,
+        ])->all();
+        $activeStore = (string) ($tiendasAsignadas->firstWhere('estado', 0)?->id_tienda ?? '');
+    @endphp
+
+    <form method="POST" action="{{ route('tienda-activa.update') }}" class="store-switcher">
         @csrf
         @method('PUT')
-        <label for="id_tienda" class="sr-only">Tienda activa</label>
-        <select id="id_tienda" name="id_tienda" onchange="this.form.submit()"
-                class="rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-gray-500 focus:outline-none">
-            @foreach ($tiendasAsignadas as $asignacion)
-                <option value="{{ $asignacion->id_tienda }}" @selected($asignacion->estado === 0)>
-                    {{ $asignacion->tienda?->nombre ?? 'Tienda '.$asignacion->id_tienda }}
-                </option>
-            @endforeach
-        </select>
+        <x-ui.selector
+            :id="$controlId"
+            name="id_tienda"
+            label="Tienda activa"
+            :options="$storeOptions"
+            :value="$activeStore"
+            :required="true"
+            :auto-submit="true"
+        />
         <noscript>
-            <button type="submit" class="rounded-md bg-gray-100 px-2 py-1 text-sm font-medium text-gray-700 hover:bg-gray-200">Cambiar</button>
+            <x-ui.button type="submit" variant="secondary" size="sm">Cambiar</x-ui.button>
         </noscript>
     </form>
 @endif

@@ -10,32 +10,38 @@ use App\Models\Usuario;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-// GESTION DIARIA: every contact one supervisor's team logged over a date range.
-// The same call log histórico reads, widened from one agent to a whole team,
-// which is why both screens share RangoFechas and ReporteContacto.
-//
-// Legacy called this "REPORTE GESTION SUPERVISORES" and it was export-only: the
-// page rendered a #tablaDatatable div that no script ever filled, so a
-// supervisor had to download a file to read a number. It lists on screen here
-// and exports the same rows.
+// Supervisor team contact log: every contact the team logged over a date range,
+// on screen and as export. Shares filters and export shape with histórico.
+// Both screens use RangoFechas and ReporteContacto for consistency.
 class SeguimientoController extends Controller
 {
+    private const POR_PAGINA = 50;
+
     public function index(Request $request): View
     {
         $rango = RangoFechas::desde($request);
         $supervisor = $this->supervisor($request);
+        $busqueda = $request->string('buscar')->trim()->limit(100)->toString();
 
         return view('seguimiento.index', [
             'contactos' => $supervisor === null
-                ? new Collection
-                : $this->delEquipo($supervisor, $rango)->orderByDesc('fecha')->get(),
+                ? new LengthAwarePaginator([], 0, self::POR_PAGINA, 1, [
+                    'path' => $request->url(),
+                    'query' => $request->query(),
+                ])
+                : $this
+                    ->delEquipo($supervisor, $rango, $busqueda)
+                    ->orderByDesc('fecha')
+                    ->paginate(self::POR_PAGINA)
+                    ->withQueryString(),
             'supervisores' => Supervisor::query()->orderBy('nombre')->get(),
             'supervisor' => $supervisor,
             'rango' => $rango,
+            'busqueda' => $busqueda,
         ]);
     }
 
@@ -53,7 +59,11 @@ class SeguimientoController extends Controller
 
         return ReporteContacto::descargar(
             'gestiones-equipo',
-            $this->delEquipo($supervisor, RangoFechas::desde($request)),
+            $this->delEquipo(
+                $supervisor,
+                RangoFechas::desde($request),
+                $request->string('buscar')->trim()->limit(100)->toString(),
+            ),
         );
     }
 
@@ -80,7 +90,7 @@ class SeguimientoController extends Controller
      *
      * @return Builder<Llamada>
      */
-    private function delEquipo(int $supervisor, RangoFechas $rango): Builder
+    private function delEquipo(int $supervisor, RangoFechas $rango, string $busqueda = ''): Builder
     {
         return Llamada::query()
             ->with('respuesta', 'agente', 'cliente')
@@ -88,6 +98,21 @@ class SeguimientoController extends Controller
                 'id_usuario',
                 Usuario::query()->select('id_usuario')->where('id_supervisor', $supervisor),
             )
+            ->when($busqueda !== '', fn (Builder $query) => $this->buscar($query, $busqueda))
             ->whereBetween('fecha', $rango->limites());
+    }
+
+    /** @param Builder<Llamada> $query */
+    private function buscar(Builder $query, string $busqueda): Builder
+    {
+        $escaped = addcslashes($busqueda, '%_\\');
+
+        return $query->where(function (Builder $contactos) use ($escaped): void {
+            $contactos
+                ->where('razon_social', 'like', "%{$escaped}%")
+                ->orWhere('nombre_contacto', 'like', "%{$escaped}%")
+                ->orWhere('telefono', 'like', "%{$escaped}%")
+                ->orWhereHas('cliente', fn (Builder $clientes) => $clientes->where('ruc', 'like', "%{$escaped}%"));
+        });
     }
 }

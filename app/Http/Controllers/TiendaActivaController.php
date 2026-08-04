@@ -22,9 +22,8 @@ class TiendaActivaController extends Controller
             return back()->with('error', 'Esa tienda no está asignada a su usuario.');
         }
 
-        // Back to the dashboard rather than the current page: every operational
-        // queue is scoped by tienda, so the page they were on is showing rows
-        // that are no longer theirs to work.
-        return redirect()->route('dashboard')->with('status', 'Tienda activa actualizada.');
+        // Every operational query is scoped by the active tienda. Return to
+        // the person's task entry point rather than a stale detail view.
+        return redirect()->route('home')->with('status', 'Tienda activa actualizada.');
     }
 }

@@ -16,9 +16,11 @@ class StoreNotaCargoMovilRequest extends FormRequest
     {
         return [
             // Resolved before the form renders, and still checked here so a
-            // hand-posted id cannot attach a case to a client that does not
-            // exist. Legacy took ruc and razon_social as free text.
-            'id_cliente' => ['required', Rule::exists('cliente', 'id_cliente')],
+            // hand-posted id cannot attach a case to a non-existent client.
+            'id_cliente' => [
+                'required',
+                Rule::exists('cliente_acceso', 'id_cliente')->where('id_usuario', $this->user()?->id_usuario),
+            ],
             'zonal' => ['required', Rule::exists('tienda', 'id_tienda')],
             'q_lineas' => ['required', 'integer', 'min:1'],
             'cargo_fijo' => ['required', 'numeric', 'min:0'],
@@ -30,9 +32,7 @@ class StoreNotaCargoMovilRequest extends FormRequest
             'fecha_estimada' => ['required', 'date'],
             'tipo_producto' => ['required', Rule::in(NcMovil::TIPOS_PRODUCTO)],
             'etapa' => ['required', Rule::in(NcMovil::ETAPAS)],
-            // Optional, unlike legacy. It is a free-text note with 1,412
-            // distinct values across 1,898 rows, many of them "." or "-":
-            // the shape of a required field with nothing to put in it.
+            // Optional free-text note; often empty or contains only punctuation.
             'oportunidad' => ['nullable', 'string', 'max:100'],
             'id_cartera' => ['nullable', Rule::exists('cartera', 'id_cartera')],
             'comentario_ejecutivo' => ['nullable', 'string'],

@@ -16,11 +16,11 @@ class ImportarClientesRequest extends FormRequest
      */
     public function rules(): array
     {
-        // `txt` is allowed alongside `csv` because a CSV renamed by a mail
+        // `txt` is allowed alongside CSV because a CSV renamed by a mail
         // client or exported from a terminal commonly arrives with that
-        // extension, and the parser cares about the contents, not the name.
+        // extension. XLSX is supported through the same parser contract.
         return [
-            'archivo' => 'required|file|mimes:csv,txt|max:'.self::MAX_KB,
+            'archivo' => 'required|file|mimes:csv,txt,xlsx|max:'.self::MAX_KB,
         ];
     }
 
@@ -29,6 +29,6 @@ class ImportarClientesRequest extends FormRequest
      */
     public function attributes(): array
     {
-        return ['archivo' => 'archivo CSV'];
+        return ['archivo' => 'archivo CSV o XLSX'];
     }
 }

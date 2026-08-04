@@ -66,32 +66,6 @@ class DistribucionDeDatos
     }
 
     /**
-     * Hands one specific record from the pool to an agent, for when they arrive
-     * with a RUC rather than asking for a batch.
-     *
-     * Returns false when someone else got there first, so the caller can say so
-     * instead of silently taking a held record. Legacy had no check here at all
-     * and simply overwrote the owner, which moved 473 records between agents
-     * with no trace.
-     */
-    public static function tomarDato(int $idDato, int $idAgente, int $idTienda): bool
-    {
-        return DB::transaction(static function () use ($idDato, $idAgente, $idTienda): bool {
-            $libre = self::sinAgente(Dato::query()->whereKey($idDato))
-                ->lockForUpdate()
-                ->exists();
-
-            if (! $libre) {
-                return false;
-            }
-
-            self::abrir([$idDato], $idAgente, $idTienda);
-
-            return true;
-        });
-    }
-
-    /**
      * Returns the agent's pending records to the pool. A gestionado record stays
      * with the agent, so its logged calls keep an owner.
      *
@@ -135,6 +109,11 @@ class DistribucionDeDatos
             ],
             $idsDato,
         ));
+
+        Dato::query()
+            ->whereIn('id_dato', $idsDato)
+            ->pluck('id_cliente')
+            ->each(static fn (int $idCliente) => AccesoAClientes::otorgar($idCliente, $idAgente));
 
         return count($idsDato);
     }

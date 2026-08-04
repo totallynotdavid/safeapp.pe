@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Cockpit\FormatoDeImportacion;
 use App\Cockpit\ImportacionDeClientes;
+use App\Cockpit\PlantillaDeImportacion;
 use App\Http\Requests\Cliente\ImportarClientesRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * CARGAR DATOS: loading a campaign file of clients.
@@ -21,12 +22,16 @@ class ImportacionController extends Controller
 {
     public function index(): View
     {
-        return view('clientes.importar', ['columnas' => FormatoDeImportacion::columnas()]);
+        return view('clientes.importar');
     }
 
     public function store(ImportarClientesRequest $request): RedirectResponse
     {
-        $resultado = ImportacionDeClientes::desdeArchivo($request->file('archivo')->getRealPath());
+        $archivo = $request->file('archivo');
+        $resultado = ImportacionDeClientes::desdeArchivo(
+            $archivo->getRealPath(),
+            $archivo->getClientOriginalExtension(),
+        );
 
         if (! $resultado->exitosa()) {
             return back()->with('errores', $resultado->errores);
@@ -36,5 +41,15 @@ class ImportacionController extends Controller
             'status',
             "Se cargaron {$resultado->total()} clientes: {$resultado->nuevos} nuevos, {$resultado->actualizados} actualizados.",
         );
+    }
+
+    public function templateCsv(): StreamedResponse
+    {
+        return PlantillaDeImportacion::csv();
+    }
+
+    public function templateXlsx(): StreamedResponse
+    {
+        return PlantillaDeImportacion::xlsx();
     }
 }

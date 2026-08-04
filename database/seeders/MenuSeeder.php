@@ -27,7 +27,6 @@ class MenuSeeder extends Seeder
             [7,  'GESTION FIJA',         'fa fa-wifi',       1,  'gestion.fija'],
             [8,  'REPORTES',             'fa fa-download',   0,  null],
             [9,  'GESTION DIARIA',       'fa fa-area-chart', 8,  'seguimiento.equipo'],
-            [10, 'AGREGAR CLIENTE',      'fa fa-plus',       1,  'clientes.crear'],
             [11, 'CARGAR DATOS',         'fa fa-database',   5,  'clientes.importar'],
             // The three AVANZADO leaves (legacy ids 23, 24, 25) and their report
             // (26) are not here. nc_avanzado has never held a row: its

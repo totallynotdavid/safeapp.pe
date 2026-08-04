@@ -74,7 +74,10 @@ class CarteraTest extends LiquidacionTestCase
         // not a row that exists, so both relations must resolve to null.
         $cargo = $this->enCola();
 
-        $this->actingAs($this->liquidador())->get(route('liquidaciones.edit', $cargo))->assertOk();
+        $this
+            ->actingAs($this->liquidador())
+            ->get(route('liquidaciones.edit', $cargo))
+            ->assertOk();
 
         $this->assertNull($cargo->cartera);
         $this->assertNull($cargo->supervisor);

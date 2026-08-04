@@ -24,7 +24,10 @@ class StoreQuiebreRegistroRequest extends FormRequest
             // would otherwise attach the case to nothing. Legacy took ruc and
             // razon_social as free text here, which let the same RUC carry
             // different names across quiebres.
-            'id_cliente' => ['required', Rule::exists('cliente', 'id_cliente')],
+            'id_cliente' => [
+                'required',
+                Rule::exists('cliente_acceso', 'id_cliente')->where('id_usuario', $this->user()?->id_usuario),
+            ],
             'zonal_telefonica' => ['required', Rule::exists('tienda', 'id_tienda')],
             'servicio' => ['required', Rule::in(Quiebre::SERVICIOS)],
             'tipo_averia' => ['required', Rule::in(array_keys(Quiebre::TIPOS_AVERIA))],

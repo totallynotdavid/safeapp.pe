@@ -35,7 +35,7 @@ class UsuarioController extends Controller
     {
         $data = $request->validated();
 
-        DB::transaction(function () use ($data): void {
+        $usuario = DB::transaction(function () use ($data): Usuario {
             $usuario = new Usuario([
                 'usuario' => $data['usuario'],
                 'clave' => $this->hasher->hash($data['clave']),
@@ -54,9 +54,11 @@ class UsuarioController extends Controller
             // and the copy is allowed to drift afterwards.
             $menuIds = DB::table('accesoxrol')->where('id_rol', $data['id_rol'])->pluck('id_menu');
             $usuario->menus()->attach($menuIds);
+
+            return $usuario;
         });
 
-        return redirect()->route('usuarios.index')->with('status', 'Usuario creado.');
+        return redirect()->route('equipo.show', $usuario)->with('status', 'Usuario creado.');
     }
 
     public function edit(Usuario $usuario): View
@@ -74,7 +76,7 @@ class UsuarioController extends Controller
         }
         $usuario->save();
 
-        return redirect()->route('usuarios.index')->with('status', 'Usuario actualizado.');
+        return redirect()->route('equipo.show', $usuario)->with('status', 'Usuario actualizado.');
     }
 
     // Enable/disable is the only "removal": a hard delete would orphan the
@@ -86,6 +88,6 @@ class UsuarioController extends Controller
         $usuario->estado = $usuario->estado ? 0 : 1;
         $usuario->save();
 
-        return redirect()->route('usuarios.index')->with('status', 'Estado actualizado.');
+        return redirect()->route('equipo.show', $usuario)->with('status', 'Estado actualizado.');
     }
 }
