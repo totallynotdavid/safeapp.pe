@@ -12,11 +12,13 @@ class AccountNotifications
 {
     public function record(Usuario $usuario, string $category, string $title, string $description): NotificacionUsuario
     {
-        $notification = $usuario->notificaciones()->create([
-            'categoria' => $category,
-            'titulo' => $title,
-            'descripcion' => $description,
-        ]);
+        $notification = $usuario
+            ->notificaciones()
+            ->create([
+                'categoria' => $category,
+                'titulo' => $title,
+                'descripcion' => $description,
+            ]);
         $preference = $usuario->preferenciasNotificacion;
         $enabled = $category === 'seguridad'
             ? $preference?->correo_seguridad ?? true

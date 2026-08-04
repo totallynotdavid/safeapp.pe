@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Cliente;
 
-use App\Models\Menu;
 use App\Models\Cliente;
+use App\Models\Menu;
 use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -36,7 +36,8 @@ class IdentidadPrivadaTest extends TestCase
         $agente = Usuario::factory()->create();
         $agente->menus()->attach(Menu::factory()->create(['permiso' => $permiso]));
 
-        $this->actingAs($agente)
+        $this
+            ->actingAs($agente)
             ->post(route($ruta), [
                 'ruc' => '20123456789',
                 'razon_social' => 'IDENTIDAD NUEVA SAC',
@@ -55,7 +56,8 @@ class IdentidadPrivadaTest extends TestCase
         $cliente = Cliente::factory()->create(['ruc' => '20123456789']);
         $cliente->accesos()->create(['id_usuario' => $otro->id_usuario]);
 
-        $this->actingAs($agente)
+        $this
+            ->actingAs($agente)
             ->from(route('notas-cargo.movil.create'))
             ->post(route('notas-cargo.movil.cliente.store'), [
                 'ruc' => $cliente->ruc,

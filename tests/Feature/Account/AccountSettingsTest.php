@@ -22,7 +22,8 @@ class AccountSettingsTest extends TestCase
         ]);
         $otro = Usuario::factory()->create(['personal' => 'PERSONA AJENA']);
 
-        $this->actingAs($usuario)
+        $this
+            ->actingAs($usuario)
             ->from(route('configuracion.perfil'))
             ->put(route('configuracion.perfil.update'), [
                 'campo' => 'personal',
@@ -51,7 +52,8 @@ class AccountSettingsTest extends TestCase
             'correo_verificado_en' => now(),
         ]);
 
-        $this->actingAs($usuario)
+        $this
+            ->actingAs($usuario)
             ->from(route('configuracion.perfil'))
             ->put(route('configuracion.perfil.update'), [
                 'campo' => 'correo',
@@ -70,7 +72,8 @@ class AccountSettingsTest extends TestCase
         $usuario = Usuario::factory()->clave('correcta')->create();
         $original = $usuario->clave;
 
-        $this->actingAs($usuario)
+        $this
+            ->actingAs($usuario)
             ->from(route('configuracion.seguridad'))
             ->put(route('configuracion.seguridad.update'), [
                 'clave_actual' => 'incorrecta',
@@ -87,7 +90,8 @@ class AccountSettingsTest extends TestCase
     {
         $usuario = Usuario::factory()->clave('correcta')->create();
 
-        $this->actingAs($usuario)
+        $this
+            ->actingAs($usuario)
             ->from(route('configuracion.seguridad'))
             ->put(route('configuracion.seguridad.update'), [
                 'clave_actual' => 'correcta',
@@ -110,7 +114,8 @@ class AccountSettingsTest extends TestCase
         $usuario = Usuario::factory()->create();
         $otro = Usuario::factory()->create();
 
-        $this->actingAs($usuario)
+        $this
+            ->actingAs($usuario)
             ->putJson(route('configuracion.notificaciones.update'), [
                 'correo_cuenta' => false,
                 'correo_seguridad' => true,
@@ -140,7 +145,8 @@ class AccountSettingsTest extends TestCase
         $this->actingAs($otro)->get($url)->assertForbidden();
         $this->assertNull($usuario->fresh()->correo_verificado_en);
 
-        $this->actingAs($usuario)
+        $this
+            ->actingAs($usuario)
             ->get($url)
             ->assertRedirect(route('configuracion.perfil'))
             ->assertSessionHas('status', 'Correo verificado. Ya puedes recibir notificaciones por email.');
