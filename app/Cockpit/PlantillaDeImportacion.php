@@ -8,17 +8,23 @@ use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Writer\XLSX\Writer;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-/** Generates empty, parser-backed campaign templates for operators to fill. */
 final class PlantillaDeImportacion
 {
     public static function csv(): StreamedResponse
     {
         return response()->streamDownload(
             static function (): void {
-                $salida = fopen('php://output', 'w');
-                fwrite($salida, "\xEF\xBB\xBF");
-                fputcsv($salida, FormatoDeImportacion::columnas(), separator: ';', escape: '');
-                fclose($salida);
+                $output = fopen('php://output', 'w');
+
+                fwrite($output, "\xEF\xBB\xBF");
+                fputcsv(
+                    $output,
+                    FormatoDeImportacion::columnas(),
+                    separator: ';',
+                    escape: '',
+                );
+
+                fclose($output);
             },
             'plantilla-clientes.csv',
             ['Content-Type' => 'text/csv; charset=UTF-8'],
@@ -30,12 +36,20 @@ final class PlantillaDeImportacion
         return response()->streamDownload(
             static function (): void {
                 $writer = new Writer;
+                $bold = (new Style)->withFontBold(true);
+
                 $writer->openToFile('php://output');
-                $negrita = (new Style)->withFontBold(true);
-                $writer->addRow(new Row(array_map(
-                    static fn (string $columna): StringCell => new StringCell($columna, $negrita),
-                    FormatoDeImportacion::columnas(),
-                )));
+                $writer->addRow(
+                    new Row(
+                        array_map(
+                            static fn (string $columna): StringCell => new StringCell(
+                                $columna,
+                                $bold,
+                            ),
+                            FormatoDeImportacion::columnas(),
+                        ),
+                    ),
+                );
                 $writer->close();
             },
             'plantilla-clientes.xlsx',

@@ -4,8 +4,8 @@ namespace App\Cockpit;
 
 use RuntimeException;
 
-// The caller intentionally never receives a reason.  Saying whether the RUC
-// exists would reveal another executive's private operational history.
+// Never reveal why the client is unavailable. Doing so would expose another
+// executive's operational history.
 final class ClienteNoDisponible extends RuntimeException
 {
     public function __construct()

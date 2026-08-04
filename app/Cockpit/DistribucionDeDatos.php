@@ -9,21 +9,14 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Owns who holds a campaign record: the unassigned pool, batch assignment, and
- * release. `Dato` owns what a record is and what logging a contact does to it.
- *
- * Assignment is now an open row in `asignacion_datos` rather than three columns
- * overwritten on the record, so releasing keeps the history of who held what.
+ * Manages the unassigned pool, batch assignment, and release of campaign data.
  */
 class DistribucionDeDatos
 {
-    // Upper bound on one assignment request. An agent may receive fewer.
     public const LOTE = 30;
 
     /**
-     * Every origen with stock in the pool, largest first. Callers offer these as
-     * choices rather than accepting a typed origen, because an exact-match
-     * string the agent has to guess silently returns nothing.
+     * Returns origins with available records, ordered by stock.
      *
      * @return Collection<int, object{origen: string, disponibles: int}>
      */
@@ -37,42 +30,50 @@ class DistribucionDeDatos
     }
 
     /**
-     * Write owner of "an agent takes a batch of records out of the pool".
+     * Assigns up to one batch of records to an agent.
+     * The rows must be selected with a lock inside the transaction. Otherwise,
+     * concurrent requests may select the same available records.
      *
-     * A record is handed to exactly one agent. The select must stay locked and
-     * inside the transaction to hold that: without it, two concurrent requests
-     * read the same rows and both try to open a hold. The unique index on
-     * (id_dato, activa) means the loser now fails loudly instead of silently
-     * taking rows from an agent who was already told they were theirs, but
-     * failing loudly is still a failure, so the lock is what makes it wait.
-     *
-     * Ordering is arbitrary but must be deterministic. Randomising it is not a
-     * substitute for the lock and sorts the whole pool on every request.
-     *
-     * @return int how many records the agent actually received
+     * @return int Number of records assigned
      */
-    public static function asignarLote(int $idAgente, int $idTienda, string $origen, string $tipoData): int
-    {
-        return DB::transaction(static function () use ($idAgente, $idTienda, $origen, $tipoData): int {
-            $ids = self::disponibles($tipoData)
-                ->where('origen', $origen)
-                ->orderBy('id_dato')
-                ->limit(self::LOTE)
-                ->lockForUpdate()
-                ->pluck('id_dato');
+    public static function asignarLote(
+        int $idAgente,
+        int $idTienda,
+        string $origen,
+        string $tipoData,
+    ): int {
+        return DB::transaction(
+            static function () use ($idAgente, $idTienda, $origen, $tipoData): int {
+                $ids = self::disponibles($tipoData)
+                    ->where('origen', $origen)
+                    ->orderBy('id_dato')
+                    ->limit(self::LOTE)
+                    ->lockForUpdate()
+                    ->pluck('id_dato');
 
-            return $ids->isEmpty() ? 0 : self::abrir($ids->all(), $idAgente, $idTienda);
-        });
+                if ($ids->isEmpty()) {
+                    return 0;
+                }
+
+                return self::abrir(
+                    $ids->all(),
+                    $idAgente,
+                    $idTienda,
+                );
+            },
+        );
     }
 
     /**
-     * Returns the agent's pending records to the pool. A gestionado record stays
-     * with the agent, so its logged calls keep an owner.
+     * Returns the agent's pending records to the pool.
+     * Managed records remain assigned so their activity keeps an owner.
      *
-     * @return int how many records were returned
+     * @return int Number of records released
      */
-    public static function liberarPendientes(int $idAgente, string $tipoData): int
-    {
+    public static function liberarPendientes(
+        int $idAgente,
+        string $tipoData,
+    ): int {
         $pendientes = Dato::query()
             ->where('estado', Dato::ESTADO_PENDIENTE)
             ->where('tipo_data', $tipoData)
@@ -89,55 +90,47 @@ class DistribucionDeDatos
     }
 
     /**
-     * Opens a hold on each record for one agent.
-     *
      * @param  list<int>  $idsDato
-     * @return int how many holds were opened
+     * @return int Number of assignments created
      */
-    private static function abrir(array $idsDato, int $idAgente, int $idTienda): int
-    {
-        $fecha = now()->toDateString();
+    private static function abrir(
+        array $idsDato,
+        int $idAgente,
+        int $idTienda,
+    ): int {
+        $fechaAsignacion = now()->toDateString();
 
-        AsignacionDato::query()->insert(array_map(
-            static fn (int $idDato): array => [
-                'id_dato' => $idDato,
-                'id_usuario' => $idAgente,
-                'id_tienda' => $idTienda,
-                // When the agent took the record, not when the import loaded it.
-                'fecha_asignacion' => $fecha,
-                'activa' => AsignacionDato::ACTIVA,
-            ],
-            $idsDato,
-        ));
+        AsignacionDato::query()->insert(
+            array_map(
+                static fn (int $idDato): array => [
+                    'id_dato' => $idDato,
+                    'id_usuario' => $idAgente,
+                    'id_tienda' => $idTienda,
+                    'fecha_asignacion' => $fechaAsignacion,
+                    'activa' => AsignacionDato::ACTIVA,
+                ],
+                $idsDato,
+            ),
+        );
 
         Dato::query()
             ->whereIn('id_dato', $idsDato)
             ->pluck('id_cliente')
-            ->each(static fn (int $idCliente) => AccesoAClientes::otorgar($idCliente, $idAgente));
+            ->each(
+                static fn (int $idCliente) => AccesoAClientes::otorgar(
+                    $idCliente,
+                    $idAgente,
+                ),
+            );
 
         return count($idsDato);
     }
 
-    /**
-     * The pool: nobody is holding the record and nobody has worked it yet.
-     *
-     * @return Builder<Dato>
-     */
     private static function disponibles(string $tipoData): Builder
     {
-        return self::sinAgente(
-            Dato::query()
-                ->where('estado', Dato::ESTADO_PENDIENTE)
-                ->where('tipo_data', $tipoData),
-        );
-    }
-
-    /**
-     * @param  Builder<Dato>  $query
-     * @return Builder<Dato>
-     */
-    private static function sinAgente(Builder $query): Builder
-    {
-        return $query->whereDoesntHave('asignacionActiva');
+        return Dato::query()
+            ->where('estado', Dato::ESTADO_PENDIENTE)
+            ->where('tipo_data', $tipoData)
+            ->whereDoesntHave('asignacionActiva');
     }
 }
