@@ -36,7 +36,7 @@ class EquipoController extends Controller
     {
         abort_unless(
             collect(self::PERMISSIONS)->contains(
-                fn (string $permission): bool => $request->user()->hasPermiso($permission),
+                static fn (string $permission): bool => $request->user()->hasPermiso($permission),
             ),
             403,
         );

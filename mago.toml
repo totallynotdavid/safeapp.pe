@@ -23,3 +23,8 @@ final-controller = { enabled = false }
 literal-named-argument = { enabled = false }
 # Our PHPUnit assertions follow a deliberate, consistent style already.
 assertion-style = { enabled = false }
+# Eloquent models spend most of their method count on one-liner relationship
+# accessors (Usuario's rol, menus, asignaciones, ...), and PHPUnit feature
+# tests spend theirs on one method per CRUD/permission scenario for a screen.
+# Both track framework/test shape, not unrelated concerns piling up.
+too-many-methods = { exclude = ["app/Models/*.php", "tests/**/*.php"] }

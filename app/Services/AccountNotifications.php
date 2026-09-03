@@ -21,8 +21,8 @@ class AccountNotifications
             ]);
         $preference = $usuario->preferenciasNotificacion;
         $enabled = $category === 'seguridad'
-            ? $preference?->correo_seguridad ?? true
-            : $preference?->correo_cuenta ?? true;
+            ? $preference->correo_seguridad ?? true
+            : $preference->correo_cuenta ?? true;
 
         if ($enabled && $usuario->correo && $usuario->correo_verificado_en) {
             try {

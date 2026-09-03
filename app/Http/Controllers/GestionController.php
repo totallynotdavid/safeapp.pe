@@ -39,10 +39,10 @@ class GestionController extends Controller
             ->enCola($agente->id_usuario, $agente->tiendaAsignada(), $tipo)
             ->with('cliente')
             ->join('cliente', 'cliente.id_cliente', '=', 'datos.id_cliente')
-            ->when($busqueda !== '', function ($query) use ($busqueda): void {
+            ->when($busqueda !== '', static function ($query) use ($busqueda): void {
                 $escaped = addcslashes($busqueda, '%_\\');
 
-                $query->where(function ($clientes) use ($escaped): void {
+                $query->where(static function ($clientes) use ($escaped): void {
                     $clientes
                         ->where('cliente.ruc', 'like', "%{$escaped}%")
                         ->orWhere('cliente.razon_social', 'like', "%{$escaped}%");

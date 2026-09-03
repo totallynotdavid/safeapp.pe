@@ -26,8 +26,11 @@ final class LectorXlsx
 
         try {
             foreach ($lector->getSheetIterator() as $hoja) {
-                foreach ($hoja->getRowIterator() as $fila) {
-                    return new self($ruta, self::normalizar(self::valores($fila->cells)));
+                $filas = $hoja->getRowIterator();
+                $filas->rewind();
+
+                if ($filas->valid()) {
+                    return new self($ruta, self::normalizar(self::valores($filas->current()->cells)));
                 }
             }
         } finally {

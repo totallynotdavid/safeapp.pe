@@ -26,7 +26,8 @@ class AuthenticatedSessionController extends Controller
         $usuarioInput = $request->string('usuario');
         $clave = $request->string('clave');
 
-        $usuario = Usuario::where('usuario', $usuarioInput)
+        $usuario = Usuario::query()
+            ->where('usuario', $usuarioInput)
             ->where('estado', true)
             ->first();
 
