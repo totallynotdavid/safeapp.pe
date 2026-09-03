@@ -114,7 +114,7 @@ class SeguimientoTest extends TestCase
             ->actingAs($this->usuarioCon(self::PERMISO))
             ->get(route('seguimiento.index', ['supervisor' => 99_999]))
             ->assertOk()
-            ->assertSee('Elija un supervisor.');
+            ->assertSee('Elija un supervisor');
     }
 
     /**

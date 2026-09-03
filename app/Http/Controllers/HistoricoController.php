@@ -67,12 +67,16 @@ class HistoricoController extends Controller
     {
         $escaped = addcslashes($busqueda, '%_\\');
 
-        return $query->where(function (Builder $contactos) use ($escaped): void {
+        return $query->where(static function (Builder $contactos) use ($escaped): void {
             $contactos
                 ->where('razon_social', 'like', "%{$escaped}%")
                 ->orWhere('nombre_contacto', 'like', "%{$escaped}%")
                 ->orWhere('telefono', 'like', "%{$escaped}%")
-                ->orWhereHas('cliente', fn (Builder $clientes) => $clientes->where('ruc', 'like', "%{$escaped}%"));
+                ->orWhereHas('cliente', static fn (Builder $clientes) => $clientes->where(
+                    'ruc',
+                    'like',
+                    "%{$escaped}%",
+                ));
         });
     }
 }

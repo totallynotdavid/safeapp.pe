@@ -14,22 +14,12 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
-    public function register(): void {}
-
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         // A held permiso grants that ability. Return null, not false, when it
         // is absent so model policies still decide view/create/update/delete;
         // those verbs are never registered as permiso keys.
-        Gate::before(static function (Usuario $user, string $ability): ?bool {
-            return $user->hasPermiso($ability) ? true : null;
-        });
+        Gate::before(static fn (Usuario $user, string $ability): ?bool => $user->hasPermiso($ability) ? true : null);
 
         View::composer('layouts.app', static function ($view): void {
             $user = Auth::user();

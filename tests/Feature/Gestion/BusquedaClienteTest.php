@@ -4,8 +4,6 @@ namespace Tests\Feature\Gestion;
 
 use App\Cockpit\AccesoAClientes;
 use App\Models\Cliente;
-use App\Models\Dato;
-use App\Models\NcMovil;
 use App\Models\Tienda;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\Route;

@@ -216,7 +216,7 @@ class Sidebar
                     ->filter(static function (array $item) use ($grants): bool {
                         if (array_key_exists('permissions', $item)) {
                             return collect($item['permissions'])
-                                ->contains(fn (string $permission): bool => $grants->has($permission));
+                                ->contains($grants->has(...));
                         }
 
                         return ($item['permission'] ?? null) === null || $grants->has($item['permission']);

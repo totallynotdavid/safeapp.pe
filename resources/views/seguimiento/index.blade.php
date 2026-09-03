@@ -110,7 +110,7 @@
                     <tr>
                         <td colspan="6">
                             <x-ui.empty-state
-                                :title="$supervisor === null ? 'Elige un supervisor' : 'No hay gestiones en este período'"
+                                :title="$supervisor === null ? 'Elija un supervisor' : 'No hay gestiones en este período'"
                                 :description="$supervisor === null ? 'Selecciona un equipo para consultar su actividad.' : 'Prueba con un rango de fechas diferente.'"
                                 compact
                             />

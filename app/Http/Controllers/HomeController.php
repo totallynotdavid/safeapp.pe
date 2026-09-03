@@ -21,7 +21,9 @@ class HomeController extends Controller
         /** @var Usuario $user */
         $user = $request->user();
 
-        if ($url = Sidebar::startUrlForUser($user)) {
+        $url = Sidebar::startUrlForUser($user);
+
+        if ($url !== null) {
             return redirect()->to($url);
         }
 
