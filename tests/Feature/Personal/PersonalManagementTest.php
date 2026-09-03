@@ -62,7 +62,7 @@ class PersonalManagementTest extends TestCase
             'fecha_nacimiento' => '1990-05-20',
             'telefono' => '987654321',
             'correo' => 'maria@example.com',
-        ])->assertRedirect(route('personal.index'));
+        ])->assertRedirect(route('equipo.show', $usuario));
 
         $fresh = $usuario->fresh();
         $this->assertSame('MARÍA ÑOÑO', $fresh->personal);
@@ -77,7 +77,7 @@ class PersonalManagementTest extends TestCase
 
         $this->actingAs($this->gestor())->put(route('personal.update', $usuario), [
             'personal' => 'SOLO NOMBRE',
-        ])->assertRedirect(route('personal.index'));
+        ])->assertRedirect(route('equipo.show', $usuario));
 
         $fresh = $usuario->fresh();
         $this->assertNull($fresh->telefono);
