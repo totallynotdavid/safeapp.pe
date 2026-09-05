@@ -8,6 +8,9 @@ class UpdateNotificationPreferencesRequest extends FormRequest
 {
     public function rules(): array
     {
-        return ['correo_cuenta' => ['nullable', 'boolean'], 'correo_seguridad' => ['nullable', 'boolean']];
+        return [
+            'correo_cuenta' => ['nullable', 'boolean'],
+            'correo_seguridad' => ['nullable', 'boolean'],
+        ];
     }
 }

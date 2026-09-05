@@ -5,11 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-/**
- * A durable, private grant to a customer identity.  It deliberately says
- * nothing about a campaign record, assignment, or case ownership: those stay
- * on their respective workflow rows.
- */
 class AccesoCliente extends Model
 {
     public const CREATED_AT = 'fecha_otorgado';

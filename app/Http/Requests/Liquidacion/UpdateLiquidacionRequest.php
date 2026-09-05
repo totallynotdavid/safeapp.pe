@@ -8,8 +8,6 @@ use Illuminate\Validation\Rule;
 
 class UpdateLiquidacionRequest extends FormRequest
 {
-    // Route middleware (`can:liquidacion.gestionar`) authorizes access; this
-    // request only shapes the input.
     public function authorize(): bool
     {
         return true;
@@ -20,8 +18,6 @@ class UpdateLiquidacionRequest extends FormRequest
      */
     public function rules(): array
     {
-        // comision and descuento are strings. observación is a closed set;
-        // settlement date is required.
         return [
             'comision' => ['required', 'string', 'max:50'],
             'observacion' => ['required', Rule::in(NcMovil::OBSERVACIONES)],

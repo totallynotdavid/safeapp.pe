@@ -6,10 +6,6 @@ use App\Models\Quiebre;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-// The ejecutivo registers a new case. The route already gates entry on the
-// quiebre.registrar permiso, so this only shapes the payload. Server-owned
-// fields (owner, estado, fecha_registro, computed ticket_atencion) are added by
-// the controller and deliberately absent here.
 class StoreQuiebreRegistroRequest extends FormRequest
 {
     public function rules(): array
@@ -19,20 +15,33 @@ class StoreQuiebreRegistroRequest extends FormRequest
             : ['nullable'];
 
         return [
-            // The client is resolved before the form renders, so this arrives as
-            // an id and must still name a real row: a hand-posted id_cliente
-            // would otherwise attach the case to nothing. Legacy took ruc and
-            // razon_social as free text here, which let the same RUC carry
-            // different names across quiebres.
+            // The client must belong to the current user.
             'id_cliente' => [
                 'required',
-                Rule::exists('cliente_acceso', 'id_cliente')->where('id_usuario', $this->user()?->id_usuario),
+                Rule::exists('cliente_acceso', 'id_cliente')
+                    ->where('id_usuario', $this->user()?->id_usuario),
             ],
-            'zonal_telefonica' => ['required', Rule::exists('tienda', 'id_tienda')],
-            'servicio' => ['required', Rule::in(Quiebre::SERVICIOS)],
-            'tipo_averia' => ['required', Rule::in(array_keys(Quiebre::TIPOS_AVERIA))],
-            'numero_problema' => ['required', 'integer', 'min:1'],
-            'problema_equipo' => ['required', Rule::in(['SI', 'NO'])],
+            'zonal_telefonica' => [
+                'required',
+                Rule::exists('tienda', 'id_tienda'),
+            ],
+            'servicio' => [
+                'required',
+                Rule::in(Quiebre::SERVICIOS),
+            ],
+            'tipo_averia' => [
+                'required',
+                Rule::in(array_keys(Quiebre::TIPOS_AVERIA)),
+            ],
+            'numero_problema' => [
+                'required',
+                'integer',
+                'min:1',
+            ],
+            'problema_equipo' => [
+                'required',
+                Rule::in(['SI', 'NO']),
+            ],
             'detalle_equipo' => [
                 Rule::requiredIf($this->input('problema_equipo') === 'SI'),
                 'nullable',

@@ -9,7 +9,13 @@ class NotificacionUsuario extends Model
 {
     protected $table = 'notificacion_usuario';
     protected $primaryKey = 'id_notificacion';
-    protected $fillable = ['id_usuario', 'categoria', 'titulo', 'descripcion'];
+
+    protected $fillable = [
+        'id_usuario',
+        'categoria',
+        'titulo',
+        'descripcion',
+    ];
 
     public function usuario(): BelongsTo
     {

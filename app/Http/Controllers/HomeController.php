@@ -7,13 +7,6 @@ use App\Navigation\Sidebar;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
-/**
- * Authenticated entry point.
- *
- * SAFEAPP has no cross-workflow dashboard data to show. Entry belongs at the
- * first work area the person is allowed to use, with Configuración as the
- * fallback for administration-only accounts.
- */
 class HomeController extends Controller
 {
     public function __invoke(Request $request): RedirectResponse

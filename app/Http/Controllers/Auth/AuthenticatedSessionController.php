@@ -23,8 +23,7 @@ class AuthenticatedSessionController extends Controller
         LoginRequest $request,
         LegacyPasswordHasher $hasher,
     ): RedirectResponse {
-        $usuarioInput = $request->string('usuario');
-        $clave = $request->string('clave');
+        ['usuario' => $usuarioInput, 'clave' => $clave] = $request->validated();
 
         $usuario = Usuario::query()
             ->where('usuario', $usuarioInput)

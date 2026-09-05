@@ -10,9 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-// Agent contact log: the contacts the signed-in agent logged over a date range,
-// read-only. Each row links to the client where the gestión form owns the write.
-// SeguimientoController shows the supervisor view of the same log.
 class HistoricoController extends Controller
 {
     private const POR_PAGINA = 50;
@@ -45,20 +42,19 @@ class HistoricoController extends Controller
         );
     }
 
-    /**
-     * One agent's own contacts in the range.
-     *
-     * Returned unresolved so the screen and the export run the same filter,
-     * including the scoping to the signed-in agent.
-     *
-     * @return Builder<Llamada>
-     */
-    private function mios(int $idUsuario, RangoFechas $rango, string $busqueda = ''): Builder
-    {
+    /** @return Builder<Llamada> */
+    private function mios(
+        int $idUsuario,
+        RangoFechas $rango,
+        string $busqueda = '',
+    ): Builder {
         return Llamada::query()
             ->with('respuesta', 'cliente')
             ->where('id_usuario', $idUsuario)
-            ->when($busqueda !== '', fn (Builder $query) => $this->buscar($query, $busqueda))
+            ->when(
+                $busqueda !== '',
+                fn (Builder $query) => $this->buscar($query, $busqueda),
+            )
             ->whereBetween('fecha', $rango->limites());
     }
 
@@ -67,16 +63,21 @@ class HistoricoController extends Controller
     {
         $escaped = addcslashes($busqueda, '%_\\');
 
-        return $query->where(static function (Builder $contactos) use ($escaped): void {
-            $contactos
-                ->where('razon_social', 'like', "%{$escaped}%")
-                ->orWhere('nombre_contacto', 'like', "%{$escaped}%")
-                ->orWhere('telefono', 'like', "%{$escaped}%")
-                ->orWhereHas('cliente', static fn (Builder $clientes) => $clientes->where(
-                    'ruc',
-                    'like',
-                    "%{$escaped}%",
-                ));
-        });
+        return $query->where(
+            static function (Builder $contactos) use ($escaped): void {
+                $contactos
+                    ->where('razon_social', 'like', "%{$escaped}%")
+                    ->orWhere('nombre_contacto', 'like', "%{$escaped}%")
+                    ->orWhere('telefono', 'like', "%{$escaped}%")
+                    ->orWhereHas(
+                        'cliente',
+                        static fn (Builder $clientes) => $clientes->where(
+                            'ruc',
+                            'like',
+                            "%{$escaped}%",
+                        ),
+                    );
+            },
+        );
     }
 }

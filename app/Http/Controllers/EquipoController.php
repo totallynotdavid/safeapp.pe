@@ -6,10 +6,13 @@ use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-/** One team directory over the account, personal, and store-assignment domains. */
 class EquipoController extends Controller
 {
-    private const PERMISSIONS = ['usuarios.manage', 'personal.gestionar', 'asignacion.gestionar'];
+    private const PERMISSIONS = [
+        'usuarios.manage',
+        'personal.gestionar',
+        'asignacion.gestionar',
+    ];
 
     public function index(Request $request): View
     {
@@ -28,15 +31,21 @@ class EquipoController extends Controller
         $this->authorizeDirectory($request);
 
         return view('equipo.show', [
-            'usuario' => $usuario->load(['rol', 'supervisor', 'asignacionActiva.tienda', 'asignaciones.tienda']),
+            'usuario' => $usuario->load([
+                'rol',
+                'supervisor',
+                'asignacionActiva.tienda',
+                'asignaciones.tienda',
+            ]),
         ]);
     }
 
     private function authorizeDirectory(Request $request): void
     {
         abort_unless(
-            collect(self::PERMISSIONS)->contains(
-                static fn (string $permission): bool => $request->user()->hasPermiso($permission),
+            array_any(
+                self::PERMISSIONS,
+                fn (string $permission): bool => $request->user()->hasPermiso($permission),
             ),
             403,
         );

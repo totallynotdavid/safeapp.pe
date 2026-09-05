@@ -24,8 +24,7 @@ class Usuario extends Authenticatable
 
     protected $authPasswordName = 'clave';
 
-    // No remember_token column on the legacy table; disable "remember me"
-    // rather than adding a column nothing else needs yet.
+    // The legacy table has no remember_token column.
     protected $rememberTokenName = '';
 
     protected $fillable = [
@@ -56,8 +55,7 @@ class Usuario extends Authenticatable
         return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
     }
 
-    // Optional: id_supervisor defaults to 0 (no row) until a user is assigned,
-    // so this resolves to null rather than hiding the user behind an inner join.
+    // id_supervisor uses 0 to mean no supervisor.
     public function supervisor(): BelongsTo
     {
         return $this->belongsTo(Supervisor::class, 'id_supervisor', 'id_supervisor');
@@ -90,25 +88,17 @@ class Usuario extends Authenticatable
 
     public function asignacionActiva(): HasOne
     {
-        return $this->hasOne(AsignacionTienda::class, 'id_usuario', 'id_usuario')->where('estado', 0);
+        return $this->hasOne(AsignacionTienda::class, 'id_usuario', 'id_usuario')
+            ->where('estado', 0);
     }
 
-    // The one place that resolves "which tienda is this operator working".
-    // Operational screens scope their rows to it; null means the user has no
-    // active assignment and sees nothing.
     public function tiendaAsignada(): ?int
     {
         return $this->asignacionActiva?->id_tienda;
     }
 
     /**
-     * Write owner of the assignment invariant tiendaAsignada() reads: this user
-     * ends up assigned to exactly $idTiendas, with $idActiva the only active row
-     * (estado 0) and every other assignment inactive. Legacy switched the active
-     * tienda with two blind UPDATEs and had no working way to create the first
-     * assignment; replacing the whole set in one transaction keeps "at most one
-     * active tienda" true by construction. An $idActiva outside $idTiendas leaves
-     * the user with no active tienda, which the form request forbids.
+     * Replaces the user's assignments, leaving at most one active.
      *
      * @param  list<int>  $idTiendas
      */
@@ -127,16 +117,9 @@ class Usuario extends Authenticatable
     }
 
     /**
-     * Switches which of this user's existing assignments is the active one.
+     * Activates one of the user's existing assignments.
      *
-     * The self-service half of sincronizarAsignaciones: an operator working two
-     * stores moves between them without an admin, but cannot assign themselves
-     * a tienda they were never given. Returns false when the tienda is not one
-     * of theirs, so the caller says so rather than silently doing nothing.
-     *
-     * Legacy did this with two blind UPDATEs and no membership check, so posting
-     * any id_tienda activated an assignment row that did not exist, leaving the
-     * operator with no active tienda and an empty queue.
+     * Returns false if the tienda is not assigned to the user.
      */
     public function activarTienda(int $idTienda): bool
     {
@@ -154,8 +137,9 @@ class Usuario extends Authenticatable
 
     public function hasPermiso(string $permiso): bool
     {
-        // Strict compare: Collection's two-arg contains() uses loose ==, and
-        // PHP's null == '' is true, so a null-permiso header would match ''.
-        return $this->menus->contains(static fn (Menu $menu): bool => $menu->permiso === $permiso);
+        // Collection::contains($key, $value) compares loosely.
+        return $this->menus->contains(
+            static fn (Menu $menu): bool => $menu->permiso === $permiso,
+        );
     }
 }

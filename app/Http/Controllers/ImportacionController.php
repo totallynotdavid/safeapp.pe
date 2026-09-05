@@ -9,15 +9,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-/**
- * CARGAR DATOS: loading a campaign file of clients.
- *
- * Legacy's version of this screen had no upload. It was a single button that
- * promoted a `datos_temporal` staging table someone filled out of band, so the
- * front door of the import lived outside the application entirely and the screen
- * held only the last step. The file is the front door now, and the staging table
- * is gone with it.
- */
 class ImportacionController extends Controller
 {
     public function index(): View
@@ -28,6 +19,7 @@ class ImportacionController extends Controller
     public function store(ImportarClientesRequest $request): RedirectResponse
     {
         $archivo = $request->file('archivo');
+
         $resultado = ImportacionDeClientes::desdeArchivo(
             $archivo->getRealPath(),
             $archivo->getClientOriginalExtension(),

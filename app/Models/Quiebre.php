@@ -13,21 +13,14 @@ class Quiebre extends Model
     /** @use HasFactory<QuiebreFactory> */
     use HasFactory;
 
-    // The validation workflow states. estado carries the validation decision;
-    // the list filters and the update form both draw their options from here so
-    // the allowed set has a single owner.
     public const ESTADOS = ['PENDIENTE', 'ATENDIDO', 'PROCESANDO', 'DEVUELTO'];
 
-    // While a case sits in one of these states the registering ejecutivo may
-    // still amend its contact/comentario fields; once validated it is frozen.
     public const ESTADOS_EDITABLES = ['PENDIENTE', 'PROCESANDO'];
 
     public const SERVICIOS = ['FIJA', 'MOVIL'];
 
     public const DETALLES_EQUIPO = ['DECO', 'BAM', 'MODEM', 'CELULAR', 'TELEFONO', 'OTROS'];
 
-    // Averia classifications. Stored values may differ from display labels
-    // (e.g., stored as "AJUSTE FACTURACION", displayed as "AJUSTE DE FACTURACIÓN").
     public const TIPOS_AVERIA = [
         'SIN TV' => 'SIN TV',
         'SIN DATOS' => 'SIN DATOS',
@@ -50,8 +43,7 @@ class Quiebre extends Model
         'OTROS' => 'OTROS',
     ];
 
-    // A ticket must be raised once the service has been active for at least this
-    // long; below the threshold registration records no ticket.
+    // Services active for at least this many days require a ticket.
     public const DIAS_PARA_TICKET = 90;
 
     public $timestamps = false;
@@ -60,10 +52,6 @@ class Quiebre extends Model
 
     protected $primaryKey = 'id_quiebre';
 
-    // Registration writes the case columns; validation writes the decision
-    // columns. Server-owned fields (id_usuario, estado on create, id_validador,
-    // fecha_registro, ticket_atencion) are set explicitly in the controllers,
-    // never mass-assigned, so they are left out here.
     protected $fillable = [
         'estado',
         'id_validador',
@@ -103,24 +91,17 @@ class Quiebre extends Model
         ];
     }
 
-    // Owns the "still amendable by its ejecutivo" rule so the policy and the
-    // edit view agree on when the followup form is writable.
     public function esEditable(): bool
     {
         return in_array($this->estado, self::ESTADOS_EDITABLES, true);
     }
 
-    // A service active for DIAS_PARA_TICKET or more at registration time needs a
-    // ticket, which makes numero_ticket and its date required. Both the store
-    // request and the controller consult this so the rule has one owner.
+    // Ticket requirement is based on service age at registration time.
     public static function requiereTicket(?Carbon $fechaActivacion): bool
     {
         return $fechaActivacion !== null && $fechaActivacion->diffInDays(now()) >= self::DIAS_PARA_TICKET;
     }
 
-    // The client the avería is reported for. Not nullable in practice: a quiebre
-    // is opened from a resolved client, and the name shown anywhere comes from
-    // here rather than from a copy frozen on this row.
     public function cliente(): BelongsTo
     {
         return $this->belongsTo(Cliente::class, 'id_cliente', 'id_cliente');

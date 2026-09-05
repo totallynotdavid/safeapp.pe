@@ -7,11 +7,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 /**
- * Product navigation for SAFEAPP.
- *
- * The legacy menu tables remain the grant store. They deliberately do not own
- * labels, grouping, icons, ordering, or route matching: those are product
- * decisions declared here.
+ * Legacy menu tables store grants. Navigation structure and presentation live
+ * here.
  */
 class Sidebar
 {
@@ -41,14 +38,22 @@ class Sidebar
                     'route' => 'notas-cargo.movil.index',
                     'permission' => 'notacargo.movil.registrar',
                     'icon' => 'device-phone-mobile',
-                    'active' => ['notas-cargo.movil.index', 'notas-cargo.movil.create', 'notas-cargo.movil.edit'],
+                    'active' => [
+                        'notas-cargo.movil.index',
+                        'notas-cargo.movil.create',
+                        'notas-cargo.movil.edit',
+                    ],
                 ],
                 [
                     'label' => 'Registro fija',
                     'route' => 'notas-cargo.fija.index',
                     'permission' => 'notacargo.fija.registrar',
                     'icon' => 'wifi',
-                    'active' => ['notas-cargo.fija.index', 'notas-cargo.fija.create', 'notas-cargo.fija.edit'],
+                    'active' => [
+                        'notas-cargo.fija.index',
+                        'notas-cargo.fija.create',
+                        'notas-cargo.fija.edit',
+                    ],
                 ],
                 [
                     'label' => 'Validación móvil',
@@ -128,13 +133,21 @@ class Sidebar
         [
             'title' => 'Cuenta',
             'items' => [
-                ['label' => 'Información personal', 'route' => 'configuracion.perfil', 'icon' => 'user'],
+                [
+                    'label' => 'Información personal',
+                    'route' => 'configuracion.perfil',
+                    'icon' => 'user',
+                ],
                 [
                     'label' => 'Inicio de sesión y seguridad',
                     'route' => 'configuracion.seguridad',
                     'icon' => 'lock-closed',
                 ],
-                ['label' => 'Notificaciones', 'route' => 'configuracion.notificaciones', 'icon' => 'bell'],
+                [
+                    'label' => 'Notificaciones',
+                    'route' => 'configuracion.notificaciones',
+                    'icon' => 'bell',
+                ],
             ],
         ],
         [
@@ -143,7 +156,11 @@ class Sidebar
                 [
                     'label' => 'Equipo',
                     'route' => 'equipo.index',
-                    'permissions' => ['usuarios.manage', 'personal.gestionar', 'asignacion.gestionar'],
+                    'permissions' => [
+                        'usuarios.manage',
+                        'personal.gestionar',
+                        'asignacion.gestionar',
+                    ],
                     'icon' => 'users',
                 ],
                 [
@@ -185,9 +202,8 @@ class Sidebar
     }
 
     /**
-     * The product has no generic dashboard: authenticated entry goes directly
-     * to the first permitted operational task, or to Configuración for an
-     * administration-only account.
+     * Authenticated entry goes to the first permitted operational task, or to
+     * Configuración when the user has no operational access.
      */
     public static function startUrlForUser(Usuario $user): ?string
     {
@@ -216,13 +232,18 @@ class Sidebar
                     ->filter(static function (array $item) use ($grants): bool {
                         if (array_key_exists('permissions', $item)) {
                             return collect($item['permissions'])
-                                ->contains($grants->has(...));
+                                ->contains(
+                                    static fn (string $permission): bool => $grants->has($permission),
+                                );
                         }
 
                         return ($item['permission'] ?? null) === null || $grants->has($item['permission']);
                     })
                     ->map(static function (array $item) use ($currentRoute): array {
-                        $patterns = $item['active'] ?? [$item['route'], $item['route'].'.*'];
+                        $patterns = $item['active'] ?? [
+                            $item['route'],
+                            $item['route'].'.*',
+                        ];
 
                         return [
                             'label' => $item['label'],

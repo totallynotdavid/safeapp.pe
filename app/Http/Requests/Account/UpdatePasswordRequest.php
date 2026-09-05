@@ -10,7 +10,14 @@ class UpdatePasswordRequest extends FormRequest
     {
         return [
             'clave_actual' => ['required', 'string'],
-            'clave' => ['required', 'string', 'min:8', 'max:255', 'confirmed', 'different:clave_actual'],
+            'clave' => [
+                'required',
+                'string',
+                'min:8',
+                'max:255',
+                'confirmed',
+                'different:clave_actual',
+            ],
         ];
     }
 }
