@@ -6,15 +6,13 @@ use Illuminate\Support\Facades\Schema;
 
 // One customer on one campaign list: what the business calls "un dato".
 //
-// This table used to hold customer identity and work assignment as well. Both
-// moved out (see create_cliente_table and create_asignacion_datos_table) and
-// what is left is exactly the campaign facts: which campaign delivered this
-// customer, which queue works them, and what the file said about them.
+// A row holds campaign facts only: which campaign delivered this customer,
+// which queue works them, and what the file said about them. Identity is in
+// `cliente` and assignment in `asignacion_datos`.
 //
-// The payoff is that "an import never overwrites what a person recorded" stops
-// being a rule and becomes a shape. A load inserts campaign rows; it cannot
-// reach identity, ownership or progress because they are not here. The
-// importer's hand-maintained list of touchable columns is gone with it.
+// That split makes "an import never overwrites what a person recorded" a shape
+// rather than a rule: a load inserts campaign rows and cannot reach identity,
+// ownership or progress, because they are not here.
 //
 // Two legacy columns are intentionally absent. `cliente_movistar` and
 // `q_competencia` were confirmed unpopulated across the full production dump
