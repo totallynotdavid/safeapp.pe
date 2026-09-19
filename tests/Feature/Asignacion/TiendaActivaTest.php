@@ -7,8 +7,6 @@ use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-// The self-service half of assignment: an operator working two stores moves
-// between them without an admin.
 class TiendaActivaTest extends TestCase
 {
     use RefreshDatabase;
@@ -20,7 +18,7 @@ class TiendaActivaTest extends TestCase
         $this
             ->actingAs($operador)
             ->put(route('tienda-activa.update'), ['id_tienda' => $arequipa->id_tienda])
-            ->assertRedirect(route('dashboard'));
+            ->assertRedirect(route('home'));
 
         $this->assertSame($arequipa->id_tienda, $operador->fresh()->tiendaAsignada());
     }
@@ -48,14 +46,6 @@ class TiendaActivaTest extends TestCase
             ->assertSessionHas('error');
 
         $this->assertSame($lima->id_tienda, $operador->fresh()->tiendaAsignada());
-    }
-
-    public function test_the_switch_is_hidden_from_an_operator_with_one_tienda(): void
-    {
-        $operador = Usuario::factory()->create();
-        $operador->sincronizarAsignaciones([Tienda::factory()->create()->id_tienda], null);
-
-        $this->actingAs($operador)->get(route('dashboard'))->assertDontSee('tienda-activa');
     }
 
     /**

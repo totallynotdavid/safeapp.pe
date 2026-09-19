@@ -2,201 +2,265 @@
 
 namespace App\Navigation;
 
-use App\Models\Menu;
 use App\Models\Usuario;
 use Illuminate\Support\Collection;
-use LogicException;
+use Illuminate\Support\Str;
 
-// Two-level sidebar: top-level sections (id_ref 0) and the leaves grouped under
-// them. Only visible rows appear; menu.estado is inverted, so 0 means visible.
+/**
+ * Legacy menu tables store grants. Navigation structure and presentation live
+ * here.
+ */
 class Sidebar
 {
-    // permiso -> app route name, one entry per leaf MenuSeeder writes.
-    private const ROUTES = [
-        'usuarios.manage' => 'usuarios.index',
-        'roles.manage' => 'roles.index',
-        'quiebre.registrar' => 'quiebres.registro.index',
-        'quiebre.validar' => 'quiebres.validacion.index',
-        'liquidacion.gestionar' => 'liquidaciones.index',
-        'notacargo.movil.registrar' => 'notas-cargo.movil.index',
-        'notacargo.movil.validar' => 'notas-cargo.movil.validacion.index',
-        'notacargo.movil.back' => 'notas-cargo.movil.back.index',
-        'notacargo.fija.registrar' => 'notas-cargo.fija.index',
-        'notacargo.fija.validar' => 'notas-cargo.fija.validacion.index',
-        'notacargo.fija.back' => 'notas-cargo.fija.back.index',
-        'personal.gestionar' => 'personal.index',
-        'asignacion.gestionar' => 'asignacion.index',
-        'gestion.movil' => 'gestion.movil',
-        'gestion.fija' => 'gestion.fija',
-        'clientes.crear' => 'clientes.create',
-        'clientes.importar' => 'clientes.importar',
-        'historico.ver' => 'historico.index',
-        'seguimiento.equipo' => 'seguimiento.index',
-        'produccion.ver' => 'produccion.index',
+    private const OPERATIONAL = [
+        [
+            'title' => 'Gestión comercial',
+            'items' => [
+                [
+                    'label' => 'Gestión móvil',
+                    'route' => 'gestion.movil',
+                    'permission' => 'gestion.movil',
+                    'icon' => 'device-phone-mobile',
+                ],
+                [
+                    'label' => 'Gestión fija',
+                    'route' => 'gestion.fija',
+                    'permission' => 'gestion.fija',
+                    'icon' => 'wifi',
+                ],
+            ],
+        ],
+        [
+            'title' => 'Notas de cargo',
+            'items' => [
+                [
+                    'label' => 'Registro móvil',
+                    'route' => 'notas-cargo.movil.index',
+                    'permission' => 'notacargo.movil.registrar',
+                    'icon' => 'device-phone-mobile',
+                    'active' => [
+                        'notas-cargo.movil.index',
+                        'notas-cargo.movil.create',
+                        'notas-cargo.movil.edit',
+                    ],
+                ],
+                [
+                    'label' => 'Registro fija',
+                    'route' => 'notas-cargo.fija.index',
+                    'permission' => 'notacargo.fija.registrar',
+                    'icon' => 'wifi',
+                    'active' => [
+                        'notas-cargo.fija.index',
+                        'notas-cargo.fija.create',
+                        'notas-cargo.fija.edit',
+                    ],
+                ],
+                [
+                    'label' => 'Validación móvil',
+                    'route' => 'notas-cargo.movil.validacion.index',
+                    'permission' => 'notacargo.movil.validar',
+                    'icon' => 'shield-check',
+                ],
+                [
+                    'label' => 'Validación fija',
+                    'route' => 'notas-cargo.fija.validacion.index',
+                    'permission' => 'notacargo.fija.validar',
+                    'icon' => 'shield-check',
+                ],
+                [
+                    'label' => 'Back móvil',
+                    'route' => 'notas-cargo.movil.back.index',
+                    'permission' => 'notacargo.movil.back',
+                    'icon' => 'wrench-screwdriver',
+                ],
+                [
+                    'label' => 'Back fija',
+                    'route' => 'notas-cargo.fija.back.index',
+                    'permission' => 'notacargo.fija.back',
+                    'icon' => 'wrench-screwdriver',
+                ],
+            ],
+        ],
+        [
+            'title' => 'Control operativo',
+            'items' => [
+                [
+                    'label' => 'Registrar quiebre',
+                    'route' => 'quiebres.registro.index',
+                    'permission' => 'quiebre.registrar',
+                    'icon' => 'exclamation-triangle',
+                ],
+                [
+                    'label' => 'Validar quiebres',
+                    'route' => 'quiebres.validacion.index',
+                    'permission' => 'quiebre.validar',
+                    'icon' => 'check-circle',
+                ],
+                [
+                    'label' => 'Liquidaciones',
+                    'route' => 'liquidaciones.index',
+                    'permission' => 'liquidacion.gestionar',
+                    'icon' => 'banknotes',
+                ],
+            ],
+        ],
+        [
+            'title' => 'Análisis',
+            'items' => [
+                [
+                    'label' => 'Histórico',
+                    'route' => 'historico.index',
+                    'permission' => 'historico.ver',
+                    'icon' => 'calendar-days',
+                ],
+                [
+                    'label' => 'Seguimiento de equipo',
+                    'route' => 'seguimiento.index',
+                    'permission' => 'seguimiento.equipo',
+                    'icon' => 'user-group',
+                ],
+                [
+                    'label' => 'Producción',
+                    'route' => 'produccion.index',
+                    'permission' => 'produccion.ver',
+                    'icon' => 'presentation-chart-line',
+                ],
+            ],
+        ],
     ];
 
-    // menu.icono -> Blade Icons component. The column holds the FontAwesome 4
-    // classes the pre-rewrite app rendered; the cutover copies them across, so
-    // they stay the stored value and are translated here instead. Users
-    // navigate this menu by icon after years of it, so each one keeps the same
-    // subject rather than being redrawn: fa-bank was a bank building, fa-money
-    // was banknotes, fa-area-chart was a chart.
-    private const ICONOS = [
-        'fa fa-area-chart' => 'heroicon-o-chart-bar',
-        'fa fa-bank' => 'heroicon-o-building-library',
-        'fa fa-briefcase' => 'heroicon-o-briefcase',
-        'fa fa-cogs' => 'heroicon-o-cog-6-tooth',
-        'fa fa-database' => 'heroicon-o-circle-stack',
-        'fa fa-download' => 'heroicon-o-arrow-down-tray',
-        'fa fa-file' => 'heroicon-o-document',
-        'fa fa-key' => 'heroicon-o-key',
-        'fa fa-mobile' => 'heroicon-o-device-phone-mobile',
-        'fa fa-money' => 'heroicon-o-banknotes',
-        'fa fa-phone' => 'heroicon-o-phone',
-        'fa fa-plus' => 'heroicon-o-plus',
-        'fa fa-users' => 'heroicon-o-users',
-        'fa fa-wifi' => 'heroicon-o-wifi',
+    private const SETTINGS = [
+        [
+            'title' => 'Cuenta',
+            'items' => [
+                [
+                    'label' => 'Información personal',
+                    'route' => 'configuracion.perfil',
+                    'icon' => 'user',
+                ],
+                [
+                    'label' => 'Inicio de sesión y seguridad',
+                    'route' => 'configuracion.seguridad',
+                    'icon' => 'lock-closed',
+                ],
+                [
+                    'label' => 'Notificaciones',
+                    'route' => 'configuracion.notificaciones',
+                    'icon' => 'bell',
+                ],
+            ],
+        ],
+        [
+            'title' => 'Equipo',
+            'items' => [
+                [
+                    'label' => 'Equipo',
+                    'route' => 'equipo.index',
+                    'permissions' => [
+                        'usuarios.manage',
+                        'personal.gestionar',
+                        'asignacion.gestionar',
+                    ],
+                    'icon' => 'users',
+                ],
+                [
+                    'label' => 'Roles y permisos',
+                    'route' => 'roles.index',
+                    'permission' => 'roles.manage',
+                    'icon' => 'key',
+                ],
+            ],
+        ],
+        [
+            'title' => 'Datos',
+            'items' => [
+                [
+                    'label' => 'Importar clientes',
+                    'route' => 'clientes.importar',
+                    'permission' => 'clientes.importar',
+                    'icon' => 'arrow-up-tray',
+                ],
+            ],
+        ],
     ];
+
+    /** @return Collection<int, array{title: string, hidden: bool, items: Collection}> */
+    public static function forUser(Usuario $user, ?string $currentRoute = null): Collection
+    {
+        return self::resolve(self::OPERATIONAL, $user, $currentRoute);
+    }
+
+    /** @return Collection<int, array{title: string, hidden: bool, items: Collection}> */
+    public static function settingsForUser(Usuario $user, ?string $currentRoute = null): Collection
+    {
+        return self::resolve(self::SETTINGS, $user, $currentRoute);
+    }
+
+    public static function settingsUrlForUser(Usuario $user): ?string
+    {
+        return route('configuracion.index');
+    }
 
     /**
-     * The menu tree a user may see, with the leaf they are currently on marked.
-     *
-     * @param  string|null  $rutaActual  current route name, null on an unnamed route
-     * @return Collection<int, array{descripcion: string, icono: string, abierta: bool, children: Collection}>
-     *
-     * @throws LogicException if a visible row carries a permiso or icono with no mapping
+     * Authenticated entry goes to the first permitted operational task, or to
+     * Configuración when the user has no operational access.
      */
-    public static function forUser(Usuario $user, ?string $rutaActual = null): Collection
+    public static function startUrlForUser(Usuario $user): ?string
     {
-        $activa = self::rutaActiva($rutaActual);
+        $firstOperationalItem = self::forUser($user)
+            ->flatMap(static fn (array $section): Collection => $section['items'])
+            ->first();
 
-        $byParent = $user
-            ->menus()
-            ->where('estado', 0)
-            ->orderBy('id_menu')
-            ->get()
-            ->groupBy('id_ref');
+        return $firstOperationalItem['url'] ?? self::settingsUrlForUser($user);
+    }
 
-        return ($byParent->get(0) ?? collect())
-            ->map(static function (Menu $section) use ($byParent, $activa): array {
-                $children = ($byParent->get($section->id_menu) ?? collect())
-                    ->map(static function (Menu $leaf) use ($activa): array {
-                        $ruta = self::ruta($leaf->permiso);
+    /**
+     * @param  array<int, array{title: string, hidden?: bool, items: array<int, array<string, mixed>>}>  $schema
+     * @return Collection<int, array{title: string, hidden: bool, items: Collection}>
+     */
+    private static function resolve(array $schema, Usuario $user, ?string $currentRoute): Collection
+    {
+        $grants = $user
+            ->menus
+            ->pluck('permiso')
+            ->filter()
+            ->flip();
+
+        return collect($schema)
+            ->map(static function (array $section) use ($grants, $currentRoute): array {
+                $items = collect($section['items'])
+                    ->filter(static function (array $item) use ($grants): bool {
+                        if (array_key_exists('permissions', $item)) {
+                            return collect($item['permissions'])
+                                ->contains(
+                                    static fn (string $permission): bool => $grants->has($permission),
+                                );
+                        }
+
+                        return ($item['permission'] ?? null) === null || $grants->has($item['permission']);
+                    })
+                    ->map(static function (array $item) use ($currentRoute): array {
+                        $patterns = $item['active'] ?? [
+                            $item['route'],
+                            $item['route'].'.*',
+                        ];
 
                         return [
-                            'descripcion' => $leaf->descripcion,
-                            'icono' => self::icono($leaf->icono),
-                            'url' => route($ruta),
-                            'activa' => $ruta === $activa,
+                            'label' => $item['label'],
+                            'url' => route($item['route']),
+                            'icon' => $item['icon'],
+                            'active' => $currentRoute !== null && Str::is($patterns, $currentRoute),
                         ];
                     })
                     ->values();
 
                 return [
-                    'descripcion' => $section->descripcion,
-                    'icono' => self::icono($section->icono),
-                    // Sections start closed, as they did before the rewrite. The
-                    // one holding the current screen opens so the user can see
-                    // where they are without reopening it on every page load.
-                    'abierta' => $children->contains(static fn (array $leaf): bool => $leaf['activa']),
-                    'children' => $children,
+                    'title' => $section['title'],
+                    'hidden' => (bool) ($section['hidden'] ?? false),
+                    'items' => $items,
                 ];
             })
-            ->filter(static fn (array $section): bool => $section['children']->isNotEmpty())
+            ->filter(static fn (array $section): bool => $section['items']->isNotEmpty())
             ->values();
-    }
-
-    /**
-     * The leaf route the current screen belongs to, or null when it sits under
-     * no leaf (the dashboard, the tienda switcher).
-     *
-     * A leaf owns its own inner screens, so usuarios.edit has to light up
-     * USUARIO. Matching on a plain prefix is not enough:
-     * notas-cargo.movil.validacion.edit starts with notas-cargo.movil, which
-     * would light up the registro leaf as well. The leaf sharing the most
-     * dotted segments wins, and the shorter route breaks a tie, which is the
-     * module's own landing screen rather than one of its sub-queues.
-     *
-     * Two leaves can still tie honestly: gestion.show is the same cockpit
-     * whether the client came from the móvil or the fija queue. Declaration
-     * order settles those, and either answer is defensible.
-     */
-    private static function rutaActiva(?string $rutaActual): ?string
-    {
-        if ($rutaActual === null) {
-            return null;
-        }
-
-        $ganadora = null;
-        $mejor = 0;
-
-        foreach (self::ROUTES as $ruta) {
-            $comunes = self::segmentosComunes($ruta, $rutaActual);
-
-            if ($comunes === 0 || $comunes < $mejor) {
-                continue;
-            }
-
-            if ($comunes === $mejor && strlen($ruta) >= strlen((string) $ganadora)) {
-                continue;
-            }
-
-            $ganadora = $ruta;
-            $mejor = $comunes;
-        }
-
-        return $ganadora;
-    }
-
-    private static function segmentosComunes(string $ruta, string $rutaActual): int
-    {
-        $actual = explode('.', $rutaActual);
-        $comunes = 0;
-
-        foreach (explode('.', $ruta) as $posicion => $segmento) {
-            if (($actual[$posicion] ?? null) !== $segmento) {
-                break;
-            }
-
-            $comunes++;
-        }
-
-        return $comunes;
-    }
-
-    /**
-     * The route a leaf points at. Every visible leaf links somewhere: one
-     * without a mapping used to render as greyed-out text, which is how a
-     * module still living in the legacy app appeared while the strangle was
-     * running. None does, and
-     * MenuSeeder is the only writer of menu rows, so a missing entry is a
-     * seeder bug rather than a state to render. SidebarTest owns the invariant;
-     * this fails loudly rather than shipping a leaf that goes nowhere.
-     */
-    private static function ruta(?string $permiso): string
-    {
-        $ruta = self::ROUTES[$permiso] ?? null;
-
-        if ($ruta === null) {
-            throw new LogicException("El menú «{$permiso}» no tiene ruta en Sidebar::ROUTES.");
-        }
-
-        return $ruta;
-    }
-
-    /**
-     * Same rule as ruta(): MenuSeeder is the only writer of menu rows, so an
-     * icono with no mapping is a seeder bug. Failing here surfaces it in
-     * SidebarTest instead of rendering a section with a hole where the icon is.
-     */
-    private static function icono(string $icono): string
-    {
-        $componente = self::ICONOS[$icono] ?? null;
-
-        if ($componente === null) {
-            throw new LogicException("El icono «{$icono}» no tiene equivalente en Sidebar::ICONOS.");
-        }
-
-        return $componente;
     }
 }
