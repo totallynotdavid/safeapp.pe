@@ -1,48 +1,60 @@
-@extends('layouts.app')
+@extends('layouts.settings')
 
-@section('title', 'Asignación de tienda')
+@section('title', 'Asignación de tiendas')
+@section('page', 'true')
 
 @section('content')
-    @if (session('status'))
-        <div class="mb-4 rounded-md border border-green-200 bg-green-50 px-4 py-2 text-sm text-green-800">
-            {{ session('status') }}
-        </div>
-    @endif
+    <x-ui.settings-page
+        title="Asignación de tiendas"
+        description="Administra la tienda asignada a cada ejecutivo."
+    >
+        <x-ui.table label="Asignaciones de tienda" :truncate="true">
+            <colgroup>
+                <col>
+                <col>
+                <col class="col-action">
+            </colgroup>
 
-    <div class="rounded-lg border border-gray-200 bg-white">
-        <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-            <h2 class="text-lg font-semibold text-gray-800">Asignación de tienda</h2>
-        </div>
+            <thead>
+                <tr>
+                    <th scope="col">Ejecutivo</th>
+                    <th scope="col">Tienda activa</th>
+                    <th scope="col" class="table__actions">Acciones</th>
+                </tr>
+            </thead>
 
-        <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
-                <thead class="border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+            <tbody>
+                @forelse ($usuarios as $usuario)
                     <tr>
-                        <th class="px-6 py-3">Ejecutivo</th>
-                        <th class="px-6 py-3">Tienda activa</th>
-                        <th class="px-6 py-3 text-right">Acciones</th>
+                        <td>
+                            <div class="stack" data-direction="horizontal" data-gap="3">
+                                <x-ui.avatar :name="$usuario->personal" size="xsmall" />
+                                <span class="table__primary">{{ $usuario->personal }}</span>
+                            </div>
+                        </td>
+
+                        <td class="table__secondary">
+                            {{ $usuario->asignacionActiva?->tienda?->nombre ?? 'Sin tienda activa' }}
+                        </td>
+
+                        <td class="table__actions">
+                            <x-ui.button
+                                href="{{ route('asignacion.edit', $usuario) }}"
+                                variant="secondary"
+                                size="sm"
+                            >
+                                Administrar
+                            </x-ui.button>
+                        </td>
                     </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    @forelse ($usuarios as $usuario)
-                        <tr>
-                            <td class="px-6 py-3 font-medium text-gray-800">{{ $usuario->personal }}</td>
-                            <td class="px-6 py-3 text-gray-600">{{ $usuario->asignacionActiva?->tienda?->nombre ?? '—' }}</td>
-                            <td class="px-6 py-3 text-right">
-                                <a href="{{ route('asignacion.edit', $usuario) }}" class="rounded-md bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-200">
-                                    Asignar
-                                </a>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="3" class="px-6 py-8 text-center text-sm text-gray-500">
-                                No hay personal activo.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
+                @empty
+                    <tr>
+                        <td colspan="3">
+                            <x-ui.empty-state title="No hay personal activo" compact />
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </x-ui.table>
+    </x-ui.settings-page>
 @endsection

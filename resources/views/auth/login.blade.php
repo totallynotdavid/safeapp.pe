@@ -1,39 +1,71 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ingresar · SAFEAPP</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="flex min-h-screen items-center justify-center bg-gray-100">
-    <div class="w-full max-w-sm rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
-        <h1 class="text-center text-xl font-semibold tracking-wide text-gray-800">INFINITY</h1>
-        <p class="mt-1 text-center text-sm text-gray-500">Sistema Llamadas</p>
+@extends('layouts.auth')
 
-        @if ($errors->any())
-            <div class="mt-6 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
-                {{ $errors->first() }}
-            </div>
-        @endif
+@section('title', 'Ingresar')
 
-        <form method="POST" action="{{ route('login') }}" class="mt-6 space-y-4">
-            @csrf
-            <div>
-                <label for="usuario" class="block text-sm font-medium text-gray-700">Usuario</label>
-                <input id="usuario" name="usuario" type="text" required autofocus value="{{ old('usuario') }}"
-                    class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none">
-            </div>
-            <div>
-                <label for="clave" class="block text-sm font-medium text-gray-700">Contraseña</label>
-                <input id="clave" name="clave" type="password" required
-                    class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none">
-            </div>
-            <button type="submit"
-                class="w-full rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800">
-                Ingresar
-            </button>
-        </form>
-    </div>
-</body>
-</html>
+@section('content')
+    <x-ui.center as="main" axis="both" class="auth-page">
+        <x-ui.stack gap="4" align="center" class="auth-column">
+            <x-ui.stack gap="2" align="center">
+                <x-ui.icon name="cube" size="lg" class="brand-icon" />
+                <x-ui.text size="lg" weight="bold">INFINITY</x-ui.text>
+            </x-ui.stack>
+
+            <x-ui.card padding="8" width="full">
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
+
+                    <x-ui.stack gap="4" align="stretch">
+                        <x-ui.stack gap="1" align="center">
+                            <x-ui.heading level="1">Accede a SAFEAPP</x-ui.heading>
+
+                            <x-ui.text type="supporting" color="secondary" class="auth-intro">
+                                Ingresa con tus credenciales corporativas.
+                            </x-ui.text>
+                        </x-ui.stack>
+
+                        <x-ui.stack gap="2" align="stretch">
+                            <x-ui.text-input
+                                name="usuario"
+                                label="Usuario"
+                                autocomplete="username"
+                                :value="old('usuario')"
+                                :error="$errors->first('usuario')"
+                                size="lg"
+                                required
+                                autofocus
+                            />
+
+                            <x-ui.text-input
+                                name="clave"
+                                label="Contraseña"
+                                type="password"
+                                autocomplete="current-password"
+                                :error="$errors->first('clave')"
+                                size="lg"
+                                required
+                            />
+                        </x-ui.stack>
+
+                        <x-ui.button type="submit" variant="primary" size="lg" width="full">
+                            Ingresar
+                        </x-ui.button>
+
+                        <x-ui.divider label="¿Necesitas ayuda?" />
+
+                        <x-ui.stack align="center" width="full">
+                            <x-ui.text type="supporting" color="secondary" class="auth-support">
+                                Si no tienes acceso o no recuerdas tus credenciales, comunícate con tu supervisor inmediato.
+                            </x-ui.text>
+                        </x-ui.stack>
+                    </x-ui.stack>
+                </form>
+            </x-ui.card>
+
+            <x-ui.stack align="center" width="full">
+                <x-ui.text type="supporting" color="secondary" class="auth-support">
+                    SAFEAPP es de uso exclusivo para personal autorizado.
+                </x-ui.text>
+            </x-ui.stack>
+        </x-ui.stack>
+    </x-ui.center>
+@endsection

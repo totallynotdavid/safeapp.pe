@@ -18,7 +18,31 @@ class LoginTest extends TestCase
             ->get('/login')
             ->assertOk()
             ->assertSee('Usuario')
-            ->assertSee('Contraseña');
+            ->assertSee('Contraseña')
+            ->assertSee('autocomplete="username"', false)
+            ->assertSee('autocomplete="current-password"', false);
+    }
+
+    public function test_a_login_error_is_attached_to_the_username_field(): void
+    {
+        Usuario::factory()->create(['usuario' => 'agente1']);
+
+        $response = $this
+            ->from('/login')
+            ->post('/login', [
+                'usuario' => 'agente1',
+                'clave' => 'contrasena-incorrecta',
+            ]);
+
+        $response->assertRedirect('/login');
+
+        $this
+            ->get('/login')
+            ->assertSee('aria-invalid="true"', false)
+            ->assertSee('aria-describedby="usuario-status"', false)
+            ->assertSee('id="usuario-status"', false)
+            ->assertSee('role="alert"', false)
+            ->assertSee('Credenciales inválidas.');
     }
 
     public function test_authenticates_with_a_correct_bcrypt_password(): void
@@ -30,7 +54,7 @@ class LoginTest extends TestCase
         $this->post('/login', [
             'usuario' => 'agente1',
             'clave' => UsuarioFactory::CLAVE,
-        ])->assertRedirect(route('dashboard'));
+        ])->assertRedirect(route('home'));
 
         $this->assertAuthenticatedAs($usuario);
     }
@@ -75,7 +99,7 @@ class LoginTest extends TestCase
         $this->post('/login', [
             'usuario' => 'viejo',
             'clave' => 'secreto-legado',
-        ])->assertRedirect(route('dashboard'));
+        ])->assertRedirect(route('home'));
 
         $this->assertAuthenticatedAs($usuario);
 

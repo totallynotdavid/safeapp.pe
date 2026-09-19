@@ -15,7 +15,6 @@ class RolManagementTest extends TestCase
     use LeeFormulario;
     use RefreshDatabase;
 
-    // A user holding the roles.manage grant, the gate the whole module hangs off.
     private function manager(): Usuario
     {
         $menu = Menu::factory()->create(['permiso' => 'roles.manage']);
@@ -44,7 +43,7 @@ class RolManagementTest extends TestCase
         $this->actingAs($this->manager())->get(route('roles.index'))->assertOk();
     }
 
-    public function test_renders_the_create_form_with_the_permiso_tree(): void
+    public function test_create_screen_exposes_the_available_permissions(): void
     {
         ['leaves' => [$leaf]] = $this->section();
 

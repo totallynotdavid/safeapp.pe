@@ -8,9 +8,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
-// Personnel contact data: the "datos personal" flow the usuarios module defers
-// birthdate/phone/email to. A separate, lower-privilege surface so it can be
-// granted (e.g. to supervisors) without full account administration.
 class PersonalController extends Controller
 {
     public function index(): View
@@ -33,17 +30,17 @@ class PersonalController extends Controller
     {
         $data = $request->validated();
 
-        // Upper-case the name the same way the usuarios module does, so it is
-        // stored consistently whichever screen writes it.
-        // The form is a full contact record: an omitted optional field clears
-        // the column rather than leaving a stale value. `nullable` rules drop
-        // absent keys from validated(), so coalesce them to null.
         $usuario->personal = Str::upper($data['personal']);
+
+        // Missing optional fields clear their existing values.
         $usuario->fecha_nacimiento = $data['fecha_nacimiento'] ?? null;
         $usuario->telefono = $data['telefono'] ?? null;
         $usuario->correo = $data['correo'] ?? null;
+
         $usuario->save();
 
-        return redirect()->route('personal.index')->with('status', 'Datos personales actualizados.');
+        return redirect()
+            ->route('equipo.show', $usuario)
+            ->with('status', 'Datos personales actualizados.');
     }
 }

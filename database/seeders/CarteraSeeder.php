@@ -6,12 +6,11 @@ use App\Models\Cartera;
 use App\Models\Tienda;
 use Illuminate\Database\Seeder;
 
-// Dev-only. No ported screen creates carteras (production maintains its 22 rows
-// by hand), so this gives the catalog a few executives for the notas de cargo to
-// be attributed to, plus retired ones so the seleccionables filter has something
-// to exclude. The id_tienda spread is deliberate and no longer a selection gate:
-// all 22 production carteras sit in one región, which is why filtering on it
-// left six of the seven regiones with an empty dropdown.
+// Dev-only: no ported screen creates carteras, production maintains its 22 rows
+// by hand. This gives the catalog a few executives to attribute notas de cargo
+// to, plus retired ones so the seleccionables filter has something to exclude.
+// The id_tienda spread is not a selection gate; all 22 production carteras sit in
+// one región.
 class CarteraSeeder extends Seeder
 {
     private const POR_TIENDA = 3;

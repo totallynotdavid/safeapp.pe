@@ -8,9 +8,8 @@ use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-// Shared fixture for the liquidación tests. The screen has no tienda scoping
-// (legacy passed one and never filtered on it), so the fixture is just a
-// liquidador and a case that reaches the queue.
+// The screen has no tienda scoping (legacy passed one and never filtered on it),
+// so the fixture places no one in a tienda.
 abstract class LiquidacionTestCase extends TestCase
 {
     use RefreshDatabase;

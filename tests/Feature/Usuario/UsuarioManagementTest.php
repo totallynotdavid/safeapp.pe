@@ -13,7 +13,6 @@ class UsuarioManagementTest extends TestCase
 {
     use RefreshDatabase;
 
-    // A user holding the usuarios.manage grant, the gate the whole module hangs off.
     private function manager(): Usuario
     {
         $menu = Menu::factory()->create(['permiso' => 'usuarios.manage']);
@@ -44,6 +43,17 @@ class UsuarioManagementTest extends TestCase
             ->assertSee('SUPERVISOR');
     }
 
+    public function test_the_create_screen_exposes_available_roles(): void
+    {
+        $rol = Rol::factory()->create(['nombre_rol' => 'OPERADOR']);
+
+        $this
+            ->actingAs($this->manager())
+            ->get(route('usuarios.create'))
+            ->assertOk()
+            ->assertSee('OPERADOR');
+    }
+
     public function test_creating_a_user_copies_the_roles_acceso_template(): void
     {
         $rol = Rol::factory()->create();
@@ -52,15 +62,16 @@ class UsuarioManagementTest extends TestCase
             $granted->map(static fn (Menu $m): array => ['id_rol' => $rol->id_rol, 'id_menu' => $m->id_menu])->all(),
         );
 
-        $this->actingAs($this->manager())->post(route('usuarios.store'), [
+        $response = $this->actingAs($this->manager())->post(route('usuarios.store'), [
             'usuario' => 'nuevo',
             'clave' => 'secreto1',
             'personal' => 'juan perez',
             'id_rol' => $rol->id_rol,
             'sexo' => 'M',
-        ])->assertRedirect(route('usuarios.index'));
+        ]);
 
         $creado = Usuario::query()->where('usuario', 'nuevo')->firstOrFail();
+        $response->assertRedirect(route('equipo.show', $creado));
         $this->assertSame('JUAN PEREZ', $creado->personal, 'personal is upper-cased like the legacy insert');
         $this->assertTrue($creado->estado);
         $this->assertEqualsCanonicalizing(
@@ -108,7 +119,7 @@ class UsuarioManagementTest extends TestCase
         $this->actingAs($this->manager())->put(route('usuarios.update', $target), [
             'personal' => 'nombre nuevo',
             'clave' => '',
-        ])->assertRedirect(route('usuarios.index'));
+        ])->assertRedirect(route('equipo.show', $target));
 
         $target->refresh();
         $this->assertSame($hashAntes, $target->clave);
@@ -135,7 +146,7 @@ class UsuarioManagementTest extends TestCase
         $this
             ->actingAs($this->manager())
             ->patch(route('usuarios.estado', $target))
-            ->assertRedirect(route('usuarios.index'));
+            ->assertRedirect(route('equipo.show', $target));
 
         $this->assertFalse($target->fresh()->estado);
     }

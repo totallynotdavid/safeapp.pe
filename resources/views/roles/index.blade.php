@@ -1,64 +1,67 @@
-@extends('layouts.app')
+@extends('layouts.settings')
 
 @section('title', 'Roles')
+@section('page', 'true')
 
 @section('content')
-    @if (session('status'))
-        <div class="mb-4 rounded-md border border-green-200 bg-green-50 px-4 py-2 text-sm text-green-800">
-            {{ session('status') }}
-        </div>
-    @endif
+    <x-ui.settings-page title="Roles y permisos" description="Define las plantillas de acceso del equipo.">
+        <x-slot:actions>
+            <x-ui.button href="{{ route('roles.create') }}" variant="primary" size="lg">
+                <x-slot:icon><x-ui.icon name="plus" /></x-slot:icon>
+                Crear rol
+            </x-ui.button>
+        </x-slot:actions>
+                        <x-ui.table label="Roles y permisos">
+                            <colgroup><col><col class="col-count"><col class="col-count"><col class="col-actions"></colgroup>
+                            <thead><tr>
+                                <th scope="col">Rol</th>
+                                <th scope="col">Usuarios</th>
+                                <th scope="col">Permisos</th>
+                                <th scope="col" class="table__actions">Acciones</th>
+                            </tr></thead>
+                            <tbody>
+                                @forelse ($roles as $rol)
+                                    @php
+                                        $deleteFormId = 'delete-role-'.$rol->getKey();
+                                        $deleteDialogId = 'delete-role-'.$rol->getKey().'-dialog';
+                                    @endphp
+                                    <tr>
+                                        <td class="table__primary">{{ $rol->nombre_rol }}</td>
+                                        <td><x-ui.badge>{{ $rol->usuarios_count }}</x-ui.badge></td>
+                                        <td><x-ui.badge>{{ $rol->menus_count }}</x-ui.badge></td>
+                                        <td class="table__actions">
+                                            <div class="stack" data-direction="horizontal" data-gap="2" data-h-align="end" data-v-align="center">
+                                                <x-ui.button href="{{ route('roles.edit', $rol) }}" variant="secondary" size="sm">Editar</x-ui.button>
+                                                <form id="{{ $deleteFormId }}" method="POST" action="{{ route('roles.destroy', $rol) }}">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                </form>
+                                                <x-ui.button type="button" variant="destructive" size="sm" :disabled="$rol->usuarios_count > 0"
+                                                    data-alert-dialog-open="{{ $deleteDialogId }}"
+                                                    aria-haspopup="dialog"
+                                                        title="{{ $rol->usuarios_count > 0 ? 'Tiene usuarios asignados' : '' }}">
+                                                    Eliminar
+                                                </x-ui.button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="4"><x-ui.empty-state title="No hay roles" compact /></td></tr>
+                                @endforelse
+                            </tbody>
+                        </x-ui.table>
 
-    @if (session('error'))
-        <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    <div class="rounded-lg border border-gray-200 bg-white">
-        <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-            <h2 class="text-lg font-semibold text-gray-800">Roles</h2>
-            <a href="{{ route('roles.create') }}" class="rounded-md bg-gray-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-700">
-                Nuevo rol
-            </a>
-        </div>
-
-        <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
-                <thead class="border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                    <tr>
-                        <th class="px-6 py-3">Rol</th>
-                        <th class="px-6 py-3">Usuarios</th>
-                        <th class="px-6 py-3">Permisos</th>
-                        <th class="px-6 py-3 text-right">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    @foreach ($roles as $rol)
-                        <tr>
-                            <td class="px-6 py-3 font-medium text-gray-800">{{ $rol->nombre_rol }}</td>
-                            <td class="px-6 py-3 text-gray-600">{{ $rol->usuarios_count }}</td>
-                            <td class="px-6 py-3 text-gray-600">{{ $rol->menus_count }}</td>
-                            <td class="px-6 py-3">
-                                <div class="flex items-center justify-end gap-2">
-                                    <a href="{{ route('roles.edit', $rol) }}" class="rounded-md bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-200">
-                                        Editar
-                                    </a>
-                                    <form method="POST" action="{{ route('roles.destroy', $rol) }}" onsubmit="return confirm('¿Eliminar este rol?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" @disabled($rol->usuarios_count > 0)
-                                            class="rounded-md px-3 py-1.5 text-xs font-medium {{ $rol->usuarios_count > 0 ? 'cursor-not-allowed bg-gray-100 text-gray-400' : 'bg-red-50 text-red-700 hover:bg-red-100' }}"
-                                            @if ($rol->usuarios_count > 0) title="Tiene usuarios asignados" @endif>
-                                            Eliminar
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div>
+                        @foreach ($roles as $rol)
+                            @if ($rol->usuarios_count === 0)
+                                <x-ui.alert-dialog
+                                    id="delete-role-{{ $rol->getKey() }}-dialog"
+                                    title="¿Eliminar el rol {{ $rol->nombre_rol }}?"
+                                    description="El rol se eliminará de forma permanente. Esta acción no se puede deshacer."
+                                    action-label="Eliminar rol"
+                                    action-variant="destructive"
+                                    form="delete-role-{{ $rol->getKey() }}"
+                                />
+                            @endif
+                        @endforeach
+    </x-ui.settings-page>
 @endsection

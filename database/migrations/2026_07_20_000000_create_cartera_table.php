@@ -14,8 +14,8 @@ use Illuminate\Support\Facades\Schema;
 //   DNI         their national id, carried so the back-office form can show it
 //
 // Small and hand-maintained: 22 rows in production, with no screen that edits
-// them. Normalized from the legacy all-text DDL; the column name DNI keeps its
-// legacy casing so the cutover copy stays a straight column-for-column move.
+// them. The column name DNI keeps its legacy casing so the cutover copy stays a
+// straight column-for-column move.
 return new class extends Migration {
     public function up(): void
     {

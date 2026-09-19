@@ -1,48 +1,108 @@
-@extends('layouts.app')
+@extends('layouts.settings')
 
 @section('title', 'Asignar tiendas')
+@section('page', 'true')
 
 @section('content')
-    <div class="max-w-xl rounded-lg border border-gray-200 bg-white p-6">
-        <h2 class="mb-1 text-lg font-semibold text-gray-800">Asignar tiendas</h2>
-        <p class="mb-4 text-sm text-gray-500">{{ $usuario->personal }} · {{ $usuario->usuario }}</p>
+    @php
+        $selectedStores = collect(old('tiendas', $asignadas))
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
 
-        @if ($errors->any())
-            <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800">
-                <ul class="list-disc pl-4">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+        $activeStore = old('activa', $activa);
 
-        <form method="POST" action="{{ route('asignacion.update', $usuario) }}" class="space-y-4">
+        $activeOptions = $tiendas
+            ->map(static fn ($tienda): array => [
+                'value' => $tienda->id_tienda,
+                'label' => $tienda->nombre,
+                'disabled' => ! in_array($tienda->id_tienda, $selectedStores, true),
+            ])
+            ->all();
+    @endphp
+
+    <x-ui.settings-page
+        title="Asignar tiendas"
+        :description="$usuario->personal . ' · ' . $usuario->usuario"
+        max-width="720px"
+    >
+        <form
+            method="POST"
+            action="{{ route('asignacion.update', $usuario) }}"
+            data-store-assignment
+        >
             @csrf
             @method('PUT')
 
-            @forelse ($tiendas as $tienda)
-                @php($asignada = in_array($tienda->id_tienda, old('tiendas', $asignadas), false))
-                <div class="flex items-center justify-between rounded-md border border-gray-200 px-4 py-2">
-                    <label class="flex items-center gap-2 text-sm text-gray-700">
-                        <input type="checkbox" name="tiendas[]" value="{{ $tienda->id_tienda }}" @checked($asignada)>
-                        {{ $tienda->nombre }}
-                    </label>
-                    <label class="flex items-center gap-2 text-xs text-gray-500">
-                        <input type="radio" name="activa" value="{{ $tienda->id_tienda }}" @checked((int) old('activa', $activa) === $tienda->id_tienda)>
-                        Activa
-                    </label>
-                </div>
-            @empty
-                <p class="text-sm text-gray-500">No hay tiendas registradas.</p>
-            @endforelse
+            <x-ui.form-layout>
+                <x-ui.stack direction="vertical" gap="1">
+                    <x-ui.heading level="3">Tiendas asignadas</x-ui.heading>
 
-            <div class="flex items-center gap-3 pt-2">
-                <button type="submit" class="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">
-                    Guardar
-                </button>
-                <a href="{{ route('asignacion.index') }}" class="text-sm font-medium text-gray-600 hover:text-gray-800">Cancelar</a>
-            </div>
+                    <x-ui.text type="supporting" color="secondary">
+                        Selecciona todas las tiendas que este usuario puede consultar.
+                    </x-ui.text>
+                </x-ui.stack>
+
+                @if ($tiendas->isEmpty())
+                    <x-ui.empty-state title="No hay tiendas registradas" compact />
+                @else
+                    <x-ui.grid
+                        :min-width="240"
+                        gap="3"
+                        role="group"
+                        aria-label="Tiendas asignadas"
+                    >
+                        @foreach ($tiendas as $tienda)
+                            <x-ui.checkbox-input
+                                :id="'tienda-' . $tienda->id_tienda"
+                                name="tiendas[]"
+                                :value="$tienda->id_tienda"
+                                :label="$tienda->nombre"
+                                :checked="in_array($tienda->id_tienda, $selectedStores, true)"
+                                data-store-checkbox
+                            />
+                        @endforeach
+                    </x-ui.grid>
+
+                    @error('tiendas')
+                        <x-ui.field-status
+                            id="tiendas-status"
+                            type="error"
+                            variant="detached"
+                        >
+                            {{ $message }}
+                        </x-ui.field-status>
+                    @enderror
+
+                    <x-ui.radio-list
+                        name="activa"
+                        label="Tienda activa"
+                        description="Elige la tienda de trabajo inicial entre las tiendas asignadas."
+                        :options="$activeOptions"
+                        :value="$activeStore"
+                        :error="$errors->first('activa')"
+                        optional
+                    />
+                @endif
+
+                <div
+                    class="stack"
+                    data-direction="horizontal"
+                    data-gap="2"
+                    data-h-align="start"
+                    data-v-align="center"
+                >
+                    <x-ui.button type="submit" variant="primary">
+                        Guardar
+                    </x-ui.button>
+
+                    <x-ui.button
+                        href="{{ route('asignacion.index') }}"
+                        variant="secondary"
+                    >
+                        Cancelar
+                    </x-ui.button>
+                </div>
+            </x-ui.form-layout>
         </form>
-    </div>
+    </x-ui.settings-page>
 @endsection

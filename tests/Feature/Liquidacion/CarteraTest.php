@@ -7,8 +7,6 @@ use App\Models\NcMovil;
 use App\Models\Supervisor;
 use App\Models\Tienda;
 
-// The carrier account executive catalog and the attribution the liquidación
-// screen displays from it.
 class CarteraTest extends LiquidacionTestCase
 {
     public function test_only_active_executives_are_selectable(): void
@@ -74,7 +72,10 @@ class CarteraTest extends LiquidacionTestCase
         // not a row that exists, so both relations must resolve to null.
         $cargo = $this->enCola();
 
-        $this->actingAs($this->liquidador())->get(route('liquidaciones.edit', $cargo))->assertOk();
+        $this
+            ->actingAs($this->liquidador())
+            ->get(route('liquidaciones.edit', $cargo))
+            ->assertOk();
 
         $this->assertNull($cargo->cartera);
         $this->assertNull($cargo->supervisor);

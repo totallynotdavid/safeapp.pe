@@ -8,9 +8,6 @@ use App\Models\Usuario;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
-// Assigns agents to the tiendas whose data they work. Net-new admin surface:
-// legacy had no working way to create an assignment (its asigna insert was
-// dead code), so this is the write side that Usuario::tiendaAsignada() reads.
 class AsignacionController extends Controller
 {
     public function index(): View
@@ -34,8 +31,10 @@ class AsignacionController extends Controller
         ]);
     }
 
-    public function update(UpdateAsignacionRequest $request, Usuario $usuario): RedirectResponse
-    {
+    public function update(
+        UpdateAsignacionRequest $request,
+        Usuario $usuario,
+    ): RedirectResponse {
         $data = $request->validated();
         $activa = $data['activa'] ?? null;
 
@@ -44,6 +43,8 @@ class AsignacionController extends Controller
             $activa === null ? null : (int) $activa,
         );
 
-        return redirect()->route('asignacion.index')->with('status', 'Asignación actualizada.');
+        return redirect()
+            ->route('equipo.show', $usuario)
+            ->with('status', 'Asignación actualizada.');
     }
 }

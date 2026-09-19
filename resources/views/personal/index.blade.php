@@ -1,56 +1,41 @@
-@extends('layouts.app')
+@extends('layouts.settings')
 
-@section('title', 'Datos personal')
+@section('title', 'Datos del personal')
+@section('page', 'true')
 
 @section('content')
-    @if (session('status'))
-        <div class="mb-4 rounded-md border border-green-200 bg-green-50 px-4 py-2 text-sm text-green-800">
-            {{ session('status') }}
-        </div>
-    @endif
+    <x-ui.settings-page title="Datos personales" description="Vista de compatibilidad para administrar los datos de contacto del equipo.">
 
-    <div class="rounded-lg border border-gray-200 bg-white">
-        <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-            <h2 class="text-lg font-semibold text-gray-800">Datos personal</h2>
-        </div>
-
-        <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
-                <thead class="border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                    <tr>
-                        <th class="px-6 py-3">Ejecutivo</th>
-                        <th class="px-6 py-3">Rol</th>
-                        <th class="px-6 py-3">Supervisor</th>
-                        <th class="px-6 py-3">Nacimiento</th>
-                        <th class="px-6 py-3">Teléfono</th>
-                        <th class="px-6 py-3">Correo</th>
-                        <th class="px-6 py-3 text-right">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    @forelse ($usuarios as $usuario)
-                        <tr>
-                            <td class="px-6 py-3 font-medium text-gray-800">{{ $usuario->personal }}</td>
-                            <td class="px-6 py-3 text-gray-600">{{ $usuario->rol?->nombre_rol ?? '—' }}</td>
-                            <td class="px-6 py-3 text-gray-600">{{ $usuario->supervisor?->nombre ?? '—' }}</td>
-                            <td class="px-6 py-3 text-gray-600">{{ $usuario->fecha_nacimiento?->format('Y-m-d') ?? '—' }}</td>
-                            <td class="px-6 py-3 text-gray-600">{{ $usuario->telefono ?? '—' }}</td>
-                            <td class="px-6 py-3 text-gray-600">{{ $usuario->correo ?? '—' }}</td>
-                            <td class="px-6 py-3 text-right">
-                                <a href="{{ route('personal.edit', $usuario) }}" class="rounded-md bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-200">
-                                    Editar
-                                </a>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="px-6 py-8 text-center text-sm text-gray-500">
-                                No hay personal activo.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
+                            <x-ui.table label="Personal" :truncate="true">
+                            <colgroup><col class="col-name"><col><col><col><col><col><col class="col-action"></colgroup>
+                            <thead><tr>
+                                <th scope="col">Ejecutivo</th><th scope="col">Rol</th><th scope="col">Supervisor</th>
+                                <th scope="col">Nacimiento</th><th scope="col">Teléfono</th><th scope="col">Correo</th>
+                                <th scope="col" class="table__actions">Acciones</th>
+                            </tr></thead>
+                            <tbody>
+                                @forelse ($usuarios as $usuario)
+                                    <tr>
+                                        <td>
+                                            <div class="stack" data-direction="horizontal" data-gap="3">
+                                                <x-ui.avatar :name="$usuario->personal" size="small" />
+                                                <div>
+                                                    <div class="table__primary">{{ $usuario->personal }}</div>
+                                                    <div class="table__secondary">{{ $usuario->rol?->nombre_rol ?? 'Sin rol' }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>{{ $usuario->rol?->nombre_rol ?? '—' }}</td>
+                                        <td>{{ $usuario->supervisor?->nombre ?? '—' }}</td>
+                                        <td>{{ $usuario->fecha_nacimiento?->format('Y-m-d') ?? '—' }}</td>
+                                        <td>{{ $usuario->telefono ?? '—' }}</td>
+                                        <td>{{ $usuario->correo ?? '—' }}</td>
+                                        <td class="table__actions"><x-ui.button href="{{ route('personal.edit', $usuario) }}" variant="secondary" size="sm">Editar</x-ui.button></td>
+                                    </tr>
+                                @empty
+                                    <tr><td colspan="7"><x-ui.empty-state title="No hay personal activo" compact /></td></tr>
+                                @endforelse
+                            </tbody>
+                            </x-ui.table>
+    </x-ui.settings-page>
 @endsection

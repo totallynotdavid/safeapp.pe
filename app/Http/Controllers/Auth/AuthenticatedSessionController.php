@@ -19,23 +19,27 @@ class AuthenticatedSessionController extends Controller
         return view('auth.login');
     }
 
-    public function store(LoginRequest $request, LegacyPasswordHasher $hasher): RedirectResponse
-    {
+    public function store(
+        LoginRequest $request,
+        LegacyPasswordHasher $hasher,
+    ): RedirectResponse {
+        ['usuario' => $usuarioInput, 'clave' => $clave] = $request->validated();
+
         $usuario = Usuario::query()
-            ->where('usuario', $request->string('usuario'))
+            ->where('usuario', $usuarioInput)
             ->where('estado', true)
             ->first();
 
-        if (! $usuario || ! $hasher->verifyAndUpgrade($usuario, $request->string('clave'))) {
+        if (! $usuario || ! $hasher->verifyAndUpgrade($usuario, $clave)) {
             throw ValidationException::withMessages([
                 'usuario' => 'Credenciales inválidas.',
             ]);
         }
 
-        Auth::login($usuario);
+        Auth::guard('web')->login($usuario);
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard'));
+        return redirect()->intended(route('home'));
     }
 
     public function destroy(Request $request): RedirectResponse

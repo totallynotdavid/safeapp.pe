@@ -1,28 +1,35 @@
 @php
-    // Two-level menu tree: section headers (id_ref 0) with their leaves under
-    // them. Only leaves are grantable; the controller re-adds parent headers on
-    // save so the granted sections actually render in the sidebar.
     $sections = $menus->groupBy('id_ref');
     $checked = collect(old('menus', $selected))->map(static fn ($id): int => (int) $id)->all();
 @endphp
 
-<div class="space-y-3">
+<div class="permission-groups">
     @foreach ($sections->get(0) ?? collect() as $header)
-        @php $children = $sections->get($header->id_menu) ?? collect(); @endphp
+        @php
+            $children = $sections->get($header->id_menu) ?? collect();
+            $sectionId = 'permission-section-'.$header->id_menu;
+        @endphp
         @if ($children->isNotEmpty())
-            <fieldset class="rounded-md border border-gray-200 p-3">
-                <legend class="px-1 text-xs font-semibold uppercase tracking-wider text-gray-500">{{ $header->descripcion }}</legend>
-                <div class="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
-                    @foreach ($children as $leaf)
-                        <label class="flex items-center gap-2 text-sm text-gray-700">
-                            <input type="checkbox" name="menus[]" value="{{ $leaf->id_menu }}"
-                                @checked(in_array($leaf->id_menu, $checked, true))
-                                class="rounded border-gray-300">
-                            {{ $leaf->descripcion }}
-                        </label>
-                    @endforeach
-                </div>
-            </fieldset>
+            <section class="form-section" aria-labelledby="{{ $sectionId }}">
+                <x-ui.stack direction="vertical" gap="3">
+                    <x-ui.heading level="3" :id="$sectionId">{{ $header->descripcion }}</x-ui.heading>
+                    <x-ui.grid :min-width="240" gap="3" role="group" :aria-labelledby="$sectionId">
+                        @foreach ($children as $leaf)
+                            <x-ui.checkbox-input
+                                :id="'menu-'.$leaf->id_menu"
+                                name="menus[]"
+                                :value="$leaf->id_menu"
+                                :label="$leaf->descripcion"
+                                :checked="in_array($leaf->id_menu, $checked, true)"
+                            />
+                        @endforeach
+                    </x-ui.grid>
+                </x-ui.stack>
+            </section>
         @endif
     @endforeach
+
+    @error('menus')
+        <x-ui.field-status id="menus-status" type="error" variant="detached">{{ $message }}</x-ui.field-status>
+    @enderror
 </div>
