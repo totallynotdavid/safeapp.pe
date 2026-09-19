@@ -1,168 +1,169 @@
 @extends('layouts.app')
 
 @section('title', 'Nuevo quiebre')
+@section('page', true)
 
 @section('content')
-    @php($field = 'mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none')
-    @php($label = 'block text-sm font-medium text-gray-700')
+    @php
+        $tiendaOptions = $tiendas->map(fn ($tienda) => [
+            'value' => $tienda->id_tienda,
+            'label' => $tienda->nombre,
+        ])->all();
+        $tipoAveriaOptions = collect($tiposAveria)->map(
+            fn ($label, $value) => ['value' => $value, 'label' => \App\Support\EtiquetasDeDominio::texto($label, 'general')],
+        )->values()->all();
+        $servicioOptions = \App\Support\EtiquetasDeDominio::opciones($servicios, 'servicio');
+        $problemaEquipoOptions = \App\Support\EtiquetasDeDominio::opciones(['NO', 'SI'], 'si_no');
+        $detalleEquipoOptions = \App\Support\EtiquetasDeDominio::opciones($detalles, 'detalle_equipo');
+        $problemaEquipo = old('problema_equipo', 'NO');
+        $requiereTicket = false;
 
-    <div class="mx-auto max-w-4xl space-y-6">
-        <a href="{{ route('quiebres.registro.index') }}" class="text-sm font-medium text-gray-600 hover:text-gray-800">&larr; Volver a la lista</a>
+        if (old('fecha_activacion')) {
+            try {
+                $requiereTicket = \App\Models\Quiebre::requiereTicket(
+                    \Illuminate\Support\Carbon::parse(old('fecha_activacion')),
+                );
+            } catch (\Throwable) {
+                // The DateInput owns the invalid value and attached server error.
+            }
+        }
+    @endphp
 
+    <x-ui.table-page title="Nuevo quiebre" content-width="1200">
         @include('partials.buscar-cliente', ['ruta' => 'quiebres.registro.create', 'ruc' => $ruc])
 
         @if ($ruc && ! $cliente)
-            {{-- The avería has to belong to a client record. Registering one is a
-                 link away rather than a menu detour, which is what legacy's
-                 "IR A FUNNEL + AGREGAR CLIENTE" dead-end made agents do. --}}
-            <div class="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                El RUC {{ $ruc }} no está registrado.
-                <a href="{{ route('clientes.create', ['ruc' => $ruc]) }}" class="font-medium underline">Regístrelo primero</a>
-                y vuelva a buscarlo aquí.
-            </div>
+            <x-ui.banner status="warning" title="Cliente no disponible"
+                description="Registre la identidad para continuar con este quiebre." />
+            @include('partials.cliente-identidad-dialog', [
+                'rutaIdentidad' => 'quiebres.registro.cliente.store',
+                'ruc' => $ruc,
+            ])
         @endif
 
         @if ($cliente)
-        <div class="rounded-lg border border-gray-200 bg-white p-6">
-            <h2 class="text-lg font-semibold text-gray-800">{{ $cliente->razon_social }}</h2>
-            <p class="mb-4 text-sm text-gray-500">RUC {{ $cliente->ruc }}</p>
+            <x-ui.grid min-width="320" repeat="fit" gap="10" align="start">
+                <x-ui.stack direction="vertical" gap="6">
+                    <x-ui.stack direction="vertical" gap="3">
+                        <x-ui.heading level="2">{{ $cliente->razon_social }}</x-ui.heading>
+                        <x-ui.text type="body" color="secondary">
+                            Registre la avería contra la identidad resuelta. El cliente, responsable y estado del flujo se mantienen protegidos por el sistema.
+                        </x-ui.text>
+                    </x-ui.stack>
 
-            @if ($errors->any())
-                <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800">
-                    <ul class="list-disc pl-4">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+                    <x-ui.metadata-list>
+                        @include('partials.campo', ['label' => 'RUC', 'value' => $cliente->ruc])
+                        @include('partials.campo', ['label' => 'Razón social', 'value' => $cliente->razon_social])
+                        @include('partials.campo', ['label' => 'Zonal del cliente', 'value' => $cliente->zonal])
+                    </x-ui.metadata-list>
 
-            <form method="POST" action="{{ route('quiebres.registro.store') }}" class="space-y-6">
-                @csrf
+                    <x-ui.banner status="info" title="Cuándo se solicita un ticket"
+                        description="Si el servicio tiene 90 días o más desde su activación, el número y la fecha del ticket son obligatorios." />
+                </x-ui.stack>
 
-                {{-- The client is resolved, not typed. The name shown above comes
-                     from the client record and is never copied onto the quiebre. --}}
-                <input type="hidden" name="id_cliente" value="{{ $cliente->id_cliente }}">
+                <x-ui.card padding="8">
+                    <form method="POST" action="{{ route('quiebres.registro.store') }}">
+                        @csrf
+                        {{-- The resolved client is the only identity accepted by the form. --}}
+                        <input type="hidden" name="id_cliente" value="{{ $cliente->id_cliente }}">
 
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <div>
-                        <label for="zonal_telefonica" class="{{ $label }}">Región</label>
-                        <select id="zonal_telefonica" name="zonal_telefonica" required class="{{ $field }}">
-                            <option value="">-- Elegir --</option>
-                            @foreach ($tiendas as $tienda)
-                                <option value="{{ $tienda->id_tienda }}" @selected((int) old('zonal_telefonica') === $tienda->id_tienda)>{{ $tienda->nombre }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label for="servicio" class="{{ $label }}">Servicio</label>
-                        <select id="servicio" name="servicio" required class="{{ $field }}">
-                            @foreach ($servicios as $opcion)
-                                <option value="{{ $opcion }}" @selected(old('servicio') === $opcion)>{{ $opcion }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label for="tipo_averia" class="{{ $label }}">Tipo de avería</label>
-                        <select id="tipo_averia" name="tipo_averia" required class="{{ $field }}">
-                            @foreach ($tiposAveria as $valor => $texto)
-                                <option value="{{ $valor }}" @selected(old('tipo_averia') === $valor)>{{ $texto }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
+                        <x-ui.form-layout>
+                            <x-ui.stack direction="vertical" gap="0.5">
+                                <x-ui.heading level="2">Datos de la avería</x-ui.heading>
+                                <x-ui.text type="supporting" color="secondary">Complete la clasificación, fechas y alcance reportado.</x-ui.text>
+                            </x-ui.stack>
 
-                {{-- Avería --}}
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <div>
-                        <label for="fecha_activacion" class="{{ $label }}">Activación del servicio</label>
-                        <input type="date" id="fecha_activacion" name="fecha_activacion" value="{{ old('fecha_activacion') }}" required class="{{ $field }}">
-                    </div>
-                    <div>
-                        <label for="fecha_inicio_averia" class="{{ $label }}">Inicio de avería</label>
-                        <input type="date" id="fecha_inicio_averia" name="fecha_inicio_averia" value="{{ old('fecha_inicio_averia') }}" class="{{ $field }}">
-                    </div>
-                    <div>
-                        <label for="numero_problema" class="{{ $label }}">Q líneas con avería</label>
-                        <input type="number" min="1" id="numero_problema" name="numero_problema" value="{{ old('numero_problema') }}" required class="{{ $field }}">
-                    </div>
-                    <div>
-                        <label for="problema_equipo" class="{{ $label }}">Problema con el equipo</label>
-                        <select id="problema_equipo" name="problema_equipo" required class="{{ $field }}">
-                            @foreach (['NO', 'SI'] as $opcion)
-                                <option value="{{ $opcion }}" @selected(old('problema_equipo') === $opcion)>{{ $opcion }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label for="detalle_equipo" class="{{ $label }}">Detalle del equipo</label>
-                        <select id="detalle_equipo" name="detalle_equipo" class="{{ $field }}">
-                            <option value="">-- Ninguno --</option>
-                            @foreach ($detalles as $opcion)
-                                <option value="{{ $opcion }}" @selected(old('detalle_equipo') === $opcion)>{{ $opcion }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label for="back" class="{{ $label }}">Back</label>
-                        <input id="back" name="back" value="{{ old('back') }}" class="{{ $field }}">
-                    </div>
-                </div>
+                            @if ($errors->has('id_cliente'))
+                                <x-ui.banner status="error" title="No se pudo identificar al cliente"
+                                    :description="$errors->first('id_cliente')" />
+                            @endif
 
-                {{-- Ticket. Required by the server once the service has been active for
-                     90 días o más; otherwise leave blank. --}}
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div>
-                        <label for="numero_ticket" class="{{ $label }}">Número de ticket</label>
-                        <input id="numero_ticket" name="numero_ticket" value="{{ old('numero_ticket') }}" class="{{ $field }}">
-                    </div>
-                    <div>
-                        <label for="fecha_ticket_atencion" class="{{ $label }}">Fecha de ticket</label>
-                        <input type="date" id="fecha_ticket_atencion" name="fecha_ticket_atencion" value="{{ old('fecha_ticket_atencion') }}" class="{{ $field }}">
-                    </div>
-                </div>
+                            <x-ui.grid min-width="180" repeat="fit" gap="3">
+                                <x-ui.selector name="zonal_telefonica" label="Región" :options="$tiendaOptions"
+                                    :value="old('zonal_telefonica')" :error="$errors->first('zonal_telefonica')" required />
+                                <x-ui.selector name="servicio" label="Servicio" :options="$servicioOptions"
+                                    :value="old('servicio')" :error="$errors->first('servicio')" required />
+                            </x-ui.grid>
 
-                {{-- Contactos --}}
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <div>
-                        <label for="contacto1" class="{{ $label }}">Contacto 1</label>
-                        <input id="contacto1" name="contacto1" value="{{ old('contacto1') }}" required class="{{ $field }}">
-                    </div>
-                    <div>
-                        <label for="celular1" class="{{ $label }}">Celular 1</label>
-                        <input id="celular1" name="celular1" value="{{ old('celular1') }}" required class="{{ $field }}">
-                    </div>
-                    <div>
-                        <label for="correo1" class="{{ $label }}">Correo 1</label>
-                        <input type="email" id="correo1" name="correo1" value="{{ old('correo1') }}" required class="{{ $field }}">
-                    </div>
-                    <div>
-                        <label for="contacto2" class="{{ $label }}">Contacto 2 (opcional)</label>
-                        <input id="contacto2" name="contacto2" value="{{ old('contacto2') }}" class="{{ $field }}">
-                    </div>
-                    <div>
-                        <label for="celular2" class="{{ $label }}">Celular 2 (opcional)</label>
-                        <input id="celular2" name="celular2" value="{{ old('celular2') }}" class="{{ $field }}">
-                    </div>
-                    <div>
-                        <label for="correo2" class="{{ $label }}">Correo 2 (opcional)</label>
-                        <input type="email" id="correo2" name="correo2" value="{{ old('correo2') }}" class="{{ $field }}">
-                    </div>
-                </div>
+                            <x-ui.selector name="tipo_averia" label="Tipo de avería" :options="$tipoAveriaOptions"
+                                :value="old('tipo_averia')" :error="$errors->first('tipo_averia')" required />
 
-                <div>
-                    <label for="comentario_ejecutivo" class="{{ $label }}">Comentario</label>
-                    <textarea id="comentario_ejecutivo" name="comentario_ejecutivo" rows="4" class="{{ $field }}">{{ old('comentario_ejecutivo') }}</textarea>
-                </div>
+                            <x-ui.grid min-width="180" repeat="fit" gap="3">
+                                <x-ui.date-input name="fecha_activacion" label="Activación del servicio"
+                                    :value="old('fecha_activacion')" :error="$errors->first('fecha_activacion')" required />
+                                <x-ui.date-input name="fecha_inicio_averia" label="Inicio de avería"
+                                    :value="old('fecha_inicio_averia')" :error="$errors->first('fecha_inicio_averia')" optional has-clear />
+                            </x-ui.grid>
 
-                <div class="flex items-center gap-3 pt-2">
-                    <button type="submit" class="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">
-                        Registrar
-                    </button>
-                    <a href="{{ route('quiebres.registro.index') }}" class="text-sm font-medium text-gray-600 hover:text-gray-800">Cancelar</a>
-                </div>
-            </form>
-        </div>
+                            <x-ui.grid min-width="180" repeat="fit" gap="3">
+                                <x-ui.text-input name="numero_problema" label="Líneas con avería" type="number" min="1"
+                                    :value="old('numero_problema')" :error="$errors->first('numero_problema')" required />
+                                <x-ui.selector name="problema_equipo" label="Problema con el equipo" :options="$problemaEquipoOptions"
+                                    :value="$problemaEquipo" :error="$errors->first('problema_equipo')" required />
+                            </x-ui.grid>
+
+                            <x-ui.grid min-width="180" repeat="fit" gap="3">
+                                <x-ui.selector name="detalle_equipo" label="Detalle del equipo" :options="$detalleEquipoOptions"
+                                    :value="old('detalle_equipo')" :error="$errors->first('detalle_equipo')"
+                                    :required="$problemaEquipo === 'SI'" :optional="$problemaEquipo !== 'SI'" />
+                                <x-ui.text-input name="back" label="Back" :value="old('back')"
+                                    :error="$errors->first('back')" optional />
+                            </x-ui.grid>
+
+                            <x-ui.divider />
+
+                            <x-ui.stack direction="vertical" gap="0.5">
+                                <x-ui.heading level="3">Ticket de atención</x-ui.heading>
+                                <x-ui.text type="supporting" color="secondary">
+                                    {{ $requiereTicket ? 'Obligatorio por la antigüedad del servicio.' : 'Obligatorio cuando la activación tiene 90 días o más.' }}
+                                </x-ui.text>
+                            </x-ui.stack>
+
+                            <x-ui.grid min-width="180" repeat="fit" gap="3">
+                                <x-ui.text-input name="numero_ticket" label="Número de ticket"
+                                    :value="old('numero_ticket')" :error="$errors->first('numero_ticket')"
+                                    :required="$requiereTicket" :optional="! $requiereTicket" />
+                                <x-ui.date-input name="fecha_ticket_atencion" label="Fecha de ticket"
+                                    :value="old('fecha_ticket_atencion')" :error="$errors->first('fecha_ticket_atencion')"
+                                    :required="$requiereTicket" :optional="! $requiereTicket" has-clear />
+                            </x-ui.grid>
+
+                            <x-ui.divider />
+
+                            <x-ui.stack direction="vertical" gap="0.5">
+                                <x-ui.heading level="3">Contactos</x-ui.heading>
+                                <x-ui.text type="supporting" color="secondary">El primer contacto es obligatorio; agregue un segundo cuando esté disponible.</x-ui.text>
+                            </x-ui.stack>
+
+                            <x-ui.grid min-width="180" repeat="fit" gap="3">
+                                <x-ui.text-input name="contacto1" label="Contacto 1" :value="old('contacto1')"
+                                    :error="$errors->first('contacto1')" required />
+                                <x-ui.text-input name="celular1" label="Celular 1" :value="old('celular1')"
+                                    :error="$errors->first('celular1')" required />
+                            </x-ui.grid>
+                            <x-ui.text-input name="correo1" label="Correo 1" type="email" :value="old('correo1')"
+                                :error="$errors->first('correo1')" required />
+
+                            <x-ui.grid min-width="180" repeat="fit" gap="3">
+                                <x-ui.text-input name="contacto2" label="Contacto 2" :value="old('contacto2')"
+                                    :error="$errors->first('contacto2')" optional />
+                                <x-ui.text-input name="celular2" label="Celular 2" :value="old('celular2')"
+                                    :error="$errors->first('celular2')" optional />
+                            </x-ui.grid>
+                            <x-ui.text-input name="correo2" label="Correo 2" type="email" :value="old('correo2')"
+                                :error="$errors->first('correo2')" optional />
+
+                            <x-ui.text-area name="comentario_ejecutivo" label="Comentario del ejecutivo"
+                                :value="old('comentario_ejecutivo')" :error="$errors->first('comentario_ejecutivo')" rows="4" optional />
+
+                            <x-ui.stack direction="horizontal" gap="2" wrap="wrap">
+                                <x-ui.button type="submit" variant="primary">Registrar quiebre</x-ui.button>
+                                <x-ui.button href="{{ route('quiebres.registro.index') }}" variant="secondary">Cancelar</x-ui.button>
+                            </x-ui.stack>
+                        </x-ui.form-layout>
+                    </form>
+                </x-ui.card>
+            </x-ui.grid>
         @endif
-    </div>
+    </x-ui.table-page>
 @endsection

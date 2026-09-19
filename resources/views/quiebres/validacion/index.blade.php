@@ -1,87 +1,80 @@
 @extends('layouts.app')
 
 @section('title', 'Validación de quiebres')
+@section('page', 'true')
 
 @section('content')
-    @if (session('status'))
-        <div class="mb-4 rounded-md border border-green-200 bg-green-50 px-4 py-2 text-sm text-green-800">
-            {{ session('status') }}
-        </div>
-    @endif
+    @php
+        $grupos = collect($estados)->mapWithKeys(fn ($estado) => [$estado => $quiebres->where('estado', $estado)])->filter->isNotEmpty();
+    @endphp
 
-    @if ($sinAsignacion)
-        <div class="rounded-lg border border-amber-200 bg-amber-50 px-6 py-4 text-sm text-amber-800">
-            No tienes una tienda asignada, así que no hay quiebres que validar. Pide a un supervisor que te asigne una.
-        </div>
-    @else
-        <div class="rounded-lg border border-gray-200 bg-white">
-            <div class="flex flex-wrap items-end justify-between gap-4 border-b border-gray-200 px-6 py-4">
-                <h2 class="text-lg font-semibold text-gray-800">Quiebres por validar</h2>
-
-                <form method="GET" action="{{ route('quiebres.validacion.index') }}" class="flex flex-wrap items-end gap-3">
-                    <div>
-                        <label for="ano" class="block text-xs font-medium text-gray-500">Año</label>
-                        <select id="ano" name="ano" class="mt-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-gray-500 focus:outline-none">
-                            @foreach ($anos as $opcion)
-                                <option value="{{ $opcion }}" @selected($ano === $opcion)>{{ $opcion }}</option>
-                            @endforeach
-                        </select>
+    <div class="page-layout layout" data-height="fill">
+        <div class="page-layout__inner">
+            <header class="layout-header" data-divider="true">
+                <div class="layout-header__inner">
+                    <div class="stack" data-direction="vertical" data-gap="1">
+                        <x-ui.heading level="1">Quiebres por validar</x-ui.heading>
+                        <x-ui.text type="supporting" color="secondary">Revise los casos correspondientes a su tienda asignada.</x-ui.text>
                     </div>
-                    <div>
-                        <label for="estado" class="block text-xs font-medium text-gray-500">Estado</label>
-                        <select id="estado" name="estado" class="mt-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-gray-500 focus:outline-none">
-                            <option value="">Todos</option>
-                            @foreach ($estados as $opcion)
-                                <option value="{{ $opcion }}" @selected($estado === $opcion)>{{ $opcion }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <button type="submit" class="rounded-md bg-gray-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-700">
-                        Filtrar
-                    </button>
-                </form>
-            </div>
+                </div>
+            </header>
 
-            <div class="overflow-x-auto">
-                <table class="min-w-full text-sm">
-                    <thead class="border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                        <tr>
-                            <th class="px-6 py-3">Fecha registro</th>
-                            <th class="px-6 py-3">RUC</th>
-                            <th class="px-6 py-3">Razón social</th>
-                            <th class="px-6 py-3">Servicio</th>
-                            <th class="px-6 py-3">Estado</th>
-                            <th class="px-6 py-3">Back</th>
-                            <th class="px-6 py-3 text-right">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                        @forelse ($quiebres as $quiebre)
-                            <tr>
-                                <td class="px-6 py-3 text-gray-600">{{ $quiebre->fecha_registro?->format('Y-m-d') }}</td>
-                                <td class="px-6 py-3 font-medium text-gray-800">{{ $quiebre->cliente->ruc }}</td>
-                                <td class="px-6 py-3 text-gray-600">{{ $quiebre->cliente->razon_social }}</td>
-                                <td class="px-6 py-3 text-gray-600">{{ $quiebre->servicio }}</td>
-                                <td class="px-6 py-3">
-                                    <span class="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">{{ $quiebre->estado }}</span>
-                                </td>
-                                <td class="px-6 py-3 text-gray-600">{{ $quiebre->back }}</td>
-                                <td class="px-6 py-3 text-right">
-                                    <a href="{{ route('quiebres.validacion.edit', $quiebre) }}" class="rounded-md bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-200">
-                                        Revisar
-                                    </a>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="px-6 py-8 text-center text-sm text-gray-500">
-                                    No hay quiebres para los filtros elegidos.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+            <div class="page-layout__middle">
+                <div class="page-layout__content-slot">
+                    <div class="layout-content">
+                        @if ($sinAsignacion)
+                            <x-ui.card padding="4">
+                                <x-ui.empty-state
+                                    title="No tienes una tienda asignada"
+                                    description="Solicite a un supervisor una tienda para poder revisar quiebres."
+                                />
+                            </x-ui.card>
+                        @else
+                            <div class="stack" data-direction="vertical" data-gap="4">
+                                <x-ui.card padding="4">
+                                    @include('partials.filtros-ano-estado', [
+                                        'ruta' => 'quiebres.validacion.index',
+                                        'formId' => 'quiebres-validacion-filtros',
+                                    ])
+                                </x-ui.card>
+
+                                <x-ui.table label="Quiebres por validar" :truncate="true">
+                                    <thead><tr>
+                                        <th scope="col">Fecha de registro</th>
+                                        <th scope="col">RUC</th>
+                                        <th scope="col">Razón social</th>
+                                        <th scope="col">Servicio</th>
+                                        <th scope="col">Back</th>
+                                        <th scope="col" class="table__actions">Acciones</th>
+                                    </tr></thead>
+                                    @if ($grupos->isEmpty())
+                                        <tbody><tr><td colspan="6">
+                                            <x-ui.empty-state title="No hay quiebres por validar" description="No encontramos casos para los filtros seleccionados." compact />
+                                        </td></tr></tbody>
+                                    @else
+                                        @foreach ($grupos as $estado => $grupo)
+                                            <x-ui.grouped-table-section id="quiebres-validacion-{{ $estado }}" :label="\App\Support\EtiquetasDeDominio::texto($estado, 'estado')" :count="$grupo->count()" :columns="6">
+                                            @foreach ($grupo as $quiebre)
+                                            <tr>
+                                                <td class="table__secondary">{{ $quiebre->fecha_registro?->format('d/m/Y') }}</td>
+                                                <td class="table__primary">{{ $quiebre->cliente->ruc }}</td>
+                                                <td>{{ $quiebre->cliente->razon_social }}</td>
+                                                <td class="table__secondary">{{ \App\Support\EtiquetasDeDominio::texto($quiebre->servicio, 'servicio') }}</td>
+                                                <td class="table__secondary">{{ $quiebre->back ?: '—' }}</td>
+                                                <td class="table__actions">
+                                                    <x-ui.button href="{{ route('quiebres.validacion.edit', $quiebre) }}" variant="secondary" size="sm">Revisar</x-ui.button>
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                            </x-ui.grouped-table-section>
+                                        @endforeach
+                                    @endif
+                                </x-ui.table>
+                            </div>
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
-    @endif
+    </div>
 @endsection

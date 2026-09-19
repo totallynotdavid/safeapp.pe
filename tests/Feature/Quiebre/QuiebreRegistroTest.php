@@ -6,8 +6,6 @@ use App\Models\Quiebre;
 use App\Models\Tienda;
 use App\Models\Usuario;
 
-// Opening a case and amending it afterwards. How the case gets its client lives
-// in QuiebreClienteTest.
 class QuiebreRegistroTest extends QuiebreTestCase
 {
     public function test_the_registrar_permiso_gates_the_index(): void

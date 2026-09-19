@@ -7,12 +7,10 @@ use Illuminate\Support\Facades\Schema;
 // Baseline schema for the averías/quiebre cluster and the assignment lookup the
 // validation screen scopes on.
 //
-// Most quiebre columns are nullable because they were written first by a legacy
-// REGISTRO screen this migration predated. That screen is ported now, and
-// StoreQuiebreRegistroRequest requires most of them, so the nullability is
-// looser than the app. Tightening it is deliberately left until after the
-// cutover: the 10 production rows are carried across by cutover:transform, and
-// a NOT NULL added now would only change what the transform has to backfill.
+// Most quiebre columns are nullable while StoreQuiebreRegistroRequest requires
+// them, so the schema is looser than the app. Tightening it waits until after the
+// cutover: the 10 production rows are carried across by cutover:transform, and a
+// NOT NULL added now would only change what the transform has to backfill.
 return new class extends Migration {
     public function up(): void
     {
