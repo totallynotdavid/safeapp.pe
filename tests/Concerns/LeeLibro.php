@@ -6,16 +6,13 @@ use Illuminate\Testing\TestResponse;
 use ZipArchive;
 
 /**
- * Reads a streamed .xlsx download back, for tests that assert on what actually
- * landed in the workbook rather than on the bytes of the response.
- *
- * An xlsx is a zip, so this is also the check that the download is the format it
- * claims: legacy's exports were HTML tables under a spreadsheet content type and
- * would fail to open here.
+ * Reads a streamed .xlsx download back. An xlsx is a zip, so opening one is
+ * also the check that the download is the format it claims: legacy's exports
+ * were HTML tables under a spreadsheet content type and would fail to open
+ * here.
  */
 trait LeeLibro
 {
-    /** The download, written to disk and opened as the archive it claims to be. */
     protected function libro(TestResponse $respuesta): ZipArchive
     {
         $ruta = tempnam(sys_get_temp_dir(), 'xlsx');

@@ -7,16 +7,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * What a nota de cargo móvil looks like as a spreadsheet row.
+ * Shared by all four móvil screens, registro through liquidación, so every
+ * export carries the settlement columns: any screen can show a case that is
+ * already settled.
  *
- * One definition for all four móvil screens, registro through liquidación.
- * Legacy spelled these columns out seven times, once per export endpoint, and
- * the liquidación copy was the only one carrying the settlement columns even
- * though every screen shows a case that may already be settled.
- *
- * Unlike fija, móvil keeps the cartera columns: `id_cartera` is set on 576 of
- * the 2,006 production rows, so EJECUTIVO TDP is a real value here. It was 0 in
- * all 5,970 fija rows, which is why the fija report drops it.
+ * Unlike fija, móvil keeps the cartera column: `id_cartera` is set on 576 of the
+ * 2,006 production rows, so EJECUTIVO TDP is a real value here.
  */
 final class ReporteNotaCargoMovil
 {
@@ -68,9 +64,7 @@ final class ReporteNotaCargoMovil
         );
     }
 
-    /**
-     * @return list<null|float|int|string|\DateTimeInterface>
-     */
+    /** @return list<null|float|int|string|\DateTimeInterface> */
     private static function fila(NcMovil $cargo): array
     {
         return [

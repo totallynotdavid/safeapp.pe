@@ -7,14 +7,6 @@ use App\Models\Llamada;
 use App\Models\Usuario;
 use Illuminate\Testing\TestResponse;
 
-/**
- * The call log as a spreadsheet, from histórico: an agent's own contacts over a
- * date range.
- *
- * Seguimiento is the same report over a supervisor's whole team and is covered
- * with that screen. What is specific here is the scoping, which is to the signed
- * in agent and to nothing the request can name.
- */
 class ExportacionContactoTest extends ExportacionTestCase
 {
     private const PERMISO = 'historico.ver';

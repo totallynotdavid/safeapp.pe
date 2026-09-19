@@ -5,12 +5,9 @@ namespace Tests\Concerns;
 use Illuminate\Testing\TestResponse;
 
 /**
- * Reads the checkboxes a rendered form offers, so a test can assert on which
- * options a screen presents and which arrive already ticked.
- *
- * The alternative is asserting on the markup, and the assertion that reads
- * naturally there ("the page contains `checked`") is the one that cannot tell
- * the right box from the wrong one.
+ * Reads back the checkboxes a rendered form offers. Asserting on the markup
+ * instead reads naturally ("the page contains `checked`") and cannot tell the
+ * right box from the wrong one.
  */
 trait LeeFormulario
 {

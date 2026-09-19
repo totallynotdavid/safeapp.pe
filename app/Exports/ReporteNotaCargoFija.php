@@ -7,14 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * What a nota de cargo fija looks like as a spreadsheet row.
- *
- * One definition for all three fija screens. Legacy spelled these columns out
- * five times (repexportarback, repexportarbackglobal, repexportarvalidacionglobal,
- * repExportarNotaCargoFija and the two REPORTE BACK views), and the copies had
- * already come apart: `repexportarback` printed column 31 (`cartera.propietario`)
- * under the EJECUTIVO TELEFONICA heading and never emitted column 26, the actual
- * `ejecutivo_telefonica`.
+ * Shared by all three fija screens.
  *
  * Six of legacy's columns are gone because the port dropped the columns behind
  * them: TIPO was always 'FIJA', Q_LINEAS always 1, and CARTERA/DNI/EJECUTIVO
@@ -67,9 +60,7 @@ final class ReporteNotaCargoFija
         );
     }
 
-    /**
-     * @return list<null|float|string|\DateTimeInterface>
-     */
+    /** @return list<null|float|string|\DateTimeInterface> */
     private static function fila(NcFija $cargo): array
     {
         return [

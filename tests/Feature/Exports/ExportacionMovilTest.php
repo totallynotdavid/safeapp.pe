@@ -7,8 +7,6 @@ use App\Models\Usuario;
 use Illuminate\Testing\TestResponse;
 
 /**
- * Notas de cargo móvil as a spreadsheet.
- *
  * Móvil is not a copy of fija with the names changed: it carries the cartera
  * attribution fija drops, four free-text comentario columns to fija's three, and
  * a period window that dates a CAIDA case by fecha_ingreso. Each of those is a
