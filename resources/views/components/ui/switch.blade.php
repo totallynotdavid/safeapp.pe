@@ -1,7 +1,7 @@
 {{--
     A Switch represents a boolean that saves immediately. Forms that contain
     one opt into data-preference-form, which turns a change into the
-    corresponding PATCH request without introducing a separate Save action.
+    corresponding PUT request without introducing a separate Save action.
 --}}
 @props([
     'id' => null,
