@@ -8,7 +8,6 @@
         $grupos = collect($estados)->mapWithKeys(fn ($estado) => [$estado => $quiebres->where('estado', $estado)])->filter->isNotEmpty();
     @endphp
 
-    {{-- Official table-page hierarchy: packages/cli/templates/pages/table-page/page.tsx @ 9da0792516e4 --}}
     <div class="page-layout layout" data-height="fill">
         <div class="page-layout__inner">
             <header class="layout-header" data-divider="true">

@@ -21,7 +21,7 @@
             Consulta y exporta los contactos que registraste en el período elegido.
         </x-ui.text>
 
-        {{-- One GET form owns both the visible range and export submission. --}}
+        {{-- The export button in the page actions submits this form by id, so it exports the range shown. --}}
         <x-ui.stack
             id="historico-filtros"
             as="form"

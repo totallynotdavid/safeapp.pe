@@ -1,6 +1,3 @@
-{{-- Only shown when there is a real choice. Selector source:
-     packages/core/src/Selector/{Selector.tsx,Selector.doc.mjs,Selector.test.tsx}
-     @ 9da0792516e4a551494e2d212f0a03909a8ffd71. --}}
 @if ($tiendasAsignadas->count() > 1)
     @php
         $controlId = ($idPrefix ?? '').'id_tienda';

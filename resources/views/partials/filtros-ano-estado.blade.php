@@ -1,7 +1,3 @@
-{{--
-    Shared compact queue filter. It preserves each queue's GET contract while
-    using the same Stack spacing, alignment, labels and action hierarchy.
---}}
 @php
     $yearOptions = collect($anos)->map(fn ($option) => ['value' => (string) $option, 'label' => (string) $option])->all();
     $statusOptions = collect([['value' => '', 'label' => 'Todos los estados']])

@@ -1,4 +1,3 @@
-{{-- Compact, route-bound identity intake for a case that has no visible RUC. --}}
 <x-ui.dialog id="cliente-identidad" title="Registrar identidad" width="460" open-on-load>
     <form id="cliente-identidad-form" method="POST" action="{{ route($rutaIdentidad) }}">
         @csrf

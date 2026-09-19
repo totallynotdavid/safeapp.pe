@@ -1,7 +1,6 @@
 @extends('layouts.settings')
 @section('title', 'Notificaciones')
 @section('content')
-    {{-- Privacy-panel hierarchy from settings-sidebar/page.tsx, applied to real delivery preferences. --}}
     <x-ui.stack direction="vertical" gap="6">
         <x-ui.heading level="2" class="settings-page__heading">Notificaciones</x-ui.heading>
 

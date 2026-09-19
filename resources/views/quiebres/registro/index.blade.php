@@ -6,7 +6,6 @@
 @section('content')
     @php($grupos = collect($estados)->mapWithKeys(fn ($estado) => [$estado => $quiebres->where('estado', $estado)])->filter->isNotEmpty())
 
-    {{-- Official table-page hierarchy: packages/cli/templates/pages/table-page/page.tsx @ 9da0792516e4 --}}
     <x-ui.table-page title="Mis quiebres">
         <x-slot:actions>
             <x-ui.button href="{{ route('quiebres.registro.create') }}" variant="primary">Nuevo quiebre</x-ui.button>

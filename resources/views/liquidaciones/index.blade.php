@@ -6,7 +6,6 @@
 @section('content')
     @php($grupos = collect($estados)->mapWithKeys(fn ($estado) => [$estado => $cargos->where('estado', $estado)])->filter->isNotEmpty())
 
-    {{-- Official table-page hierarchy: packages/cli/templates/pages/table-page/page.tsx @ 9da0792516e4 --}}
     <x-ui.table-page title="Notas de cargo por liquidar">
         <x-ui.text type="supporting" color="secondary">Revise y complete la liquidación de las notas de cargo pendientes.</x-ui.text>
 

@@ -1,7 +1,6 @@
 @extends('layouts.settings')
 @section('title', 'Inicio de sesión y seguridad')
 @section('content')
-    {{-- Login & security panel, based on settings-sidebar/page.tsx. --}}
     <x-ui.stack direction="vertical" gap="6">
         <x-ui.heading level="2" class="settings-page__heading">Inicio de sesión y seguridad</x-ui.heading>
 

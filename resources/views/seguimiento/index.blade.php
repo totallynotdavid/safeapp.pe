@@ -28,7 +28,7 @@
             Revisa y exporta los contactos registrados por el equipo de un supervisor.
         </x-ui.text>
 
-        {{-- The visible supervisor/range and export remain one GET form. --}}
+        {{-- The export button in the page actions submits this form by id, so it exports the supervisor and range shown. --}}
         <x-ui.stack
             id="seguimiento-filtros"
             as="form"

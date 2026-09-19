@@ -1,10 +1,6 @@
 {{--
-    The RUC resolution step every client-scoped workflow opens with.
-
     A GET form pointed back at the screen that included it, so the resolved
-    state is a URL the agent can reload or share. Legacy gave each workflow its
-    own RUC box wired to its own AJAX endpoint, which is why four screens
-    disagreed about what a RUC resolves to.
+    state is a URL the agent can reload or share.
 
     Expects: $ruta (route name to submit to), $ruc (current value or null).
 --}}

@@ -1,10 +1,4 @@
 {{--
-    Shared read-only stages for the nota de cargo móvil lifecycle. The caller
-    supplies the official detail-page shell; these cards follow the Section /
-    VStack / MetadataList composition in packages/cli/templates/pages/
-    detail-page/page.tsx and packages/core/src/MetadataList/ at
-    9da0792516e4a551494e2d212f0a03909a8ffd71.
-
     Expects: $cargo with cliente, ejecutivo, supervisor, validador, region and
     cartera loaded. Set $mostrarSeguimientoEjecutivo=false when the registro
     page renders those request-owned values as an editable form. Set

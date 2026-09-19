@@ -1,6 +1,7 @@
 {{--
-    One GET form owns both the visible query and export submission so every
-    nota-de-cargo queue exports exactly the period and state shown on screen.
+    One GET form owns both the visible query and the export, so every queue
+    exports exactly the period and state shown on screen.
+
     Expects: $ruta, $rutaExportar, $filtro, $estados, $formId.
 --}}
 @php
