@@ -1,68 +1,88 @@
-@extends('layouts.app')
+@extends('layouts.settings')
 
-@section('title', 'Cargar datos')
+@section('title', 'Importar clientes')
 
 @section('content')
-    <div class="mx-auto max-w-3xl space-y-6">
-        <h1 class="text-xl font-semibold text-gray-800">Cargar datos de clientes</h1>
+    <x-ui.stack direction="vertical" gap="6" max-width="760px">
+        <x-ui.heading level="2" class="settings-page__heading">
+            Importar clientes
+        </x-ui.heading>
 
-        @if (session('status'))
-            <div class="rounded-md border border-green-200 bg-green-50 px-4 py-2 text-sm text-green-800">{{ session('status') }}</div>
-        @endif
-
-        {{-- The file is rejected as a whole, so these are the reasons it was
-             rejected, not a list of rows that failed to load. --}}
         @if (session('errores'))
-            <div class="space-y-2 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-                <p class="font-medium">No se cargó nada. Corrija el archivo y vuelva a subirlo.</p>
-                <ul class="list-disc space-y-0.5 pl-5">
+            <x-ui.banner
+                status="error"
+                title="No se cargó ningún cliente"
+                description="Corrige el archivo y vuelve a subirlo."
+            >
+                <x-ui.stack direction="vertical" gap="1">
                     @foreach (session('errores') as $error)
-                        <li>{{ $error }}</li>
+                        <x-ui.text type="supporting">
+                            • {{ $error }}
+                        </x-ui.text>
                     @endforeach
-                </ul>
-            </div>
+                </x-ui.stack>
+            </x-ui.banner>
         @endif
 
-        <form method="POST" action="{{ route('clientes.importar.store') }}" enctype="multipart/form-data" class="space-y-4 rounded-lg border border-gray-200 bg-white p-6">
+        <form
+            method="POST"
+            action="{{ route('clientes.importar.store') }}"
+            enctype="multipart/form-data"
+            data-upload-form
+        >
             @csrf
 
-            @if ($errors->any())
-                <div class="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800">
-                    <ul class="list-disc pl-4">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+            <x-ui.stack direction="vertical" gap="4">
+                <x-ui.file-input
+                    name="archivo"
+                    label="Archivo de clientes"
+                    accept=".xlsx,.csv,.txt"
+                    description="Sube una plantilla XLSX o CSV de hasta 20 MB. Completa ruc, tipo_data y origen."
+                    :error="$errors->first('archivo')"
+                    required
+                />
 
-            <div>
-                <label for="archivo" class="block text-sm font-medium text-gray-700">Archivo CSV</label>
-                <input id="archivo" name="archivo" type="file" accept=".csv,.txt" required
-                       class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm file:mr-3 file:rounded file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-sm file:font-medium focus:border-gray-500 focus:outline-none">
-            </div>
+                <x-ui.stack direction="horizontal" gap="2" wrap="wrap">
+                    <x-ui.button type="submit" variant="primary">
+                        Importar clientes
+                    </x-ui.button>
 
-            <button type="submit" class="rounded-md bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">
-                Cargar
-            </button>
+                    <x-ui.button
+                        href="{{ route('clientes.importar.plantilla.xlsx') }}"
+                        variant="secondary"
+                    >
+                        <x-slot:icon>
+                            <x-ui.icon name="arrow-down-tray" />
+                        </x-slot:icon>
+                        Descargar plantilla XLSX
+                    </x-ui.button>
+
+                    <x-ui.link
+                        href="{{ route('clientes.importar.plantilla.csv') }}"
+                        standalone
+                    >
+                        Plantilla CSV
+                    </x-ui.link>
+                </x-ui.stack>
+            </x-ui.stack>
         </form>
 
-        <div class="space-y-3 rounded-lg border border-gray-200 bg-white p-6 text-sm text-gray-600">
-            <h2 class="text-sm font-semibold text-gray-800">Formato del archivo</h2>
-            <p>
-                La primera fila son los nombres de columna. Se aceptan archivos separados por
-                punto y coma o por coma.
-            </p>
-            <div class="overflow-x-auto">
-                <code class="whitespace-nowrap text-xs text-gray-800">{{ implode(';', $columnas) }}</code>
-            </div>
-            <ul class="list-disc space-y-1 pl-5">
-                <li><span class="font-medium text-gray-800">ruc</span>, <span class="font-medium text-gray-800">tipo_data</span> y <span class="font-medium text-gray-800">origen</span> son obligatorios. El resto puede ir vacío.</li>
-                <li><span class="font-medium text-gray-800">tipo_data</span> decide qué cola trabaja al cliente: {{ implode(' o ', \App\Models\Dato::TIPOS_DATA) }}.</li>
-                <li><span class="font-medium text-gray-800">origen</span> es la campaña de la que viene. Los agentes piden lotes por origen.</li>
-                <li>Un RUC que ya existe se actualiza; no se duplica. La carga nunca cambia a qué agente pertenece un cliente ni si ya fue gestionado.</li>
-                <li>Si alguna fila tiene un error no se carga nada, para que no quede una carga a medias.</li>
-            </ul>
-        </div>
-    </div>
+        <x-ui.card variant="muted">
+            <x-ui.stack direction="horizontal" gap="4" v-align="start">
+                <x-ui.center class="settings-info-card__icon">
+                    <x-ui.icon name="document-text" />
+                </x-ui.center>
+
+                <x-ui.stack direction="vertical" gap="1">
+                    <x-ui.text type="body" weight="bold">
+                        Empieza con una plantilla
+                    </x-ui.text>
+
+                    <x-ui.text type="body" color="secondary">
+                        La plantilla incluye todas las columnas aceptadas. La carga valida cada fila antes de importar; si encuentra un error, no realiza cambios parciales.
+                    </x-ui.text>
+                </x-ui.stack>
+            </x-ui.stack>
+        </x-ui.card>
+    </x-ui.stack>
 @endsection

@@ -9,7 +9,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
-// CARGAR DATOS: which files the upload accepts, and why it rejects the rest.
 class ImportacionFormatoTest extends TestCase
 {
     use RefreshDatabase;
@@ -49,7 +48,6 @@ class ImportacionFormatoTest extends TestCase
         $this->assertNotNull($cliente);
         $this->assertSame('ACME SAC', $cliente->razon_social);
 
-        // One file row becomes identity plus one campaign record.
         $dato = $cliente->datos()->sole();
         $this->assertSame('CAMPAÑA JULIO', $dato->origen);
         $this->assertSame(3, $dato->q_movistar);

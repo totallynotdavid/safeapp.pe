@@ -5,28 +5,18 @@ namespace App\Cockpit;
 use App\Models\Dato;
 
 /**
- * What a row in an import file looks like: which columns it carries, what each
- * one must contain, and which table each belongs to.
+ * The contract an import file is built against. The screen renders its template
+ * from here, so the instructions cannot drift from what the upload enforces.
  *
- * Separate from ImportacionDeClientes, which owns reading a file and writing the
- * rows, because this is the contract an operator builds their file against. The
- * screen renders the template from here, so the instructions on screen cannot
- * drift from the rules the upload enforces.
- *
- * There is no longer a list of "columns a load may overwrite". One existed to
- * keep a reload from resetting ownership and progress, and it had to be
- * maintained by hand: forget an entry and a load could take a record from the
- * agent working it. Those columns no longer live on the tables a load writes, so
- * the guarantee is structural instead of remembered. A load reaches identity and
- * campaign facts, and nothing else.
+ * A load reaches identity and campaign columns only; ownership and progress live
+ * on tables it never writes.
  */
 final class FormatoDeImportacion
 {
     /**
-     * Every column a file may carry, in the order the operator sees them.
-     *
-     * The file format is unchanged by the split: an operator's existing
-     * spreadsheet still loads, it just lands in two tables instead of one.
+     * The order is the template's column order. The file format did not change
+     * with the identity/campaign split: an existing spreadsheet still loads, into
+     * two tables instead of one.
      *
      * @return list<string>
      */
@@ -36,7 +26,7 @@ final class FormatoDeImportacion
     }
 
     /**
-     * Columns a file cannot omit. The rest may be absent entirely.
+     * Header columns that must be present. Every other column may be absent.
      *
      * @return list<string>
      */
@@ -45,9 +35,7 @@ final class FormatoDeImportacion
         return ['ruc', 'tipo_data', 'origen'];
     }
 
-    /**
-     * @return array<string, string>
-     */
+    /** @return array<string, string> */
     public static function reglas(): array
     {
         return [
@@ -67,8 +55,8 @@ final class FormatoDeImportacion
     }
 
     /**
-     * Who the row is about. Permanent, and shared by every campaign that ever
-     * delivers this customer.
+     * Permanent facts about the customer, shared by every campaign that delivers
+     * them.
      *
      * @return list<string>
      */
@@ -78,10 +66,8 @@ final class FormatoDeImportacion
     }
 
     /**
-     * What this campaign says about them. True of one load, not of the customer.
-     *
-     * The carrier counts are derived so a change to the carrier catalog reaches
-     * the import template without anyone remembering this list exists.
+     * Facts true of one load, not of the customer. The carrier counts are derived
+     * so a change to the carrier catalog reaches the template automatically.
      *
      * @return list<string>
      */
@@ -91,8 +77,8 @@ final class FormatoDeImportacion
     }
 
     /**
-     * The identity half of a row, reduced to exactly the columns `cliente`
-     * takes, so a stray column in the file can never reach the insert.
+     * Reduced to exactly the columns `cliente` takes, so a stray column in the
+     * file never reaches the insert.
      *
      * @param  array<string, string>  $fila
      * @return array<string, mixed>
@@ -106,8 +92,6 @@ final class FormatoDeImportacion
     }
 
     /**
-     * The campaign half of a row, reduced to exactly the columns `datos` takes.
-     *
      * @param  array<string, string>  $fila
      * @return array<string, mixed>
      */
@@ -128,9 +112,7 @@ final class FormatoDeImportacion
         return $valores;
     }
 
-    /**
-     * @param  array<string, string>  $fila
-     */
+    /** @param  array<string, string>  $fila */
     private static function texto(array $fila, string $columna): ?string
     {
         $valor = trim((string) ($fila[$columna] ?? ''));
@@ -138,9 +120,7 @@ final class FormatoDeImportacion
         return $valor === '' ? null : $valor;
     }
 
-    /**
-     * @return list<string>
-     */
+    /** @return list<string> */
     private static function carriers(): array
     {
         return array_map(Operadores::columna(...), Operadores::TODOS);

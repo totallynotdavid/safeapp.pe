@@ -6,9 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class ImportarClientesRequest extends FormRequest
 {
-    // 20 MB is roughly 200k client rows, well past any single campaign file.
-    // The cap exists because validation reads the whole file before writing
-    // anything, so an unbounded upload is an unbounded request.
+    // Validation loads the entire file before writing, so uploads are capped.
     private const MAX_KB = 20_480;
 
     /**
@@ -16,11 +14,9 @@ class ImportarClientesRequest extends FormRequest
      */
     public function rules(): array
     {
-        // `txt` is allowed alongside `csv` because a CSV renamed by a mail
-        // client or exported from a terminal commonly arrives with that
-        // extension, and the parser cares about the contents, not the name.
+        // Accept .txt because CSV files may arrive with that extension.
         return [
-            'archivo' => 'required|file|mimes:csv,txt|max:'.self::MAX_KB,
+            'archivo' => 'required|file|mimes:csv,txt,xlsx|max:'.self::MAX_KB,
         ];
     }
 
@@ -29,6 +25,6 @@ class ImportarClientesRequest extends FormRequest
      */
     public function attributes(): array
     {
-        return ['archivo' => 'archivo CSV'];
+        return ['archivo' => 'archivo CSV o XLSX'];
     }
 }

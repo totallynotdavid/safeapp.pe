@@ -12,7 +12,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
-// CARGAR DATOS: what a load does to the clients already in the table.
 class ImportacionCargaTest extends TestCase
 {
     use RefreshDatabase;
@@ -90,9 +89,8 @@ class ImportacionCargaTest extends TestCase
     }
 
     /**
-     * A second campaign delivering the same customer is a second job, not an
-     * overwrite. Legacy kept one row per RUC, so a new list silently replaced
-     * whatever the previous one was still working.
+     * Legacy kept one row per RUC, so a new list silently replaced whatever the
+     * previous one was still working.
      */
     public function test_a_second_campaign_adds_a_record_rather_than_replacing_one(): void
     {
