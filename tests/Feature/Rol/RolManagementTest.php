@@ -15,7 +15,6 @@ class RolManagementTest extends TestCase
     use LeeFormulario;
     use RefreshDatabase;
 
-    // A user holding the roles.manage grant, the gate the whole module hangs off.
     private function manager(): Usuario
     {
         $menu = Menu::factory()->create(['permiso' => 'roles.manage']);

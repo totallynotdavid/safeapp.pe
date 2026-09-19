@@ -5,7 +5,6 @@ namespace Tests\Feature\Gestion;
 use App\Models\Llamada;
 use App\Models\Usuario;
 
-// HISTORICO: the agent's own contacts over a date range.
 class HistoricoTest extends GestionTestCase
 {
     public function test_the_ver_permiso_gates_the_screen(): void

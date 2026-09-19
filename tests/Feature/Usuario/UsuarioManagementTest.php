@@ -13,7 +13,6 @@ class UsuarioManagementTest extends TestCase
 {
     use RefreshDatabase;
 
-    // A user holding the usuarios.manage grant, the gate the whole module hangs off.
     private function manager(): Usuario
     {
         $menu = Menu::factory()->create(['permiso' => 'usuarios.manage']);

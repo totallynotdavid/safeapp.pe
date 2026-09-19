@@ -10,7 +10,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Concerns\LeeLibro;
 use Tests\TestCase;
 
-// GESTION DIARIA: one supervisor's team's contacts over a date range.
 class SeguimientoTest extends TestCase
 {
     use LeeLibro;
@@ -144,8 +143,6 @@ class SeguimientoTest extends TestCase
     }
 
     /**
-     * A supervisor and one agent reporting to them.
-     *
      * @return array{Supervisor, Usuario}
      */
     private function equipo(): array

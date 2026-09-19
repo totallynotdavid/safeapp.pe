@@ -7,13 +7,9 @@ use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 /**
- * A legacy-shaped source database on its own in-memory connection, plus the
- * handful of rows every cutover test starts from.
- *
  * The figures the transform's comments cite come from measuring the real export
  * against MariaDB. These tests pin the behaviour those measurements led to, one
  * row per rule, so a later change has to disagree with the reasoning out loud.
- * The schema itself is EsquemaLegado.
  */
 abstract class CutoverTestCase extends TestCase
 {
@@ -45,8 +41,6 @@ abstract class CutoverTestCase extends TestCase
     }
 
     /**
-     * A campaign row with the columns every test would otherwise have to repeat.
-     *
      * @param  array<string, mixed>  $atributos
      */
     protected function datoLegado(array $atributos = []): void
@@ -71,8 +65,7 @@ abstract class CutoverTestCase extends TestCase
     }
 
     /**
-     * An account with the columns every test would otherwise have to repeat.
-     * Role 1 is ADMINISTRADOR, which is the one most tests want.
+     * Role 1 is ADMINISTRADOR, the role most tests want.
      */
     protected function usuarioLegado(int $id, int $idRol = 1): void
     {

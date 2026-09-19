@@ -6,9 +6,6 @@ use App\Models\Cliente;
 use App\Models\Dato;
 use Illuminate\Support\Facades\DB;
 
-/**
- * The command's contract with whoever runs it on the night.
- */
 class TransformCommandTest extends CutoverTestCase
 {
     /**

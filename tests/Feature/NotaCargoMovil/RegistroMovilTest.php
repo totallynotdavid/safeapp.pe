@@ -6,7 +6,6 @@ use App\Cockpit\AccesoAClientes;
 use App\Models\NcMovil;
 use App\Models\Usuario;
 
-// REGISTRO: how an ejecutivo files a nota de cargo móvil and amends their own.
 class RegistroMovilTest extends NotaCargoMovilTestCase
 {
     private const PERMISO = 'notacargo.movil.registrar';

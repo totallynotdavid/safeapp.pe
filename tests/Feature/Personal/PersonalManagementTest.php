@@ -12,7 +12,6 @@ class PersonalManagementTest extends TestCase
 {
     use RefreshDatabase;
 
-    // A user holding the personal.gestionar grant.
     private function gestor(): Usuario
     {
         $menu = Menu::factory()->create(['permiso' => 'personal.gestionar']);

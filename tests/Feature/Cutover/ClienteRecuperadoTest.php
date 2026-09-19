@@ -6,12 +6,6 @@ use App\Models\Cliente;
 use App\Models\Dato;
 use App\Models\Llamada;
 
-/**
- * Building `cliente` out of five tables that each kept the RUC as free text.
- *
- * This is the step the whole cutover rests on: everything else resolves through
- * it, so a customer this misses is a row nothing can be attached to.
- */
 class ClienteRecuperadoTest extends CutoverTestCase
 {
     public function test_a_customer_known_only_from_a_contact_is_recovered(): void

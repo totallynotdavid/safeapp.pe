@@ -10,9 +10,8 @@ use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-// Shared fixture for the averías tests: an ejecutivo who may open cases, and a
-// valid registration payload. A quiebre names a client, so the payload resolves
-// one rather than carrying a typed identity.
+// A quiebre names a client, so the payload resolves one rather than carrying a typed
+// identity.
 abstract class QuiebreTestCase extends TestCase
 {
     use RefreshDatabase;

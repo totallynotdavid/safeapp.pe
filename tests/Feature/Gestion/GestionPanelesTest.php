@@ -5,8 +5,6 @@ namespace Tests\Feature\Gestion;
 use App\Cockpit\Operadores;
 use App\Models\Llamada;
 
-// The read panels on the client screen: contact history, the phone numbers
-// derived from it, and the per-carrier line mix.
 class GestionPanelesTest extends GestionTestCase
 {
     public function test_the_history_shows_every_contact_newest_first(): void
@@ -80,7 +78,6 @@ class GestionPanelesTest extends GestionTestCase
         $agente = $this->agente('gestion.movil');
         $dato = $this->datoDe($agente);
 
-        // Repeats of one number collapse into a single row with a count.
         Llamada::factory()->count(2)->create(['id_cliente' => $dato->id_cliente, 'telefono' => '987654321']);
         Llamada::factory()->create(['id_cliente' => $dato->id_cliente, 'telefono' => '912345678']);
 

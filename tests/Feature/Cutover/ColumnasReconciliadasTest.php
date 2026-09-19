@@ -5,13 +5,6 @@ namespace Tests\Feature\Cutover;
 use App\Models\NcFija;
 use App\Models\NcMovil;
 
-/**
- * Pairs of legacy columns that held the same fact and were allowed to disagree,
- * collapsing onto the one column the rewrite kept.
- *
- * Each pair needs a rule about which side wins, and each rule is an answer the
- * data gave rather than a preference.
- */
 class ColumnasReconciliadasTest extends CutoverTestCase
 {
     /**

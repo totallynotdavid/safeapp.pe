@@ -13,7 +13,6 @@ class AsignacionManagementTest extends TestCase
 {
     use RefreshDatabase;
 
-    // A user holding the asignacion.gestionar grant.
     private function gestor(): Usuario
     {
         $menu = Menu::factory()->create(['permiso' => 'asignacion.gestionar']);

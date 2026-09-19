@@ -12,9 +12,8 @@ use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-// Shared fixture for the three nota-de-cargo-fija stages. None of them scopes by
-// tienda, so the fixture is a user holding one stage's permiso, a client to file
-// against and a catalog row to sell.
+// None of the three stages scopes by tienda, so the fixture never places the user
+// in one.
 abstract class NotaCargoFijaTestCase extends TestCase
 {
     use RefreshDatabase;
@@ -64,9 +63,6 @@ abstract class NotaCargoFijaTestCase extends TestCase
     }
 
     /**
-     * The payload the registro form posts, for a resolved client and a catalog
-     * product.
-     *
      * @param  array<string, mixed>  $overrides
      * @return array<string, mixed>
      */

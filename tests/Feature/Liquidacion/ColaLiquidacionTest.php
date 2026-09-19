@@ -5,7 +5,6 @@ namespace Tests\Feature\Liquidacion;
 use App\Models\NcMovil;
 use App\Models\Usuario;
 
-// What reaches the liquidador's queue, and what must not.
 class ColaLiquidacionTest extends LiquidacionTestCase
 {
     public function test_the_gestionar_permiso_gates_the_index(): void

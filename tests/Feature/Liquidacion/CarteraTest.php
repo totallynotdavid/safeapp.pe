@@ -7,8 +7,6 @@ use App\Models\NcMovil;
 use App\Models\Supervisor;
 use App\Models\Tienda;
 
-// The carrier account executive catalog and the attribution the liquidación
-// screen displays from it.
 class CarteraTest extends LiquidacionTestCase
 {
     public function test_only_active_executives_are_selectable(): void

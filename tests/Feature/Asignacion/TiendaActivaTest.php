@@ -7,8 +7,6 @@ use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-// The self-service half of assignment: an operator working two stores moves
-// between them without an admin.
 class TiendaActivaTest extends TestCase
 {
     use RefreshDatabase;

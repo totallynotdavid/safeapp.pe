@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Liquidacion;
 
-// Settling a case: the only write the liquidación screen performs.
 class LiquidacionTest extends LiquidacionTestCase
 {
     public function test_settles_a_case(): void

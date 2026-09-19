@@ -9,7 +9,6 @@ use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-// PRODUCCION: per-ejecutivo totals by estado, for both productos.
 class ProduccionTest extends TestCase
 {
     use RefreshDatabase;

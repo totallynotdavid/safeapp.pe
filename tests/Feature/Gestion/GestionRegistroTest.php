@@ -40,7 +40,6 @@ class GestionRegistroTest extends GestionTestCase
         $this->assertSame($dato->id_cliente, $llamada->id_cliente);
         $this->assertSame($dato->id_dato, $llamada->id_dato);
 
-        // The queue and the log move together.
         $this->assertSame(Dato::ESTADO_GESTIONADO, $dato->fresh()->estado);
     }
 

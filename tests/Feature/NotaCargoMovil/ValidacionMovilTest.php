@@ -5,7 +5,6 @@ namespace Tests\Feature\NotaCargoMovil;
 use App\Models\NcMovil;
 use App\Models\Usuario;
 
-// VALIDACIÓN: the validador's ruling, and the two figures they may correct.
 class ValidacionMovilTest extends NotaCargoMovilTestCase
 {
     private const PERMISO = 'notacargo.movil.validar';

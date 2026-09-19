@@ -15,7 +15,6 @@ class QuiebreValidacionTest extends TestCase
 {
     use RefreshDatabase;
 
-    // A validator holding the quiebre.validar grant and assigned to a tienda.
     private function agente(Tienda $tienda): Usuario
     {
         $menu = Menu::factory()->create(['permiso' => 'quiebre.validar']);

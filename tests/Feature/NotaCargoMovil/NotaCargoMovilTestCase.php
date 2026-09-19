@@ -11,9 +11,8 @@ use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-// Shared fixture for the three nota-de-cargo-móvil stages. None of them scopes
-// by tienda, so the fixture is a user holding one stage's permiso plus a client
-// to file against.
+// None of the three stages scopes by tienda, so the fixture never places the user
+// in one.
 abstract class NotaCargoMovilTestCase extends TestCase
 {
     use RefreshDatabase;
@@ -54,8 +53,6 @@ abstract class NotaCargoMovilTestCase extends TestCase
     }
 
     /**
-     * The payload the registro form posts, for a resolved client.
-     *
      * @param  array<string, mixed>  $overrides
      * @return array<string, mixed>
      */

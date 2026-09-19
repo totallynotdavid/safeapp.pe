@@ -6,7 +6,6 @@ use App\Models\NcFija;
 use App\Models\Tienda;
 use App\Models\Usuario;
 
-// VALIDACIÓN: the validador rules on filed cases, and rules on nothing else.
 class ValidacionFijaTest extends NotaCargoFijaTestCase
 {
     private const PERMISO = 'notacargo.fija.validar';

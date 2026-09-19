@@ -26,7 +26,6 @@ class GestionColaTest extends GestionTestCase
         $agente = $this->agente('gestion.movil');
         $this->datoDe($agente, 'MOVIL', ['razon_social' => 'CLIENTE EN COLA']);
 
-        // Excluded: already worked, wrong segment, and another agent's client.
         Dato::factory()
             ->gestionado()
             ->asignadoA($agente->id_usuario, $this->tienda->id_tienda)

@@ -7,9 +7,8 @@ use App\Models\Tienda;
 use App\Models\Usuario;
 use Illuminate\Testing\TestResponse;
 
-// Notas de cargo fija as a spreadsheet: what lands in the workbook, and what
-// must not. The format and formula rules here are Reporte's, so they hold for
-// every export and are not repeated in the móvil and contacto suites.
+// The format and formula rules are Reporte's, so they hold for every export and
+// are not repeated in the móvil and contacto suites.
 class ExportacionFijaTest extends ExportacionTestCase
 {
     public function test_the_export_is_a_real_workbook_not_an_html_table(): void

@@ -14,9 +14,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
-// Shared fixture for the cockpit tests: a seeded disposition catalog and agents
-// placed on one tienda, since every gestión path is scoped by the agent's active
-// tienda.
+// Every gestión path is scoped by the agent's active tienda, so agents are placed
+// on one.
 abstract class GestionTestCase extends TestCase
 {
     use RefreshDatabase;

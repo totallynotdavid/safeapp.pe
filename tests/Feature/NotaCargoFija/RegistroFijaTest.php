@@ -6,7 +6,6 @@ use App\Models\NcFija;
 use App\Models\Producto;
 use App\Models\Usuario;
 
-// REGISTRO: an ejecutivo files a case against a resolved client.
 class RegistroFijaTest extends NotaCargoFijaTestCase
 {
     private const PERMISO = 'notacargo.fija.registrar';

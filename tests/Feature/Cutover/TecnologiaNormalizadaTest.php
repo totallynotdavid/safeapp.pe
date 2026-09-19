@@ -4,14 +4,6 @@ namespace Tests\Feature\Cutover;
 
 use App\Models\NcFija;
 
-/**
- * Three technologies spelled 28 ways, because legacy made this a free-text
- * input.
- *
- * Its own file rather than another few cases in SaneamientoTest: the other
- * rules are about what legacy stored to mean nothing, this one is a vocabulary
- * the screen now constrains.
- */
 class TecnologiaNormalizadaTest extends CutoverTestCase
 {
     /**

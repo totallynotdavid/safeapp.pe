@@ -14,7 +14,6 @@ class GestionDistribucionTest extends GestionTestCase
     {
         Dato::factory()->count(3)->create(['origen' => 'DB_UNO']);
         Dato::factory()->count(1)->create(['origen' => 'DB_DOS']);
-        // Neither of these is available: one is held, the other is another segment.
         Dato::factory()
             ->asignadoA($this->agente()->id_usuario, $this->tienda->id_tienda)
             ->create(['origen' => 'DB_TRES']);
@@ -135,7 +134,6 @@ class GestionDistribucionTest extends GestionTestCase
             ->assertRedirect();
 
         $this->assertNull($pendiente->fresh()->asignacionActiva);
-        // A worked record stays with the agent who logged the call.
         $this->assertSame($agente->id_usuario, $gestionado->fresh()->asignacionActiva?->id_usuario);
         // The hold is closed, not erased: who held what stays on the record.
         $this->assertNotNull($pendiente->asignaciones()->first()->fecha_liberacion);
