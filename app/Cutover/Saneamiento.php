@@ -3,20 +3,15 @@
 namespace App\Cutover;
 
 /**
- * The value-level rules every traslado repeats, in one place.
- *
  * Legacy declared almost every column `text NOT NULL` and every date
  * `date NOT NULL`, then stored '' and '0000-00-00' to mean "not set". The new
- * schema says what it means with NULL and real widths, so the same four
- * conversions apply everywhere and are worth having one owner rather than
- * thirty inlined ternaries.
+ * schema says it with NULL and real widths, so these conversions have one owner
+ * instead of being inlined in every traslado.
  */
 final class Saneamiento
 {
     /**
-     * The largest number of lines a row is allowed to claim.
-     *
-     * Not a business rule, a junk filter: 78 contacts carry a q_lineas in the
+     * A junk filter, not a business rule: 78 contacts carry a q_lineas in the
      * hundreds of millions, and the values are Peruvian mobile numbers
      * (900442964, 963334930), so the count field and the phone field were
      * filled in the wrong order. Anything outside 0..100 is not a line count.
@@ -24,10 +19,9 @@ final class Saneamiento
     private const MAX_LINEAS = 100;
 
     /**
-     * Trimmed text, or null when legacy's "not set" placeholder is what it
-     * holds. Truncates rather than rejects: the over-long values are all
-     * free-text fields where the tail is a repeated address or a pasted
-     * coordinate pair, never a key. Omit $max for a target column typed `text`.
+     * Truncates rather than rejects: the over-long values are all free-text
+     * fields where the tail is a repeated address or a pasted coordinate pair,
+     * never a key. Omit $max for a target column typed `text`.
      */
     public static function texto(mixed $valor, ?int $max = null): ?string
     {
@@ -40,11 +34,7 @@ final class Saneamiento
         return $max === null ? $texto : mb_substr($texto, 0, $max);
     }
 
-    /**
-     * A date, or null for legacy's zero date. Every date column in the export
-     * carries '0000-00-00' somewhere, including all 605 rows of
-     * usuario.fecha_nacimiento.
-     */
+    /** Every date column in the export carries legacy's zero date somewhere. */
     public static function fecha(mixed $valor): ?string
     {
         $fecha = trim((string) $valor);
@@ -57,9 +47,9 @@ final class Saneamiento
     }
 
     /**
-     * A carrier line count. Negatives (13 campaign rows, 46 contacts) and the
-     * phone numbers described above both collapse to 0, because the target
-     * columns are unsigned and neither value was ever a count.
+     * Negatives (13 campaign rows, 46 contacts) and the phone numbers described
+     * above both collapse to 0, because the target columns are unsigned and
+     * neither value was ever a count.
      */
     public static function conteo(mixed $valor): int
     {
@@ -69,11 +59,11 @@ final class Saneamiento
     }
 
     /**
-     * A monthly charge. Legacy typed these `double` and the target columns are
-     * decimal(10,2), so anything that will not fit is refused rather than
-     * rounded: one móvil case carries 996871768, which is a mobile number in
-     * the charge field, the same slip that fills q_lineas with phone numbers.
-     * Real charges run from 31.90 to 539.90.
+     * Legacy typed these `double` and the target columns are decimal(10,2), so
+     * anything that will not fit is refused rather than rounded: one móvil case
+     * carries 996871768, which is a mobile number in the charge field, the same
+     * slip that fills q_lineas with phone numbers. Real charges run from 31.90
+     * to 539.90.
      */
     public static function monto(mixed $valor): float
     {
@@ -83,9 +73,8 @@ final class Saneamiento
     }
 
     /**
-     * An id held in one of legacy's text columns, or null when it holds the ''
-     * or '0' that mean "none chosen". Used for zonal (a tienda id stored as
-     * text) and ejecutivo_tdp (a cartera id stored as text).
+     * Legacy stored these ids in text columns, with '' or '0' meaning "none
+     * chosen": zonal holds a tienda id and ejecutivo_tdp a cartera id.
      */
     public static function idEnTexto(mixed $valor): ?int
     {

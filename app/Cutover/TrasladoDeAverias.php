@@ -4,13 +4,6 @@ namespace App\Cutover;
 
 use Illuminate\Support\Facades\DB;
 
-/**
- * Copies the averías (quiebre) cases. Ten rows, all PENDIENTE and none
- * validated, so this is the smallest step by far.
- *
- * `casosf` becomes `caso_sf`, and `zonal_telefonica` was a tienda id kept in a
- * text column.
- */
 final class TrasladoDeAverias implements Traslado
 {
     public function __construct(

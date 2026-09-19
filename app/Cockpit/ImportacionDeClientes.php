@@ -10,11 +10,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 /**
- * Imports campaign files into clientes and datos without changing assignment or
- * progress state.
- *
- * The file is validated completely before anything is written. A failed import
- * can therefore be corrected and retried safely as an idempotent upsert.
+ * The file is validated completely before anything is written, so a failed
+ * import can be corrected and retried as an idempotent upsert.
  */
 final class ImportacionDeClientes
 {
@@ -23,8 +20,8 @@ final class ImportacionDeClientes
     private const MAX_ERRORES = 50;
 
     /**
-     * The file is read once for validation and again for loading so imports stay
-     * all-or-nothing without keeping every row in memory.
+     * Validation and loading each stream the file, so an import stays
+     * all-or-nothing without holding every row in memory.
      */
     public static function desdeArchivo(string $ruta, string $extension): ResultadoImportacion
     {
@@ -41,9 +38,7 @@ final class ImportacionDeClientes
             : ResultadoImportacion::rechazada($errores);
     }
 
-    /**
-     * @return list<string>
-     */
+    /** @return list<string> */
     private static function errores(string $ruta, string $extension): array
     {
         $lector = self::lector($ruta, $extension);
@@ -135,11 +130,7 @@ final class ImportacionDeClientes
         return ResultadoImportacion::cargada($nuevos, $actualizados);
     }
 
-    /**
-     * Counts records that already exist under the full campaign key.
-     *
-     * @param  list<array<string, mixed>>  $campana
-     */
+    /** @param  list<array<string, mixed>>  $campana */
     private static function yaCargados(array $campana): int
     {
         $clave = static fn (array $registro): string => implode("\0", [
@@ -165,9 +156,6 @@ final class ImportacionDeClientes
     }
 
     /**
-     * Resolves a batch into campaign records, creating or updating its clients
-     * first and then loading their identifiers in one query.
-     *
      * @param  list<array<string, string>>  $lote
      * @return list<array<string, mixed>>
      */
@@ -193,9 +181,7 @@ final class ImportacionDeClientes
         );
     }
 
-    /**
-     * @return iterable<int, list<array<string, string>>>
-     */
+    /** @return iterable<int, list<array<string, string>>> */
     private static function lotes(
         string $ruta,
         string $extension,

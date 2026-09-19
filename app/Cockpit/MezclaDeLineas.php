@@ -3,30 +3,22 @@
 namespace App\Cockpit;
 
 /**
- * How many lines a customer holds with each carrier, as one observation.
+ * Two sources report a customer's lines per carrier and neither owns the other:
+ * the campaign file says what the list believed when it was loaded, a logged
+ * contact says what the agent confirmed on the phone. Both are kept, and this is
+ * the one shape a screen renders.
  *
- * Two sources report this and neither owns the other: the campaign file says
- * what the list believed when it was loaded, a logged contact says what the
- * agent confirmed on the phone. Both are kept, so this is the shape they have
- * in common and the only one a screen renders.
- *
- * Legacy wrote the agent's correction back over the file's counts, which meant
- * a reload silently erased it and there was no way to tell which number came
- * from where.
+ * Legacy wrote the agent's correction back over the file's counts, so a reload
+ * silently erased it and nothing recorded which number came from where.
  */
 final readonly class MezclaDeLineas
 {
-    /**
-     * @param  array<string, int>  $porOperador  keyed by carrier name
-     */
+    /** @param  array<string, int>  $porOperador  keyed by carrier name */
     private function __construct(
         public array $porOperador,
     ) {}
 
-    /**
-     * Reads the counts off any row carrying the q_<carrier> columns, which is
-     * both `datos` and `llamada`.
-     */
+    /** Accepts any row with the q_<carrier> columns: `datos` or `llamada`. */
     public static function observada(object $fila): self
     {
         $counts = [];

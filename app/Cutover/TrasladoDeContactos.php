@@ -4,14 +4,6 @@ namespace App\Cutover;
 
 use Illuminate\Support\Facades\DB;
 
-/**
- * Copies the contact log, repointing it from the RUC it carried to the customer
- * it is about.
- *
- * This is the table the split was for. Legacy kept the RUC and the name as free
- * text on every contact, which is the only reason 146,736 customers are still
- * recoverable at all: `datos` had long since dropped them, and the log had not.
- */
 final class TrasladoDeContactos implements Traslado
 {
     public function __construct(

@@ -2,10 +2,6 @@
 
 namespace App\Cockpit;
 
-/**
- * Shared carrier catalog for the per-carrier line-count columns used by
- * Cliente and Llamada.
- */
 final class Operadores
 {
     public const TODOS = ['MOVISTAR', 'ENTEL', 'CLARO', 'BITEL'];
@@ -14,9 +10,7 @@ final class Operadores
     // must not depend on branding.
     public const PROPIO = 'ENTEL';
 
-    /**
-     * @return list<string>
-     */
+    /** @return list<string> */
     public static function competencia(): array
     {
         return array_values(array_diff(self::TODOS, [self::PROPIO]));

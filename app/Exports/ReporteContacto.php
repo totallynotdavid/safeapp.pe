@@ -8,16 +8,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * What a logged contact looks like as a spreadsheet row.
- *
- * One definition for both call-log reports: histórico (the agent's own contacts)
- * and seguimiento (a supervisor's team). They differ only in who is in scope.
- *
- * The per-carrier line counts are appended from Operadores rather than spelled
- * out, so a rebrand stays the one-line change that class exists to keep it. They
- * are new to the export: an agent records them on every contact and legacy's
- * report left them out, which made it impossible to see from the report what the
- * call actually established.
+ * Shared by both call-log reports, histórico (the agent's own contacts) and
+ * seguimiento (a supervisor's team), which differ only in who is in scope.
  */
 final class ReporteContacto
 {
@@ -41,6 +33,8 @@ final class ReporteContacto
             $nombre,
             [
                 ...self::ENCABEZADOS,
+                // Derived from Operadores rather than spelled out, so a rebrand
+                // stays a one-line change there.
                 ...array_map(
                     static fn (string $operador): string => 'LINEAS '.$operador,
                     Operadores::TODOS,
@@ -54,9 +48,7 @@ final class ReporteContacto
         );
     }
 
-    /**
-     * @return list<null|int|string|\DateTimeInterface>
-     */
+    /** @return list<null|int|string|\DateTimeInterface> */
     private static function fila(Llamada $contacto): array
     {
         return [

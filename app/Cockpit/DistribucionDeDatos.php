@@ -8,18 +8,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
-/**
- * Manages the unassigned pool, batch assignment, and release of campaign data.
- */
 class DistribucionDeDatos
 {
     public const LOTE = 30;
 
-    /**
-     * Returns origins with available records, ordered by stock.
-     *
-     * @return Collection<int, object{origen: string, disponibles: int}>
-     */
+    /** @return Collection<int, object{origen: string, disponibles: int}> */
     public static function origenesDisponibles(string $tipoData): Collection
     {
         return self::disponibles($tipoData)
@@ -29,13 +22,6 @@ class DistribucionDeDatos
             ->get();
     }
 
-    /**
-     * Assigns up to one batch of records to an agent.
-     * The rows must be selected with a lock inside the transaction. Otherwise,
-     * concurrent requests may select the same available records.
-     *
-     * @return int Number of records assigned
-     */
     public static function asignarLote(
         int $idAgente,
         int $idTienda,
@@ -44,6 +30,8 @@ class DistribucionDeDatos
     ): int {
         return DB::transaction(
             static function () use ($idAgente, $idTienda, $origen, $tipoData): int {
+                // The lock has to be taken inside this transaction, or two
+                // concurrent requests draw the same records.
                 $ids = self::disponibles($tipoData)
                     ->where('origen', $origen)
                     ->orderBy('id_dato')
@@ -64,16 +52,11 @@ class DistribucionDeDatos
         );
     }
 
-    /**
-     * Returns the agent's pending records to the pool.
-     * Managed records remain assigned so their activity keeps an owner.
-     *
-     * @return int Number of records released
-     */
     public static function liberarPendientes(
         int $idAgente,
         string $tipoData,
     ): int {
+        // Managed records stay assigned so their activity keeps an owner.
         $pendientes = Dato::query()
             ->where('estado', Dato::ESTADO_PENDIENTE)
             ->where('tipo_data', $tipoData)
@@ -89,10 +72,7 @@ class DistribucionDeDatos
             ]);
     }
 
-    /**
-     * @param  list<int>  $idsDato
-     * @return int Number of assignments created
-     */
+    /** @param  list<int>  $idsDato */
     private static function abrir(
         array $idsDato,
         int $idAgente,

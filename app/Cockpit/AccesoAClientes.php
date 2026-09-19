@@ -25,11 +25,7 @@ final class AccesoAClientes
         ]);
     }
 
-    /**
-     * An existing inaccessible RUC must not grant access to another user's client.
-     *
-     * @throws ClienteNoDisponible
-     */
+    /** @throws ClienteNoDisponible */
     public static function resolverOCrear(
         Usuario $usuario,
         string $ruc,
@@ -47,6 +43,8 @@ final class AccesoAClientes
                         ->whereKey($cliente->id_cliente)
                         ->exists();
 
+                    // A RUC that exists but is not visible must not grant access to
+                    // another user's client.
                     if (! $esVisible) {
                         throw new ClienteNoDisponible;
                     }

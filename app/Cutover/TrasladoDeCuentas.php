@@ -5,11 +5,9 @@ namespace App\Cutover;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Copies the accounts and the roles they hold.
- *
  * The roles are production's, not the three the dev seeder invents, because
  * usuario.id_rol points at them and 570 of the 605 accounts are EJECUTIVO
- * COMERCIAL. What each role may reach is TrasladoDePermisos, which runs next.
+ * COMERCIAL.
  */
 final class TrasladoDeCuentas implements Traslado
 {
@@ -33,9 +31,7 @@ final class TrasladoDeCuentas implements Traslado
         ];
     }
 
-    /**
-     * @return array<string, int>
-     */
+    /** @return array<string, int> */
     private function copiarRoles(): array
     {
         $roles = new Lote('rol');
@@ -62,9 +58,7 @@ final class TrasladoDeCuentas implements Traslado
         ];
     }
 
-    /**
-     * @return array<string, int>
-     */
+    /** @return array<string, int> */
     private function copiarUsuarios(): array
     {
         $usuarios = new Lote('usuario');

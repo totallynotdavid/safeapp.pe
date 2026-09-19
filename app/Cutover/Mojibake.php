@@ -3,17 +3,15 @@
 namespace App\Cutover;
 
 /**
- * Undoes UTF-8 that was read as Latin-1 and re-encoded, repeatedly.
+ * UTF-8 that was read as Latin-1 and re-encoded, repeatedly. 1,359 values
+ * across `datos`, `llamada`, `nc_fija` and `nc_movil` carry it, almost all of
+ * them customer names with an ñ: PEÑA is stored as PE followed by sixteen
+ * mangled characters, four rounds deep. Each round is one decode, so the loop
+ * runs until the tell-tale characters are gone.
  *
- * 1,359 values across `datos`, `llamada`, `nc_fija` and `nc_movil` carry it,
- * almost all of them customer names with an ñ: PEÑA is stored as PE followed by
- * eight mangled characters, four rounds deep. Every round is one decode, so the
- * loop runs until the tell-tale characters are gone.
- *
- * Its own class rather than another branch in Saneamiento, because this is not
- * a rule about what legacy stored to mean "not set": it is repair of damage the
- * data suffered on the way in, and it is the only part of the cutover that
- * changes what a value says rather than what shape it has.
+ * Kept out of Saneamiento because it repairs damage the data suffered on the way
+ * in, and is the only part of the cutover that changes what a value says rather
+ * than what shape it has.
  */
 final class Mojibake
 {
@@ -27,9 +25,6 @@ final class Mojibake
     private const MAX_VUELTAS = 10;
 
     /**
-     * The repaired text, or the original when the damage cannot be fully
-     * undone.
-     *
      * All-or-nothing on purpose: a partly decoded name is no more readable than
      * the mangled one and is a worse thing to write, so the 62 values the loop
      * cannot resolve, mostly ü, are carried through exactly as legacy holds

@@ -20,10 +20,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Copies a restored legacy export into the current schema.
- *
- * The migrations define the destination schema. This command only transfers
- * data, so schema changes remain isolated to the migrations.
+ * Only transfers data; the migrations own the destination schema.
  *
  * The destination must be empty. To rerun the cutover, rebuild it with:
  *
@@ -35,10 +32,6 @@ class CutoverTransform extends Command
 
     protected $description = 'Load a restored legacy export into the current schema';
 
-    /**
-     * Transfer order matters: customer-dependent data follows the client map,
-     * and grants follow the seeded menus and copied users.
-     */
     private const TABLAS_DESTINO = [
         'cliente',
         'cliente_acceso',
@@ -113,11 +106,11 @@ class CutoverTransform extends Command
         return self::SUCCESS;
     }
 
-    /**
-     * @return list<Traslado>
-     */
+    /** @return list<Traslado> */
     private function pasos(MapaDeClientes $clientes): array
     {
+        // Order matters: grants filter against the copied users and seeded
+        // menus, and everything customer-dependent needs the client map.
         return [
             new TrasladoDeCuentas,
             new TrasladoDePermisos,

@@ -5,13 +5,10 @@ namespace App\Cutover;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Builds `cliente` from every RUC legacy ever recorded, and answers the one
- * question the rest of the transform keeps asking: which id_cliente is this RUC?
- *
  * Legacy had no customer table. Identity lived on the campaign row, so a
  * customer existed only while some list still carried them, and the other four
  * tables referred to them by copying the RUC and the name as free text. The
- * union of those five columns is therefore the real customer list, and it is
+ * union of those five sources is therefore the real customer list, and it is
  * much larger than the campaign table: 146,736 of the 206,121 RUCs appear only
  * in `llamada`, meaning legacy had contacted them and then dropped every trace
  * of who they were when the list was replaced.
@@ -25,14 +22,13 @@ final class MapaDeClientes
     private const LOTE = 2_000;
 
     /**
-     * The name is taken from the most trustworthy source that has one, which is
-     * the order these are listed in: last write wins.
+     * Listed from least to most trusted, because the last write wins the name.
      *
-     * `datos` is first because a campaign file is the closest thing legacy had
-     * to a customer record. `llamada` outranks the case tables because an agent
-     * who just spoke to the customer corrects the name; the case screens
-     * prefilled it and then let a modal edit it, which is why the same RUC can
-     * carry several spellings.
+     * `datos` is last because a campaign file is the closest thing legacy had to
+     * a customer record. `llamada` outranks the case tables because an agent who
+     * just spoke to the customer corrects the name; the case screens prefilled
+     * it and then let a modal edit it, which is why the same RUC can carry
+     * several spellings.
      */
     private const FUENTES = [
         ['tabla' => 'quiebre', 'orden' => 'id_quiebre'],
@@ -47,9 +43,7 @@ final class MapaDeClientes
 
     private int $descartados = 0;
 
-    /**
-     * @return array{clientes: int, rucs_descartados: int}
-     */
+    /** @return array{clientes: int, rucs_descartados: int} */
     public function construir(): array
     {
         $nombres = $this->recolectar();
@@ -76,10 +70,8 @@ final class MapaDeClientes
     }
 
     /**
-     * The id for a legacy RUC, or null when the value was never a customer key.
-     *
-     * Callers drop the row rather than inventing a customer: a row whose RUC is
-     * junk has no subject, and the transform reports how many it dropped.
+     * Callers drop the row on null rather than inventing a customer: a row whose
+     * RUC is junk has no subject, and the transform reports how many it dropped.
      */
     public function resolver(mixed $ruc): ?int
     {
@@ -88,9 +80,7 @@ final class MapaDeClientes
         return $ruc === null ? null : $this->ids[$ruc] ?? null;
     }
 
-    /**
-     * @return array<string, string|null> ruc => razon_social
-     */
+    /** @return array<string, string|null> ruc => razon_social */
     private function recolectar(): array
     {
         $nombres = [];
@@ -124,9 +114,9 @@ final class MapaDeClientes
     }
 
     /**
-     * A RUC is digits. The export holds exactly one value that is not: `?ruc`,
-     * carrying the razón social "razon_social", which is a CSV header row that
-     * was imported as data. Nothing references it and it names no customer.
+     * The export holds exactly one value that is not digits: `?ruc`, carrying
+     * the razón social "razon_social", which is a CSV header row that was
+     * imported as data. Nothing references it and it names no customer.
      *
      * The one 9-digit value (940891060, a mobile number an agent typed into the
      * RUC field) is kept: it is wrong, but it consistently identifies a real

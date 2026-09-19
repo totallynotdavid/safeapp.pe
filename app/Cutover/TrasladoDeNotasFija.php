@@ -5,8 +5,6 @@ namespace App\Cutover;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Copies the nota de cargo fija cases.
- *
  * Six legacy columns are not carried: `tipo` ('FIJA' in every row), `q_lineas`
  * (1 in every row), `agenda` (empty in every row), `id_cartera` (0 in every
  * row), `ejecutivo_telefonica` (set in one), and `zonal_telefonica`, which is

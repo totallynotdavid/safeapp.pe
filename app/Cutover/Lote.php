@@ -5,13 +5,12 @@ namespace App\Cutover;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Buffers rows for one target table and writes them in batches.
- *
  * Row-at-a-time inserts would make the contact log alone 276,006 round trips.
+ *
  * Timing is the caller's: it flushes at the end of each source chunk, in
  * dependency order, because one step writes `datos` and `asignacion_datos`
  * together and a hold cannot be inserted before the record it points at. A
- * buffer that decided its own timing put those two out of order and the foreign
+ * buffer that chose its own timing put those two out of order and the foreign
  * key caught it.
  *
  * The one thing decided here is the ceiling, because it is a limit of the
@@ -33,9 +32,7 @@ final class Lote
         private readonly string $tabla,
     ) {}
 
-    /**
-     * @param  array<string, mixed>  $fila
-     */
+    /** @param  array<string, mixed>  $fila */
     public function agregar(array $fila): void
     {
         if ($this->maximo === 0) {
@@ -49,10 +46,7 @@ final class Lote
         }
     }
 
-    /**
-     * Writes what has accumulated. Called at the end of each source chunk so a
-     * buffer never grows past one chunk's worth of rows.
-     */
+    /** Called at the end of each source chunk, which bounds the buffer to one chunk of rows. */
     public function vaciar(): void
     {
         if ($this->pendientes === []) {
@@ -64,10 +58,7 @@ final class Lote
         $this->pendientes = [];
     }
 
-    /**
-     * Writes the tail and reports the total. Keep this the last thing a
-     * traslado does, so an early return cannot leave rows unwritten.
-     */
+    /** A traslado that returns without calling this loses the rows still buffered. */
     public function cerrar(): int
     {
         $this->vaciar();

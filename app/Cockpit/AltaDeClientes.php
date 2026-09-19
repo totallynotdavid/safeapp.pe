@@ -12,9 +12,7 @@ class AltaDeClientes
     // `origen` records provenance; `tipo_data` selects the queue.
     public const ORIGEN = 'INHOUSE';
 
-    /**
-     * @param  array<string, mixed>  $payload
-     */
+    /** @param  array<string, mixed>  $payload */
     public static function registrar(
         array $payload,
         string $tipoData,
@@ -35,7 +33,6 @@ class AltaDeClientes
                     'tipo_data' => $tipoData,
                 ];
 
-                // Reuse the existing campaign record on repeated submissions.
                 $dato = Dato::query()->where($clave)->first() ?? new Dato;
 
                 $dato->forceFill([
