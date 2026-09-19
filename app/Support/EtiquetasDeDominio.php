@@ -2,11 +2,6 @@
 
 namespace App\Support;
 
-/**
- * Keeps persistence-oriented workflow values separate from the language shown
- * to people. Database and request values intentionally remain stable uppercase
- * codes; UI consumers use these sentence-case labels instead.
- */
 final class EtiquetasDeDominio
 {
     private const ETIQUETAS = [
@@ -55,7 +50,11 @@ final class EtiquetasDeDominio
             'F4-DISENO' => 'F4 · Diseño',
             'F5-DEFINICION' => 'F5 · Definición',
         ],
-        'tecnologia' => ['FTTH' => 'FTTH', 'HFC' => 'HFC', 'GPON' => 'GPON'],
+        'tecnologia' => [
+            'FTTH' => 'FTTH',
+            'HFC' => 'HFC',
+            'GPON' => 'GPON',
+        ],
         'nodo' => [
             'SINNODO' => 'Sin nodo',
             'NAT' => 'NAT',
@@ -71,8 +70,14 @@ final class EtiquetasDeDominio
             'SUSPENSION' => 'Suspensión',
             'ACUERDO COMERCIAL' => 'Acuerdo comercial',
         ],
-        'servicio' => ['FIJA' => 'Fija', 'MOVIL' => 'Móvil'],
-        'si_no' => ['SI' => 'Sí', 'NO' => 'No'],
+        'servicio' => [
+            'FIJA' => 'Fija',
+            'MOVIL' => 'Móvil',
+        ],
+        'si_no' => [
+            'SI' => 'Sí',
+            'NO' => 'No',
+        ],
         'detalle_equipo' => [
             'DECO' => 'Decodificador',
             'BAM' => 'BAM',
@@ -103,18 +108,28 @@ final class EtiquetasDeDominio
         $valores = is_array($valores) ? $valores : iterator_to_array($valores);
         $asociativo = ! array_is_list($valores);
 
-        return collect($valores)->map(static function ($etiqueta, $valor) use ($asociativo, $dominio): array {
-            $valor = (string) ($asociativo ? $valor : $etiqueta);
-            $etiqueta = (string) $etiqueta;
+        return collect($valores)
+            ->map(static function ($etiqueta, $valor) use ($asociativo, $dominio): array {
+                $valor = (string) ($asociativo ? $valor : $etiqueta);
+                $etiqueta = (string) $etiqueta;
 
-            return ['value' => $valor, 'label' => self::texto($etiqueta, $dominio) ?? ''];
-        })->values()->all();
+                return [
+                    'value' => $valor,
+                    'label' => self::texto($etiqueta, $dominio) ?? '',
+                ];
+            })
+            ->values()
+            ->all();
     }
 
     private static function titulo(string $valor): string
     {
         $valor = mb_strtolower($valor, 'UTF-8');
-        $valor = mb_strtoupper(mb_substr($valor, 0, 1, 'UTF-8'), 'UTF-8').mb_substr($valor, 1, null, 'UTF-8');
+        $valor =
+            mb_strtoupper(
+                mb_substr($valor, 0, 1, 'UTF-8'),
+                'UTF-8',
+            ).mb_substr($valor, 1, null, 'UTF-8');
 
         return (
             preg_replace_callback(

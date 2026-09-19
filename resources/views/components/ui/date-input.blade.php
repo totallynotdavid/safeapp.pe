@@ -26,7 +26,8 @@
 
     if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $isoValue)) {
         try {
-            $displayValue = \Carbon\CarbonImmutable::createFromFormat('Y-m-d', $isoValue)->format('d/m/Y');
+            $displayValue = \Carbon\CarbonImmutable::createFromFormat('Y-m-d', $isoValue)
+                ->format('d/m/Y');
         } catch (\Throwable) {
             $displayValue = $isoValue;
         }
@@ -34,26 +35,49 @@
 @endphp
 
 <div class="field" data-date-field>
-    <label class="field-label" for="{{ $inputId }}" @if ($disabled) data-disabled="true" @endif>
+    <label
+        class="field-label"
+        for="{{ $inputId }}"
+        @if ($disabled) data-disabled="true" @endif
+    >
         {{ $label }}
+
         @if ($optional || $required)
-            <span class="field-label__requirement"><span aria-hidden="true"> ∙ </span>{{ $optional ? 'Opcional' : 'Obligatorio' }}</span>
+            <span class="field-label__requirement">
+                <span aria-hidden="true"> ∙ </span>
+                {{ $optional ? 'Opcional' : 'Obligatorio' }}
+            </span>
         @endif
     </label>
 
     @if ($description)
-        <span id="{{ $descriptionId }}" class="field-description">{{ $description }}</span>
+        <span id="{{ $descriptionId }}" class="field-description">
+            {{ $description }}
+        </span>
     @endif
 
     <div class="field-input-status-wrapper">
-        <div class="date-input" data-date-input data-size="{{ $size }}"
-            data-value="{{ $isoValue }}" @if ($min) data-min="{{ $min }}" @endif @if ($max) data-max="{{ $max }}" @endif
-            @if ($error) data-status="error" @endif @if ($disabled) data-disabled="true" @endif
-            style="anchor-name: {{ $anchorName }}">
-            <button type="button" class="date-input__icon-button" data-date-toggle
-                aria-label="Abrir calendario" @disabled($disabled)>
+        <div
+            class="date-input"
+            data-date-input
+            data-size="{{ $size }}"
+            data-value="{{ $isoValue }}"
+            @if ($min) data-min="{{ $min }}" @endif
+            @if ($max) data-max="{{ $max }}" @endif
+            @if ($error) data-status="error" @endif
+            @if ($disabled) data-disabled="true" @endif
+            style="anchor-name: {{ $anchorName }}"
+        >
+            <button
+                type="button"
+                class="date-input__icon-button"
+                data-date-toggle
+                aria-label="Abrir calendario"
+                @disabled($disabled)
+            >
                 <x-ui.icon name="calendar-days" size="sm" />
             </button>
+
             <input
                 id="{{ $inputId }}"
                 type="text"
@@ -71,25 +95,63 @@
                 @disabled($disabled)
                 {{ $attributes }}
             >
-            <span class="visually-hidden" role="alert" aria-live="assertive" data-date-alert></span>
+
+            <span
+                class="visually-hidden"
+                role="alert"
+                aria-live="assertive"
+                data-date-alert
+            ></span>
+
             @if ($hasClear && ! $disabled)
-                <button type="button" class="date-input__icon-button" data-date-clear aria-label="Borrar {{ $label }}" @if (blank($isoValue)) hidden @endif>
+                <button
+                    type="button"
+                    class="date-input__icon-button"
+                    data-date-clear
+                    aria-label="Borrar {{ $label }}"
+                    @if (blank($isoValue)) hidden @endif
+                >
                     <x-ui.icon name="x-mark" size="sm" />
                 </button>
             @endif
-            @if ($error)
-                <x-ui.icon name="exclamation-circle" class="text-input__status-icon" data-type="error" />
-            @endif
-            <input type="hidden" name="{{ $name }}" value="{{ $isoValue }}" data-date-value @disabled($disabled)>
 
-            <div id="{{ $calendarId }}" class="popover date-input__popover" role="dialog"
-                aria-label="Elegir fecha" popover="auto" data-date-popover style="position-anchor: {{ $anchorName }}">
+            @if ($error)
+                <x-ui.icon
+                    name="exclamation-circle"
+                    class="text-input__status-icon"
+                    data-type="error"
+                />
+            @endif
+
+            <input
+                type="hidden"
+                name="{{ $name }}"
+                value="{{ $isoValue }}"
+                data-date-value
+                @disabled($disabled)
+            >
+
+            <div
+                id="{{ $calendarId }}"
+                class="popover date-input__popover"
+                role="dialog"
+                aria-label="Elegir fecha"
+                popover="auto"
+                data-date-popover
+                style="position-anchor: {{ $anchorName }}"
+            >
                 <div class="calendar" data-mode="single"></div>
             </div>
         </div>
 
         @if ($error)
-            <x-ui.field-status :id="$statusId" type="error" variant="attached">{{ $error }}</x-ui.field-status>
+            <x-ui.field-status
+                :id="$statusId"
+                type="error"
+                variant="attached"
+            >
+                {{ $error }}
+            </x-ui.field-status>
         @endif
     </div>
 </div>

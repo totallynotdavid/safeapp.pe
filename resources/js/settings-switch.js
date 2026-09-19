@@ -1,3 +1,5 @@
+const SAVE_ERROR = "No se pudo guardar la preferencia.";
+
 for (const form of document.querySelectorAll("[data-preference-form]")) {
     if (!(form instanceof HTMLFormElement)) continue;
 
@@ -5,9 +7,10 @@ for (const form of document.querySelectorAll("[data-preference-form]")) {
         if (!(input instanceof HTMLInputElement)) continue;
 
         input.addEventListener("change", async () => {
-            const priorValue = !input.checked;
-            const field = input.closest("[data-switch]");
-            field?.setAttribute("data-loading", "true");
+            const previousChecked = !input.checked;
+            const switchElement = input.closest("[data-switch]");
+
+            switchElement?.setAttribute("data-loading", "true");
             input.disabled = true;
 
             try {
@@ -20,15 +23,13 @@ for (const form of document.querySelectorAll("[data-preference-form]")) {
                     body: new FormData(form),
                 });
 
-                if (!response.ok) throw new Error("No se pudo guardar la preferencia.");
+                if (!response.ok) throw new Error(SAVE_ERROR);
             } catch (error) {
-                input.checked = priorValue;
-                window.alert(
-                    error instanceof Error ? error.message : "No se pudo guardar la preferencia.",
-                );
+                input.checked = previousChecked;
+                window.alert(error instanceof Error ? error.message : SAVE_ERROR);
             } finally {
                 input.disabled = false;
-                field?.removeAttribute("data-loading");
+                switchElement?.removeAttribute("data-loading");
             }
         });
     }

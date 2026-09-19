@@ -17,8 +17,9 @@
                     <x-ui.stack gap="4" align="stretch">
                         <x-ui.stack gap="1" align="center">
                             <x-ui.heading level="1">Accede a SAFEAPP</x-ui.heading>
+
                             <x-ui.text type="supporting" color="secondary" class="auth-intro">
-                                Ingresa con tus credenciales corporativas para continuar.
+                                Ingresa con tus credenciales corporativas.
                             </x-ui.text>
                         </x-ui.stack>
 
@@ -53,7 +54,7 @@
 
                         <x-ui.stack align="center" width="full">
                             <x-ui.text type="supporting" color="secondary" class="auth-support">
-                                ¿No tienes acceso o no recuerdas tus credenciales? Comunícate con tu supervisor inmediato.
+                                Si no tienes acceso o no recuerdas tus credenciales, comunícate con tu supervisor inmediato.
                             </x-ui.text>
                         </x-ui.stack>
                     </x-ui.stack>

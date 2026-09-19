@@ -1,9 +1,3 @@
-/*
- * Shell interactions: dropdowns, mobile navigation, side navigation collapse/resize,
- * dialogs, and toasts. Handles keyboard navigation, popover positioning,
- * focus management, and responsive breakpoint sync.
- */
-
 for (const field of document.querySelectorAll("[data-selector]")) {
     const container = field.querySelector(".selector");
     const trigger = field.querySelector(".selector__trigger");
@@ -37,13 +31,16 @@ for (const field of document.querySelectorAll("[data-selector]")) {
         for (const option of options) {
             option.removeAttribute("data-highlighted");
         }
+
         if (index < 0 || options[index]?.getAttribute("aria-disabled") === "true") {
             highlightedIndex = -1;
             trigger.removeAttribute("aria-activedescendant");
             return;
         }
+
         highlightedIndex = index;
         const option = options[index];
+
         option.setAttribute("data-highlighted", "true");
         trigger.setAttribute("aria-activedescendant", option.id);
         option.scrollIntoView({ block: "nearest" });
@@ -53,16 +50,20 @@ for (const field of document.querySelectorAll("[data-selector]")) {
         if (trigger.disabled || listbox.matches(":popover-open")) {
             return;
         }
+
         listbox.showPopover();
+
         const selectedIndex = options.findIndex(
             (option) => option.getAttribute("aria-selected") === "true",
         );
         const firstEnabled = enabledIndexes()[0] ?? -1;
+
         highlight(selectedIndex >= 0 ? selectedIndex : firstEnabled);
     };
 
     const close = () => {
         highlight(-1);
+
         if (listbox.matches(":popover-open")) {
             listbox.hidePopover();
         }
@@ -72,14 +73,17 @@ for (const field of document.querySelectorAll("[data-selector]")) {
         if (!(option instanceof HTMLElement) || option.getAttribute("aria-disabled") === "true") {
             return;
         }
+
         for (const candidate of options) {
             candidate.setAttribute("aria-selected", String(candidate === option));
         }
+
         carrier.value = option.dataset.value ?? "";
         label.textContent =
             option.querySelector(".selector__option-content")?.textContent?.trim() ?? "";
         container.setAttribute("data-placeholder", "false");
         carrier.dispatchEvent(new Event("change", { bubbles: true }));
+
         close();
         trigger.focus({ preventScroll: true });
     };
@@ -95,6 +99,7 @@ for (const field of document.querySelectorAll("[data-selector]")) {
     listbox.addEventListener("click", (event) => {
         const option =
             event.target instanceof Element ? event.target.closest('[role="option"]') : null;
+
         if (option && listbox.contains(option)) {
             select(option);
         }
@@ -108,8 +113,10 @@ for (const field of document.querySelectorAll("[data-selector]")) {
         const indexes = enabledIndexes();
         const currentPosition = indexes.indexOf(highlightedIndex);
         const isOpen = listbox.matches(":popover-open");
+
         if (event.key === "ArrowDown") {
             event.preventDefault();
+
             if (!isOpen) {
                 open();
                 highlight(indexes[0] ?? -1);
@@ -119,6 +126,7 @@ for (const field of document.querySelectorAll("[data-selector]")) {
             }
         } else if (event.key === "ArrowUp") {
             event.preventDefault();
+
             if (!isOpen) {
                 open();
                 highlight(indexes.at(-1) ?? -1);
@@ -128,11 +136,13 @@ for (const field of document.querySelectorAll("[data-selector]")) {
             }
         } else if (event.key === "Home" || event.key === "End") {
             event.preventDefault();
+
             if (isOpen) {
                 highlight(event.key === "Home" ? (indexes[0] ?? -1) : (indexes.at(-1) ?? -1));
             }
         } else if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
+
             if (isOpen && highlightedIndex >= 0) {
                 select(options[highlightedIndex]);
             } else {
@@ -150,6 +160,7 @@ for (const field of document.querySelectorAll("[data-selector]")) {
         } else if (event.key.length === 1 && !event.ctrlKey && !event.metaKey) {
             typeahead += event.key.toLocaleLowerCase();
             window.clearTimeout(typeaheadTimeout);
+
             typeaheadTimeout = window.setTimeout(() => {
                 typeahead = "";
             }, 500);
@@ -163,10 +174,12 @@ for (const field of document.querySelectorAll("[data-selector]")) {
                         .toLocaleLowerCase()
                         .startsWith(typeahead),
             );
+
             if (matchIndex >= 0) {
                 if (!isOpen) {
                     open();
                 }
+
                 highlight(matchIndex);
             }
         }
@@ -174,8 +187,10 @@ for (const field of document.querySelectorAll("[data-selector]")) {
 
     listbox.addEventListener("toggle", (event) => {
         const isOpen = event.newState === "open";
+
         trigger.setAttribute("aria-expanded", String(isOpen));
         container.toggleAttribute("data-open", isOpen);
+
         if (!isOpen) {
             trigger.removeAttribute("aria-activedescendant");
         }
@@ -192,8 +207,10 @@ for (const form of document.querySelectorAll("[data-store-assignment]")) {
                 .filter((checkbox) => checkbox.checked)
                 .map((checkbox) => checkbox.value),
         );
+
         for (const radio of activeRadios) {
             radio.disabled = !assigned.has(radio.value);
+
             if (radio.disabled) {
                 radio.checked = false;
             }
@@ -205,7 +222,6 @@ for (const form of document.querySelectorAll("[data-store-assignment]")) {
     }
 }
 
-// Side navigation collapse and resize behavior with responsive breakpoint handling.
 const mobileSideNavQuery = window.matchMedia("(max-width: 768px)");
 
 for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
@@ -237,6 +253,7 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
     const closeCollapsedPopovers = () => {
         for (const trigger of sectionTriggers) {
             const group = document.getElementById(trigger.getAttribute("aria-controls") ?? "");
+
             if (group instanceof HTMLElement && group.matches(":popover-open")) {
                 group.hidePopover();
             }
@@ -248,6 +265,7 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
 
         for (const [index, trigger] of sectionTriggers.entries()) {
             const group = document.getElementById(trigger.getAttribute("aria-controls") ?? "");
+
             if (!(trigger instanceof HTMLElement) || !(group instanceof HTMLElement)) {
                 continue;
             }
@@ -257,7 +275,9 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
                     group.dataset.inlineExpanded = trigger.getAttribute("aria-expanded") ?? "false";
                     group.setAttribute("popover", "auto");
                 }
+
                 const anchorName = `--side-nav-item-${index}`;
+
                 trigger.style.anchorName = anchorName;
                 group.style.positionAnchor = anchorName;
                 group.setAttribute("aria-hidden", "false");
@@ -269,11 +289,14 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
             if (group.matches(":popover-open")) {
                 group.hidePopover();
             }
+
             if (group.hasAttribute("popover")) {
                 group.removeAttribute("popover");
                 group.style.removeProperty("position-anchor");
                 trigger.style.removeProperty("anchor-name");
+
                 const expanded = group.dataset.inlineExpanded === "true";
+
                 trigger.setAttribute("aria-expanded", String(expanded));
                 group.setAttribute("aria-hidden", String(!expanded));
                 group.toggleAttribute("inert", !expanded);
@@ -284,6 +307,7 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
 
     const render = () => {
         const effectiveCollapsed = isCollapsed && !mobileSideNavQuery.matches;
+
         if (effectiveCollapsed) {
             nav.setAttribute("data-collapsed", "true");
             region.setAttribute("data-collapsed", "true");
@@ -291,6 +315,7 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
             nav.removeAttribute("data-collapsed");
             region.removeAttribute("data-collapsed");
         }
+
         nav.style.width = effectiveCollapsed ? "" : `${width}px`;
         handle.setAttribute("aria-valuenow", String(effectiveCollapsed ? 0 : width));
         collapseButton.setAttribute("aria-expanded", String(!effectiveCollapsed));
@@ -298,9 +323,11 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
             "aria-label",
             effectiveCollapsed ? "Expandir barra lateral" : "Contraer barra lateral",
         );
+
         if (!effectiveCollapsed) {
             closeCollapsedPopovers();
         }
+
         syncPopoverTargets();
     };
 
@@ -308,12 +335,15 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
         if (collapsed === isCollapsed) {
             return;
         }
+
         closeCollapsedPopovers();
+
         if (collapsed) {
             preCollapseWidth = width;
         } else {
             width = Math.min(maxWidth, Math.max(minWidth, preCollapseWidth || defaultWidth));
         }
+
         isCollapsed = collapsed;
         render();
     };
@@ -323,9 +353,11 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
             setCollapsed(true);
             return;
         }
+
         if (isCollapsed) {
             isCollapsed = false;
         }
+
         width = Math.min(maxWidth, Math.max(minWidth, nextWidth));
         render();
     };
@@ -344,8 +376,10 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
     handle.addEventListener("pointerdown", (event) => {
         event.preventDefault();
         event.stopPropagation();
+
         dragStartWidth = isCollapsed ? 0 : width;
         dragStartX = event.clientX;
+
         handle.setAttribute("data-resizing", "true");
         document.body.style.cursor = "col-resize";
         document.body.style.userSelect = "none";
@@ -356,6 +390,7 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
 
     handle.addEventListener("keydown", (event) => {
         const step = event.shiftKey ? 50 : 10;
+
         if (event.key === "ArrowRight" || event.key === "ArrowDown") {
             event.preventDefault();
             resizeFrom((isCollapsed ? 0 : width) + step);
@@ -375,9 +410,8 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
     });
 
     handle.addEventListener("dblclick", () => setCollapsed(!isCollapsed));
+
     collapseButton.addEventListener("click", (event) => {
-        // Keep the footer action inside the same state boundary and never let
-        // a click fall through to a nested toggle.
         event.preventDefault();
         event.stopImmediatePropagation();
         setCollapsed(!isCollapsed);
@@ -385,14 +419,17 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
 
     for (const trigger of sectionTriggers) {
         const group = document.getElementById(trigger.getAttribute("aria-controls") ?? "");
+
         if (!(group instanceof HTMLElement)) {
             continue;
         }
+
         group.addEventListener("toggle", () => {
             if (group.hasAttribute("popover")) {
                 trigger.setAttribute("aria-expanded", String(group.matches(":popover-open")));
             }
         });
+
         group.addEventListener("click", (event) => {
             if (
                 group.hasAttribute("popover") &&
@@ -430,6 +467,7 @@ for (const nav of document.querySelectorAll("[data-side-nav]")) {
             } else {
                 group.showPopover();
             }
+
             return;
         }
 
@@ -438,6 +476,7 @@ for (const nav of document.querySelectorAll("[data-side-nav]")) {
         }
 
         const expanded = toggle.getAttribute("aria-expanded") === "true";
+
         toggle.setAttribute("aria-expanded", String(!expanded));
         group.setAttribute("aria-hidden", String(expanded));
         group.toggleAttribute("inert", expanded);
@@ -451,10 +490,13 @@ for (const control of document.querySelectorAll("[data-auto-submit]")) {
 for (const dismiss of document.querySelectorAll("[data-toast-dismiss]")) {
     dismiss.addEventListener("click", () => {
         const wrapper = dismiss.closest("[data-toast-wrapper]");
+
         if (!wrapper) {
             return;
         }
+
         wrapper.setAttribute("data-exiting", "true");
+
         window.setTimeout(
             () => wrapper.remove(),
             window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 10 : 125,
@@ -462,7 +504,7 @@ for (const dismiss of document.querySelectorAll("[data-toast-dismiss]")) {
     });
 }
 
-// Modal alert dialog: no light dismiss, Escape cancels, initial focus on least destructive action.
+// Alert dialogs do not light-dismiss; Escape acts as cancel.
 for (const alertDialog of document.querySelectorAll("[data-alert-dialog]")) {
     if (!(alertDialog instanceof HTMLDialogElement)) {
         continue;
@@ -484,11 +526,14 @@ for (const alertDialog of document.querySelectorAll("[data-alert-dialog]")) {
             if (alertDialog.open) {
                 return;
             }
+
             invoker = trigger;
+
             const rect = trigger.getBoundingClientRect();
             const dx = rect.left + rect.width / 2 - window.innerWidth / 2;
             const dy = rect.top + rect.height / 2 - window.innerHeight / 2;
             const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+
             alertDialog.style.setProperty(
                 "--dialog-dir-x",
                 `${Math.round((dx / distance) * 16)}px`,
@@ -498,6 +543,7 @@ for (const alertDialog of document.querySelectorAll("[data-alert-dialog]")) {
                 `${Math.round((dy / distance) * 16)}px`,
             );
             alertDialog.showModal();
+
             if (cancel instanceof HTMLElement) {
                 cancel.focus({ preventScroll: true });
             }
@@ -505,19 +551,22 @@ for (const alertDialog of document.querySelectorAll("[data-alert-dialog]")) {
     }
 
     cancel?.addEventListener("click", close);
+
     alertDialog.addEventListener("cancel", (event) => {
         event.preventDefault();
         close();
     });
+
     alertDialog.addEventListener("close", () => {
         if (invoker instanceof HTMLElement) {
             invoker.focus({ preventScroll: true });
         }
+
         invoker = null;
     });
 }
 
-// Modal form dialog: dismiss on Escape, return focus to trigger. Native <dialog> supplies focus containment.
+// Native <dialog> handles focus containment.
 for (const dialog of document.querySelectorAll("[data-dialog]")) {
     if (!(dialog instanceof HTMLDialogElement)) {
         continue;
@@ -531,16 +580,21 @@ for (const dialog of document.querySelectorAll("[data-dialog]")) {
         }
 
         invoker = trigger instanceof HTMLElement ? trigger : null;
+
         if (invoker) {
             const rect = invoker.getBoundingClientRect();
             const dx = rect.left + rect.width / 2 - window.innerWidth / 2;
             const dy = rect.top + rect.height / 2 - window.innerHeight / 2;
             const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+
             dialog.style.setProperty("--dialog-dir-x", `${Math.round((dx / distance) * 16)}px`);
             dialog.style.setProperty("--dialog-dir-y", `${Math.round((dy / distance) * 16)}px`);
         }
+
         dialog.showModal();
+
         const title = dialog.querySelector("[data-dialog-title]");
+
         if (title instanceof HTMLElement) {
             title.focus({ preventScroll: true });
         }
@@ -558,6 +612,7 @@ for (const dialog of document.querySelectorAll("[data-dialog]")) {
         if (invoker instanceof HTMLElement) {
             invoker.focus({ preventScroll: true });
         }
+
         invoker = null;
     });
 
@@ -578,7 +633,6 @@ let invoker = null;
 let closeTimer = null;
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-// Relocate the side nav between desktop and mobile targets based on breakpoint.
 const syncSideNavLocation = () => {
     if (
         !(sideNavRegion instanceof HTMLElement) ||
@@ -589,6 +643,7 @@ const syncSideNavLocation = () => {
     }
 
     const target = mobileSideNavQuery.matches ? mobileNavContent : sideNavHome;
+
     if (sideNavRegion.parentElement !== target) {
         target.append(sideNavRegion);
     }
@@ -611,6 +666,7 @@ const closeMobileNav = () => {
     }
 
     dialog.removeAttribute("data-open");
+
     closeTimer = window.setTimeout(
         () => {
             closeTimer = null;
@@ -633,6 +689,7 @@ if (
         invoker = openButton;
         dialog.showModal();
         openButton.setAttribute("aria-expanded", "true");
+
         window.requestAnimationFrame(() => {
             dialog.setAttribute("data-open", "true");
             drawer?.focus({ preventScroll: true });
@@ -671,6 +728,7 @@ if (
                 window.clearTimeout(closeTimer);
                 closeTimer = null;
             }
+
             finishClose();
         }
     });

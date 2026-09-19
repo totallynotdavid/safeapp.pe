@@ -6,13 +6,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 use InvalidArgumentException;
 
-/**
- * Icon component using Heroicons.
- *
- * SAFEAPP uses one outline Heroicons family. The allowlist keeps product
- * configuration semantic and prevents stored or request-provided component
- * names from becoming executable Blade markup.
- */
 class Icon extends Component
 {
     private const ICONS = [

@@ -33,27 +33,54 @@
                 @if ($describedBy) aria-describedby="{{ $describedBy }}" @endif
                 @if ($error) aria-invalid="true" @endif
             >
-            <div class="checkbox" data-size="{{ $size }}" @if ($checked) data-checked="checked" @endif
-                @if ($disabled) data-disabled="disabled" @endif aria-hidden="true">
+
+            <div
+                class="checkbox"
+                data-size="{{ $size }}"
+                @if ($checked) data-checked="checked" @endif
+                @if ($disabled) data-disabled="disabled" @endif
+                aria-hidden="true"
+            >
                 <svg class="checkbox__checkmark" viewBox="0 0 10 10">
-                    <path d="M8.5 2.5L4 7.5L1.5 5" stroke="currentColor" stroke-width="1.5" fill="none"
-                        stroke-linecap="round" stroke-linejoin="round" />
+                    <path
+                        d="M8.5 2.5L4 7.5L1.5 5"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        fill="none"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
                 </svg>
             </div>
         </div>
+
         <div class="checkbox-input__label-wrapper">
-            <label class="field-label" for="{{ $id }}" @if ($disabled) data-disabled="true" @endif>
+            <label
+                class="field-label"
+                for="{{ $id }}"
+                @if ($disabled) data-disabled="true" @endif
+            >
                 {{ $label }}
+
                 @if ($optional || $required)
-                    <span class="field-label__requirement"><span aria-hidden="true"> ∙ </span>{{ $optional ? 'Opcional' : 'Obligatorio' }}</span>
+                    <span class="field-label__requirement">
+                        <span aria-hidden="true"> ∙ </span>
+                        {{ $optional ? 'Opcional' : 'Obligatorio' }}
+                    </span>
                 @endif
             </label>
+
             @if ($description)
-                <span id="{{ $descriptionId }}" class="field-description">{{ $description }}</span>
+                <span id="{{ $descriptionId }}" class="field-description">
+                    {{ $description }}
+                </span>
             @endif
         </div>
     </div>
+
     @if ($error)
-        <x-ui.field-status :id="$statusId" type="error" variant="detached">{{ $error }}</x-ui.field-status>
+        <x-ui.field-status :id="$statusId" type="error" variant="detached">
+            {{ $error }}
+        </x-ui.field-status>
     @endif
 </div>

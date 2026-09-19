@@ -10,8 +10,12 @@ use Throwable;
 
 class AccountNotifications
 {
-    public function record(Usuario $usuario, string $category, string $title, string $description): NotificacionUsuario
-    {
+    public function record(
+        Usuario $usuario,
+        string $category,
+        string $title,
+        string $description,
+    ): NotificacionUsuario {
         $notification = $usuario
             ->notificaciones()
             ->create([
@@ -19,14 +23,18 @@ class AccountNotifications
                 'titulo' => $title,
                 'descripcion' => $description,
             ]);
-        $preference = $usuario->preferenciasNotificacion;
-        $enabled = $category === 'seguridad'
-            ? $preference->correo_seguridad ?? true
-            : $preference->correo_cuenta ?? true;
 
-        if ($enabled && $usuario->correo && $usuario->correo_verificado_en) {
+        $preferences = $usuario->preferenciasNotificacion;
+
+        $emailEnabled = $category === 'seguridad'
+            ? $preferences->correo_seguridad ?? true
+            : $preferences->correo_cuenta ?? true;
+
+        if ($emailEnabled && $usuario->correo && $usuario->correo_verificado_en) {
             try {
-                Mail::to($usuario->correo)->queue(new AccountEmail($title, $title, $description));
+                Mail::to($usuario->correo)->queue(
+                    new AccountEmail($title, $title, $description),
+                );
             } catch (Throwable $exception) {
                 report($exception);
             }

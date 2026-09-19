@@ -16,9 +16,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        // A held permiso grants that ability. Return null, not false, when it
-        // is absent so model policies still decide view/create/update/delete;
-        // those verbs are never registered as permiso keys.
+        // Null lets the model policy decide when the user lacks the permission.
         Gate::before(static fn (Usuario $user, string $ability): ?bool => $user->hasPermiso($ability) ? true : null);
 
         View::composer('layouts.app', static function ($view): void {
@@ -26,8 +24,7 @@ class AppServiceProvider extends ServiceProvider
             $routeName = Route::currentRouteName();
             $dato = request()->route('dato');
 
-            // The shared cockpit detail route belongs to the segment carried by
-            // its bound record, so the matching queue remains selected.
+            // Detail routes use the sidebar section for their record type.
             if ($routeName === 'gestion.show' && $dato instanceof Dato) {
                 $routeName = GestionController::rutaIndex($dato->tipo_data);
             }
@@ -40,9 +37,12 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer('layouts.settings', static function ($view): void {
             $user = Auth::user();
-            $routeName = Route::currentRouteName() === 'configuracion.index'
-                ? 'configuracion.perfil'
-                : Route::currentRouteName();
+            $routeName = Route::currentRouteName();
+
+            if ($routeName === 'configuracion.index') {
+                $routeName = 'configuracion.perfil';
+            }
+
             $view->with(
                 'settingsSections',
                 $user
@@ -53,7 +53,13 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer('partials.tienda-activa', static function ($view): void {
             $user = Auth::user();
-            $view->with('tiendasAsignadas', $user ? $user->asignaciones()->with('tienda')->get() : collect());
+
+            $view->with(
+                'tiendasAsignadas',
+                $user
+                    ? $user->asignaciones()->with('tienda')->get()
+                    : collect(),
+            );
         });
     }
 }
