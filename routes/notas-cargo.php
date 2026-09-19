@@ -1,18 +1,6 @@
 <?php
 
-// NOTA DE CARGO: the three stages a case passes through, each its own screen
-// with its own permiso and its own columns. Liquidación is the fourth stage and
-// still lives in web.php with the rest of the COBRANZA section.
-//
-// Legacy shipped five sidebar leaves per producto, because validación and back
-// each existed twice: once filtered to the reviewer's tienda and once not. The
-// filtered copies are gone. See the controllers for the evidence.
-//
-// Each queue also exports. The export sits inside the screen's own permiso group
-// and runs the screen's own query, so it needs no leaf of its own: legacy's four
-// REPORTE BACK leaves were the back screen a third and fourth time, with an
-// Excel button bolted on.
-
+use App\Http\Controllers\ClienteIdentidadController;
 use App\Http\Controllers\NotaCargoFijaBackController;
 use App\Http\Controllers\NotaCargoFijaController;
 use App\Http\Controllers\NotaCargoFijaValidacionController;
@@ -21,6 +9,12 @@ use App\Http\Controllers\NotaCargoMovilController;
 use App\Http\Controllers\NotaCargoMovilValidacionController;
 use Illuminate\Support\Facades\Route;
 
+// Legacy shipped validación and back twice, once filtered to the reviewer's tienda
+// and once not. The filtered copies are gone; see the controllers for the evidence.
+//
+// Each export sits inside its screen's permiso group and runs the screen's own
+// query, so it needs no leaf of its own: legacy's four REPORTE BACK leaves were the
+// back screen again with an Excel button bolted on.
 Route::middleware('can:notacargo.movil.registrar')->group(function () {
     Route::get('/notas-cargo/movil', [NotaCargoMovilController::class, 'index'])
         ->name('notas-cargo.movil.index');
@@ -30,6 +24,9 @@ Route::middleware('can:notacargo.movil.registrar')->group(function () {
         ->name('notas-cargo.movil.create');
     Route::post('/notas-cargo/movil', [NotaCargoMovilController::class, 'store'])
         ->name('notas-cargo.movil.store');
+    Route::post('/notas-cargo/movil/cliente', [ClienteIdentidadController::class, 'store'])
+        ->defaults('origen', 'movil')
+        ->name('notas-cargo.movil.cliente.store');
     Route::get('/notas-cargo/movil/{ncMovil}/editar', [NotaCargoMovilController::class, 'edit'])
         ->name('notas-cargo.movil.edit');
     Route::put('/notas-cargo/movil/{ncMovil}', [NotaCargoMovilController::class, 'update'])
@@ -65,6 +62,9 @@ Route::middleware('can:notacargo.fija.registrar')->group(function () {
         ->name('notas-cargo.fija.create');
     Route::post('/notas-cargo/fija', [NotaCargoFijaController::class, 'store'])
         ->name('notas-cargo.fija.store');
+    Route::post('/notas-cargo/fija/cliente', [ClienteIdentidadController::class, 'store'])
+        ->defaults('origen', 'fija')
+        ->name('notas-cargo.fija.cliente.store');
     Route::get('/notas-cargo/fija/{ncFija}/editar', [NotaCargoFijaController::class, 'edit'])
         ->name('notas-cargo.fija.edit');
     Route::put('/notas-cargo/fija/{ncFija}', [NotaCargoFijaController::class, 'update'])
