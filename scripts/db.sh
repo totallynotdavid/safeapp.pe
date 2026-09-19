@@ -22,8 +22,6 @@ PORT="${MARIADB_PORT:-3306}"
 SOCKET="/tmp/safeapp-pe-mariadb.sock"
 
 # The app's own .env is the single source of the dev DB's name and credentials.
-# It used to be the legacy app's .env, which is why the names differed; that app
-# is gone, so this reads Laravel's names directly.
 ENV_FILE="${ROOT_DIR}/.env"
 if [ -f "$ENV_FILE" ]; then
   set -a
