@@ -1,61 +1,146 @@
 @extends('layouts.app')
 
 @section('title', 'Histórico')
+@section('page', 'true')
 
 @section('content')
-    @php($field = 'mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none')
+    <x-ui.table-page title="Mis gestiones">
+        <x-slot:actions>
+            <x-ui.icon-button
+                type="submit"
+                label="Exportar gestiones"
+                variant="ghost"
+                form="historico-filtros"
+                formaction="{{ route('historico.exportar') }}"
+            >
+                <x-ui.icon name="arrow-down-tray" />
+            </x-ui.icon-button>
+        </x-slot:actions>
 
-    <div class="space-y-6">
-        <h1 class="text-xl font-semibold text-gray-800">Mis gestiones</h1>
+        <x-ui.text type="supporting" color="secondary">
+            Consulta y exporta los contactos que registraste en el período elegido.
+        </x-ui.text>
 
-        {{-- Exportar is a second submit on this form, so the download always
-             carries exactly the range on screen. --}}
-        <form method="GET" action="{{ route('historico.index') }}" class="flex flex-wrap items-end gap-3 rounded-lg border border-gray-200 bg-white p-4">
-            <div>
-                <label for="desde" class="block text-sm font-medium text-gray-700">Desde</label>
-                <input id="desde" name="desde" type="date" value="{{ $rango->desde->toDateString() }}" class="{{ $field }}">
-            </div>
-            <div>
-                <label for="hasta" class="block text-sm font-medium text-gray-700">Hasta</label>
-                <input id="hasta" name="hasta" type="date" value="{{ $rango->hasta->toDateString() }}" class="{{ $field }}">
-            </div>
-            <button type="submit" class="rounded-md bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">Filtrar</button>
-            <button type="submit" formaction="{{ route('historico.exportar') }}"
-                class="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Exportar</button>
-        </form>
+        {{-- The export button in the page actions submits this form by id, so it exports the range shown. --}}
+        <x-ui.stack
+            id="historico-filtros"
+            as="form"
+            method="GET"
+            action="{{ route('historico.index') }}"
+            direction="horizontal"
+            v-align="end"
+            gap="3"
+            wrap="wrap"
+        >
+            <input type="hidden" name="buscar" value="{{ $busqueda }}">
+            <x-ui.date-input
+                name="desde"
+                label="Desde"
+                :value="$rango->desde->toDateString()"
+                :max="$rango->hasta->toDateString()"
+                required
+            />
+            <x-ui.date-input
+                name="hasta"
+                label="Hasta"
+                :value="$rango->hasta->toDateString()"
+                :min="$rango->desde->toDateString()"
+                required
+            />
+            <x-ui.button type="submit" variant="primary">Filtrar</x-ui.button>
+        </x-ui.stack>
 
-        <div class="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-            <table class="min-w-full divide-y divide-gray-200 text-sm">
-                <thead class="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
+        <x-ui.table-search
+            :action="route('historico.index')"
+            :value="$busqueda"
+            placeholder="Buscar por cliente, RUC, contacto o teléfono…"
+            :result-count="$contactos->total()"
+            label="Buscar en mis gestiones"
+            :preserve="['desde' => $rango->desde->toDateString(), 'hasta' => $rango->hasta->toDateString()]"
+        />
+
+        @php
+            $contactosPorDia = $contactos->getCollection()->groupBy(
+                fn ($contacto) => $contacto->fecha?->toDateString() ?? 'sin-fecha',
+            );
+            $agruparPorDia = $contactosPorDia->count() > 1;
+        @endphp
+
+        <x-ui.table label="Histórico de mis gestiones" :truncate="true">
+            <colgroup>
+                <col class="col-client">
+                <col class="col-contact">
+                <col class="col-response">
+                <col class="col-date">
+                <col class="col-phone">
+                <col class="col-comment">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th scope="col">Cliente</th>
+                    <th scope="col">Contacto</th>
+                    <th scope="col">Respuesta</th>
+                    <th scope="col">{{ $agruparPorDia ? 'Hora' : 'Fecha' }}</th>
+                    <th scope="col">Teléfono</th>
+                    <th scope="col">Comentario</th>
+                </tr>
+            </thead>
+            @if ($contactos->isEmpty())
+                <tbody>
                     <tr>
-                        <th class="px-6 py-3 text-left">Fecha</th>
-                        <th class="px-6 py-3 text-left">Cliente</th>
-                        <th class="px-6 py-3 text-left">Contacto</th>
-                        <th class="px-6 py-3 text-left">Teléfono</th>
-                        <th class="px-6 py-3 text-left">Respuesta</th>
-                        <th class="px-6 py-3 text-left">Comentario</th>
+                        <td colspan="6">
+                            <x-ui.empty-state
+                                title="No hay gestiones en este período"
+                                description="Prueba con un rango de fechas diferente."
+                                compact
+                            />
+                        </td>
                     </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    @forelse ($contactos as $contacto)
-                        <tr>
-                            <td class="whitespace-nowrap px-6 py-3 text-gray-600">{{ $contacto->fecha?->format('Y-m-d H:i') }}</td>
-                            <td class="px-6 py-3">
-                                <span class="font-medium text-gray-800">{{ $contacto->razon_social }}</span>
-                                <span class="block text-xs text-gray-500">{{ $contacto->cliente?->ruc }}</span>
-                            </td>
-                            <td class="px-6 py-3 text-gray-600">{{ $contacto->gestion }}</td>
-                            <td class="whitespace-nowrap px-6 py-3 text-gray-600">{{ $contacto->telefono }}</td>
-                            <td class="px-6 py-3 text-gray-600">{{ $contacto->respuesta?->descripcion }}</td>
-                            <td class="px-6 py-3 text-gray-600">{{ $contacto->comentario }}</td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="px-6 py-6 text-center text-gray-500">Sin gestiones en el rango elegido.</td>
-                        </tr>
-                    @endforelse
                 </tbody>
-            </table>
-        </div>
-    </div>
+            @elseif ($agruparPorDia)
+                @foreach ($contactosPorDia as $dia => $contactosDelDia)
+                    <x-ui.grouped-table-section
+                        id="historico-dia-{{ $dia }}"
+                        :label="$dia === 'sin-fecha' ? 'Sin fecha registrada' : \Illuminate\Support\Carbon::parse($dia)->format('d/m/Y')"
+                        :count="$contactosDelDia->count()"
+                        :columns="6"
+                    >
+                        @foreach ($contactosDelDia as $contacto)
+                            <tr>
+                                <td>
+                                    <div class="table__primary">{{ $contacto->razon_social }}</div>
+                                    <div class="table__secondary">{{ $contacto->cliente?->ruc ?? '—' }}</div>
+                                </td>
+                                <td>{{ $contacto->gestion ?? '—' }}</td>
+                                <td>{{ $contacto->respuesta?->descripcion ?? '—' }}</td>
+                                <td class="table__secondary">{{ $contacto->fecha?->format('H:i') ?? '—' }}</td>
+                                <td>{{ $contacto->telefono ?? '—' }}</td>
+                                <td>{{ $contacto->comentario ?? '—' }}</td>
+                            </tr>
+                        @endforeach
+                    </x-ui.grouped-table-section>
+                @endforeach
+            @else
+                <tbody>
+                    @foreach ($contactos as $contacto)
+                        <tr>
+                            <td>
+                                <div class="table__primary">{{ $contacto->razon_social }}</div>
+                                <div class="table__secondary">{{ $contacto->cliente?->ruc ?? '—' }}</div>
+                            </td>
+                            <td>{{ $contacto->gestion ?? '—' }}</td>
+                            <td>{{ $contacto->respuesta?->descripcion ?? '—' }}</td>
+                            <td class="table__secondary">{{ $contacto->fecha?->format('Y-m-d H:i') }}</td>
+                            <td>{{ $contacto->telefono ?? '—' }}</td>
+                            <td>{{ $contacto->comentario ?? '—' }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            @endif
+        </x-ui.table>
+
+        @if ($contactos->hasPages())
+            <x-ui.pagination :paginator="$contactos" label="Páginas del histórico de gestiones" />
+        @endif
+    </x-ui.table-page>
 @endsection

@@ -36,11 +36,9 @@ class DatoFactory extends Factory
      * Lets a fixture name its subject by RUC instead of wiring a Cliente by
      * hand, resolving it exactly as AltaDeClientes and the importer do.
      *
-     * Without this every test that cares about a specific RUC would have to
-     * create the customer, keep the id, and pass it down, which buries what the
-     * test is actually about. `ruc` and `razon_social` are facts about the
-     * record's subject, so accepting them here reads the same as before the
-     * identity split even though two rows are now written.
+     * `ruc` and `razon_social` are facts about the record's subject, so a test
+     * that cares about a specific RUC states it here instead of creating the
+     * customer, keeping the id and passing it down.
      *
      * @param  array<string, mixed>  $attributes
      */

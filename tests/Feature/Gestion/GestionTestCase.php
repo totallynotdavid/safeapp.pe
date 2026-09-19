@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Gestion;
 
+use App\Cockpit\AccesoAClientes;
 use App\Models\Dato;
 use App\Models\Menu;
 use App\Models\Tienda;
@@ -13,9 +14,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
-// Shared fixture for the cockpit tests: a seeded disposition catalog and agents
-// placed on one tienda, since every gestión path is scoped by the agent's active
-// tienda.
+// Every gestión path is scoped by the agent's active tienda, so agents are placed
+// on one.
 abstract class GestionTestCase extends TestCase
 {
     use RefreshDatabase;
@@ -55,10 +55,14 @@ abstract class GestionTestCase extends TestCase
      */
     protected function datoDe(Usuario $agente, string $tipoData = 'MOVIL', array $atributos = []): Dato
     {
-        return Dato::factory()
+        $dato = Dato::factory()
             ->tipoData($tipoData)
             ->asignadoA($agente->id_usuario, $this->tienda->id_tienda)
             ->create($atributos);
+
+        AccesoAClientes::otorgar($dato->id_cliente, $agente);
+
+        return $dato;
     }
 
     /**

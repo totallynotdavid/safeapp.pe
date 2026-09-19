@@ -15,10 +15,10 @@ use Illuminate\Support\Facades\DB;
  * One customer on one campaign list: the unit of work behind GESTION MOVIL and
  * GESTION FIJA. The business calls these "datos", and a single one "un dato".
  *
- * Deliberately not called Cliente, though it once was. A customer is a person;
- * this is a job. The same customer delivered by two campaigns is two rows here
- * and one row in `cliente`, which is what lets a campaign be reloaded without
- * disturbing the customer or the agent working them.
+ * Deliberately not called Cliente: a customer is a person, this is a job. The
+ * same customer delivered by two campaigns is two rows here and one in `cliente`,
+ * which is what lets a campaign be reloaded without disturbing the customer or
+ * the agent working them.
  */
 class Dato extends Model
 {

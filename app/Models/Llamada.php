@@ -12,9 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 // seguimiento reports read. Dato::registrarGestion owns the write.
 //
 // Points at the customer, not at the campaign record that prompted the call, so
-// a contact survives the campaign. This is also the one legacy table that always
-// referenced clients by their natural key, and correspondingly the only one with
-// no orphaned rows in the production dump.
+// a contact survives the campaign.
 class Llamada extends Model
 {
     /** @use HasFactory<LlamadaFactory> */

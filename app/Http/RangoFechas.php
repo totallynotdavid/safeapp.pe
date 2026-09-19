@@ -7,10 +7,8 @@ use Illuminate\Support\Carbon;
 
 /**
  * The date range a call-log report is filtered to, read once from the request.
- *
- * Two screens read the call log over a range: histórico shows the signed-in
- * agent their own contacts, seguimiento shows a supervisor's whole team. Each
- * also exports, so the parsing has four call sites.
+ * Histórico and seguimiento each list and export, so the parsing has four call
+ * sites.
  *
  * An unparseable or inverted range falls back rather than erroring. These arrive
  * from a query string anyone can edit, and a report should still render.
