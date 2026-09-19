@@ -9,8 +9,7 @@ use RuntimeException;
  * Reads a CSV as a stream of header-keyed rows, tolerating what Excel actually
  * produces.
  *
- * Two quirks are handled here rather than in every caller, because both were
- * present in the sample files the legacy upload left behind:
+ * Two Excel quirks are handled here rather than in every caller:
  *
  * - Excel on a Spanish locale writes semicolon-separated files, English writes
  *   commas, and neither announces which. The delimiter is taken from whichever
