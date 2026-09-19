@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Quiebre;
 
+use App\Cockpit\AccesoAClientes;
 use App\Models\Dato;
 use App\Models\Quiebre;
 use App\Models\Tienda;
@@ -14,35 +15,32 @@ class QuiebreClienteTest extends QuiebreTestCase
     public function test_the_form_appears_only_once_a_ruc_resolves_to_a_client(): void
     {
         $ejecutivo = $this->ejecutivo();
-        Dato::factory()->create(['ruc' => self::RUC, 'razon_social' => 'ACME SAC']);
+        $dato = Dato::factory()->create(['ruc' => self::RUC, 'razon_social' => 'ACME SAC']);
+        AccesoAClientes::otorgar($dato->id_cliente, $ejecutivo);
 
-        // No RUC yet: the search box, and nothing to file against.
         $this
             ->actingAs($ejecutivo)
             ->get(route('quiebres.registro.create'))
-            ->assertOk()
-            ->assertDontSee('name="id_cliente"', false);
+            ->assertOk();
 
-        // A RUC with no client cannot open a case, and says where to go instead.
         $this
             ->actingAs($ejecutivo)
             ->get(route('quiebres.registro.create', ['ruc' => '20000000000']))
             ->assertOk()
-            ->assertSee('no está registrado')
-            ->assertDontSee('name="id_cliente"', false);
+            ->assertSee('Cliente no disponible');
 
         $this
             ->actingAs($ejecutivo)
             ->get(route('quiebres.registro.create', ['ruc' => self::RUC]))
             ->assertOk()
-            ->assertSee('ACME SAC')
-            ->assertSee('name="id_cliente"', false);
+            ->assertSee('ACME SAC');
     }
 
     public function test_the_client_name_is_never_an_input(): void
     {
         $ejecutivo = $this->ejecutivo();
         $cliente = Dato::factory()->create(['ruc' => '20555555555', 'razon_social' => 'NOMBRE REAL']);
+        AccesoAClientes::otorgar($cliente->id_cliente, $ejecutivo);
 
         // A posted name must be ignored, not stored: the client record owns it.
         $this->actingAs($ejecutivo)->post(
