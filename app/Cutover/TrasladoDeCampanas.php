@@ -6,19 +6,9 @@ use App\Models\AsignacionDato;
 use App\Models\Dato;
 use Illuminate\Support\Facades\DB;
 
-/**
- * Splits legacy `datos` into the campaign record and the agent's hold on it.
- *
- * One legacy row becomes one `datos` row always, plus one open `asignacion_datos`
- * row when an agent was holding it. Identity has already left for `cliente`, so
- * what stays here is what the file said and what the agent has done with it.
- */
 final class TrasladoDeCampanas implements Traslado
 {
     /**
-     * The segment a hand-registered client is filed under when nothing else
-     * says otherwise.
-     *
      * Legacy's agregarcliente wrote 'CONVERGENTE' into tipo_data, which is the
      * column the queue filters on, so all 2,677 of those rows became
      * unreachable. They are all estado 1 (already worked), so the segment is now
@@ -164,9 +154,9 @@ final class TrasladoDeCampanas implements Traslado
     }
 
     /**
-     * The queue that works the record. Anything legacy already filed under a
-     * real segment keeps it; everything else is one of the INHOUSE rows and is
-     * placed by the case the agent went on to open.
+     * Anything legacy already filed under a real segment keeps it; everything
+     * else is one of the INHOUSE rows and is placed by the case the agent went on
+     * to open.
      */
     private function segmento(mixed $tipoData, int $idCliente): string
     {
@@ -187,9 +177,7 @@ final class TrasladoDeCampanas implements Traslado
         return self::SEGMENTO_POR_DEFECTO;
     }
 
-    /**
-     * @return array<int, true> id_cliente => true
-     */
+    /** @return array<int, true> id_cliente => true */
     private function clientesConCaso(string $tabla): array
     {
         $clientes = [];

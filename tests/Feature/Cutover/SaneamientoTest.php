@@ -7,10 +7,6 @@ use App\Models\Llamada;
 use App\Models\NcMovil;
 use App\Models\Usuario;
 
-/**
- * The value-level rules: what legacy stored to mean "not set", and the fields
- * people filled in with the wrong thing.
- */
 class SaneamientoTest extends CutoverTestCase
 {
     public function test_the_zero_date_becomes_no_date(): void

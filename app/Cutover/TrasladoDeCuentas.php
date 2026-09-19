@@ -5,23 +5,18 @@ namespace App\Cutover;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Copies the accounts and the roles they hold.
- *
  * The roles are production's, not the three the dev seeder invents, because
  * usuario.id_rol points at them and 570 of the 605 accounts are EJECUTIVO
- * COMERCIAL. What each role may reach is TrasladoDePermisos, which runs next.
+ * COMERCIAL.
  */
 final class TrasladoDeCuentas implements Traslado
 {
     /**
-     * Roles for modules that were retired rather than ported, dropped for the
-     * same reason their menus are.
-     *
-     * Only BACK OFFICE AVANZADO (10) qualifies: nc_avanzado has never held a
-     * row and no AVANZADO product exists, so the role has 0 users and 0 rows in
-     * accesoxrol and would arrive as an empty entry in the new ROLES screen.
-     * VALIDADOR MOVIL (8) and VALIDADOR FIJA (9) are also userless but their
-     * screens exist and were ported, so they are kept.
+     * Roles for modules retired rather than ported, dropped for the same reason
+     * their menus are. Only BACK OFFICE AVANZADO (10) qualifies: nc_avanzado has
+     * never held a row and no AVANZADO product exists, so it has 0 users and 0
+     * rows in accesoxrol. VALIDADOR MOVIL (8) and VALIDADOR FIJA (9) are userless
+     * too, but their screens were ported.
      */
     private const ROLES_RETIRADOS = [10];
 
@@ -33,9 +28,7 @@ final class TrasladoDeCuentas implements Traslado
         ];
     }
 
-    /**
-     * @return array<string, int>
-     */
+    /** @return array<string, int> */
     private function copiarRoles(): array
     {
         $roles = new Lote('rol');
@@ -62,9 +55,7 @@ final class TrasladoDeCuentas implements Traslado
         ];
     }
 
-    /**
-     * @return array<string, int>
-     */
+    /** @return array<string, int> */
     private function copiarUsuarios(): array
     {
         $usuarios = new Lote('usuario');

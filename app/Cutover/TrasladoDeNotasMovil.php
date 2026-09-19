@@ -5,8 +5,6 @@ namespace App\Cutover;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Copies the nota de cargo móvil cases.
- *
  * Four legacy columns are not carried: `tipo`, `ejecutivo_telefonica`,
  * `tipo_etapa`, and `zonal_telefonica`, which is folded into `zonal` the same
  * way fija's is. `ejecutivo_tdp` is not dropped, it becomes `id_cartera`.
@@ -59,8 +57,7 @@ final class TrasladoDeNotasMovil implements Traslado
                         // populated one wins: ejecutivo_tdp carries 576 rows to
                         // id_cartera's 3, and every value in it resolves to a
                         // real cartera. The two rows where both are set disagree
-                        // (65 vs 85, 87 vs 34), so one of them has to be chosen
-                        // and it is the column the screens actually filled.
+                        // (65 vs 85, 87 vs 34), so one has to lose.
                         'id_cartera' => Saneamiento::idEnTexto($fila->ejecutivo_tdp) ?? (int) $fila->id_cartera,
                         'oportunidad' => Saneamiento::texto($fila->oportunidad, 100),
                         'nivel_negociacion' => Saneamiento::texto($fila->nivel_negociacion, 10),

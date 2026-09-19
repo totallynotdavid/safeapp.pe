@@ -5,17 +5,12 @@ namespace App\Cutover;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Copies the small hand-maintained tables: stores, who works in them,
- * supervisors, the carrier account executives, and the product catalog.
+ * Production data, so these are copied rather than seeded: the seeders build
+ * invented rows for a dev database, and the real ones (7 stores, 15 supervisors,
+ * 22 executives, 86 products) are not something to retype.
  *
- * These are production data, not reference data, which is why they are copied
- * rather than seeded: the seeders that build them for a dev database are
- * invented rows, and the real ones are 7 stores, 15 supervisors, 22 executives
- * and 86 products that nobody would want to retype.
- *
- * `respuesta` is the exception in the other direction and is seeded, because the
- * catalog is fixed, the app owns the SI/NO to boolean normalisation, and the
- * seeder already carries legacy's ids.
+ * `respuesta` is seeded instead: its catalog is fixed, the app owns the SI/NO to
+ * boolean normalisation, and the seeder already carries legacy's ids.
  */
 final class TrasladoDeCatalogos implements Traslado
 {
@@ -45,9 +40,9 @@ final class TrasladoDeCatalogos implements Traslado
     }
 
     /**
-     * Legacy called this `asigna`. The table has no key of its own, so a row
-     * naming a deleted account is invisible junk rather than a broken link, and
-     * 23 of the 631 rows are exactly that.
+     * The table has no key of its own, so a row naming a deleted account is
+     * invisible junk rather than a broken link, and 23 of the 631 rows are
+     * exactly that.
      *
      * @return array<string, int>
      */
@@ -115,10 +110,6 @@ final class TrasladoDeCatalogos implements Traslado
         return $carteras->cerrar();
     }
 
-    /**
-     * Legacy's `cf` becomes `cargo_fijo`, the name the charge it produces has
-     * always had on the case.
-     */
     private function copiarProductos(): int
     {
         $productos = new Lote('producto');

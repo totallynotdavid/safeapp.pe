@@ -6,8 +6,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * The pre-rewrite schema, as far as the transform reads it.
- *
  * Declared here rather than dumped from production because what each test needs
  * is one row shaped to trigger one rule, and because the real export cannot live
  * in the repository: it is 76 MB of real customer data.

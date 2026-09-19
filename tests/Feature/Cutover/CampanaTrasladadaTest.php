@@ -5,11 +5,6 @@ namespace Tests\Feature\Cutover;
 use App\Models\AsignacionDato;
 use App\Models\Dato;
 
-/**
- * Splitting one legacy row into the campaign record and the hold on it, and the
- * two legacy defects that split exposes: duplicate registrations and a segment
- * column carrying provenance.
- */
 class CampanaTrasladadaTest extends CutoverTestCase
 {
     public function test_a_held_record_becomes_a_record_plus_an_open_hold(): void

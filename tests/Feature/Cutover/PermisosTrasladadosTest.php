@@ -7,8 +7,6 @@ use App\Models\Usuario;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Grants meeting a menu table that changed shape underneath them.
- *
  * The menu is seeded rather than copied: it keeps legacy's ids so grants still
  * point at the right screen, but it drops the leaves the rewrite removed, adds
  * two it introduced, and replaces the `url` legacy filtered on with the

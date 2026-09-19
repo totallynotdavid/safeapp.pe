@@ -5,12 +5,6 @@ namespace Tests\Feature\Cutover;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\DB;
 
-/**
- * The accounts themselves: the role each one holds and the store it works from.
- *
- * What an account may reach once it arrives is PermisosTrasladadosTest. This is
- * only about the rows the account points at existing and being the right ones.
- */
 class CuentasTrasladadasTest extends CutoverTestCase
 {
     protected function setUp(): void

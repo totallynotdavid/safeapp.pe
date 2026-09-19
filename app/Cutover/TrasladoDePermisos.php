@@ -6,12 +6,9 @@ use App\Models\Menu;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Carries the grants across to a menu table that deliberately changed shape.
- *
  * `menu` is not copied. It is reference data the app owns now, seeded with
  * legacy's own ids so every surviving grant still points at the right screen,
- * and with `permiso` keys in place of the `url` legacy filtered on. That remap
- * is the seeder, and this is where grants meet the result of it.
+ * and with `permiso` keys in place of the `url` legacy filtered on.
  *
  * Runs after TrasladoDeCuentas, whose users it filters against.
  */
@@ -27,10 +24,6 @@ final class TrasladoDePermisos implements Traslado
      * Screens the rewrite added, which have no legacy grant to carry over.
      * Without this the cutover ships two administration screens nobody in the
      * system can reach.
-     *
-     * ROLES Y PERMISOS is the permissions surface legacy only had as a broken
-     * off-sidebar orphan; ASIGNACION DE TIENDA is the agent-to-store
-     * assignment, which legacy did by editing the table directly.
      */
     private const PERMISOS_NUEVOS = ['roles.manage', 'asignacion.gestionar'];
 
@@ -49,9 +42,9 @@ final class TrasladoDePermisos implements Traslado
      * Three kinds of grant are dropped. Ones naming a user that no longer
      * exists (237 of 8,475) are leftovers from deleted accounts. Ones naming
      * menu -1 or 0 (32) never pointed at a screen. Ones naming a retired leaf
-     * point at a screen the rewrite removed, and that is the kind worth
-     * checking rather than assuming: for every retired leaf, zero holders lack
-     * the surviving global equivalent, so dropping them costs nobody access.
+     * point at a screen the rewrite removed; for every retired leaf, zero holders
+     * lack the surviving global equivalent, so dropping them costs nobody
+     * access.
      *
      * @param  array<int, int>  $menus
      * @return array<string, int>
@@ -90,9 +83,7 @@ final class TrasladoDePermisos implements Traslado
         ];
     }
 
-    /**
-     * @param  array<int, int>  $menus
-     */
+    /** @param  array<int, int>  $menus */
     private function copiarGrantsDeRol(array $menus): int
     {
         $roles = DB::table('rol')->pluck('id_rol')->flip()->all();

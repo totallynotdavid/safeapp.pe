@@ -4,14 +4,6 @@ namespace App\Cutover;
 
 use Illuminate\Support\Facades\DB;
 
-/**
- * Copies the contact log, repointing it from the RUC it carried to the customer
- * it is about.
- *
- * This is the table the split was for. Legacy kept the RUC and the name as free
- * text on every contact, which is the only reason 146,736 customers are still
- * recoverable at all: `datos` had long since dropped them, and the log had not.
- */
 final class TrasladoDeContactos implements Traslado
 {
     public function __construct(
@@ -39,14 +31,9 @@ final class TrasladoDeContactos implements Traslado
                     $llamadas->agregar([
                         'id_llamada' => (int) $fila->id_llamada,
                         'id_cliente' => $idCliente,
-                        // Left null for every historical contact. Legacy had no
-                        // reference to the campaign row: the one report that
-                        // wanted it re-derived the link by joining on RUC and
-                        // agent, which is ambiguous whenever an agent held the
-                        // same customer on two lists. The column is nullable
-                        // precisely because a contact outlives the campaign that
-                        // prompted it, so "unknown" is the honest value and no
-                        // screen reads it for history.
+                        // Left null for historical contacts. The column is
+                        // nullable because a contact outlives the campaign that
+                        // prompted it, and no screen reads it for history.
                         'id_dato' => null,
                         'id_usuario' => (int) $fila->id_usuario,
                         // 203 contacts carry id_respuesta 0: legacy let the form

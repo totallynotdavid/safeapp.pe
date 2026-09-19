@@ -5,8 +5,6 @@ namespace App\Cutover;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Copies the nota de cargo fija cases.
- *
  * Six legacy columns are not carried: `tipo` ('FIJA' in every row), `q_lineas`
  * (1 in every row), `agenda` (empty in every row), `id_cartera` (0 in every
  * row), `ejecutivo_telefonica` (set in one), and `zonal_telefonica`, which is
@@ -15,15 +13,12 @@ use Illuminate\Support\Facades\DB;
 final class TrasladoDeNotasFija implements Traslado
 {
     /**
-     * Three technologies spelled 28 ways, because legacy made this a free-text
-     * input and the screen is a select now.
-     *
-     * Listed rather than pattern-matched: the data is fixed forever, a reviewer
-     * can check every line against the export, and a rule clever enough to read
-     * FFTTHH as FTTH would also read something else wrong. FIBRA is mapped to
-     * FTTH, which is an inference from how the word is used locally and not
-     * something the rows state. 'HFC/GPON' names two and is left unset, as are
-     * the three rows holding GPS coordinates and the ones holding '1' or 'TV'.
+     * Three technologies spelled 28 ways, listed rather than pattern-matched:
+     * the data is fixed forever, a reviewer can check every line against the
+     * export, and a rule clever enough to read FFTTHH as FTTH would read
+     * something else wrong. FIBRA maps to FTTH, an inference from local usage
+     * rather than something the rows state. 'HFC/GPON' names two and is left
+     * unset, as are the three GPS coordinates and the rows holding '1' or 'TV'.
      */
     private const TECNOLOGIAS = [
         'FTTH' => 'FTTH',
