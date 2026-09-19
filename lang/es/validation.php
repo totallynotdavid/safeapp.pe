@@ -3,15 +3,10 @@
 /*
  * Spanish validation messages.
  *
- * APP_LOCALE and APP_FALLBACK_LOCALE were both `es` while the framework ships
- * only `en`, so every failed rule in the app rendered as its raw key: a form
- * that rejected input showed the user "validation.required". The fallback is
- * now `en`, so a rule this file does not translate degrades to an English
- * sentence rather than to a key.
- *
  * Only the rules the app's form requests actually use are translated. Adding a
- * rule to a request means adding it here; the English fallback is the safety
- * net, not the plan.
+ * rule to a request means adding it here. APP_FALLBACK_LOCALE is `en`, which the
+ * framework does ship, so an untranslated rule degrades to an English sentence
+ * rather than to a raw key like "validation.required".
  *
  * The wording avoids adjectives that agree with :attribute, because the
  * attributes below are both genders: ":Attribute seleccionado no existe" reads
