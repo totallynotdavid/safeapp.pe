@@ -13,12 +13,8 @@ use Illuminate\View\View;
 // ejecutivos have filed, and may correct the line count and the monthly charge
 // the decision turns on. Nothing else on the case is theirs to change.
 //
-// The queue is global. Legacy shipped this screen twice, once filtered to the
-// reviewer's own tienda and once not, and the filtered one is unused: the four
-// users who hold it also hold the global one, which shows a superset of the same
-// rows. Worse, the column it filtered on is the case's región rather than the
-// reviewer's store, so a Lima validador saw none of the Piura cases. There is
-// one screen now.
+// One global queue. The per-tienda variant filtered on the case's región rather
+// than the reviewer's store, so a Lima validador saw none of the Piura cases.
 class NotaCargoMovilValidacionController extends Controller
 {
     public function index(Request $request): View

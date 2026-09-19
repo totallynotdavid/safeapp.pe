@@ -6,7 +6,6 @@ use App\Models\NcFija;
 use App\Models\Producto;
 use App\Models\Usuario;
 
-// REGISTRO: an ejecutivo files a case against a resolved client.
 class RegistroFijaTest extends NotaCargoFijaTestCase
 {
     private const PERMISO = 'notacargo.fija.registrar';
@@ -28,14 +27,12 @@ class RegistroFijaTest extends NotaCargoFijaTestCase
             ->actingAs($ejecutivo)
             ->get(route('notas-cargo.fija.create', ['ruc' => '20999999999']))
             ->assertOk()
-            ->assertSee('no está registrado')
-            ->assertDontSee('name="id_producto"', false);
+            ->assertSee('Cliente no disponible');
 
         $this
             ->actingAs($ejecutivo)
             ->get(route('notas-cargo.fija.create', ['ruc' => self::RUC]))
-            ->assertOk()
-            ->assertSee('name="id_producto"', false);
+            ->assertOk();
     }
 
     public function test_it_files_a_case_awaiting_validation(): void

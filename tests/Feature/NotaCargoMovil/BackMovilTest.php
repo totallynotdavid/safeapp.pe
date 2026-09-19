@@ -6,7 +6,6 @@ use App\Models\NcMovil;
 use App\Models\Tienda;
 use App\Models\Usuario;
 
-// BACK: the office that owns `estado` and moves a validated case through it.
 class BackMovilTest extends NotaCargoMovilTestCase
 {
     private const PERMISO = 'notacargo.movil.back';

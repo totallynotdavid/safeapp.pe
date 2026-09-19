@@ -27,13 +27,9 @@ class Producto extends Model
 
     /**
      * The fija catalog as the registro form needs it: subtipo, then the
-     * descripciones under it, then the charge for the pair.
-     *
-     * Legacy asked the server for each of those three separately, as three AJAX
-     * round trips per case (crudProducto has a query for each), which is also
-     * why the form let the price be typed over afterwards. The form is small
+     * descripciones under it, then the charge for the pair. The form is small
      * enough to hold the whole catalog, so it is one query and the price is
-     * filled in from it.
+     * filled in from it rather than typed over.
      *
      * @return Collection<string, Collection<int, Producto>>
      */

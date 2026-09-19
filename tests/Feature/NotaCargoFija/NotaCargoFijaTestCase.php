@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\NotaCargoFija;
 
+use App\Cockpit\AccesoAClientes;
 use App\Models\Cliente;
 use App\Models\Menu;
 use App\Models\NcFija;
@@ -11,26 +12,33 @@ use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-// Shared fixture for the three nota-de-cargo-fija stages. None of them scopes by
-// tienda, so the fixture is a user holding one stage's permiso, a client to file
-// against and a catalog row to sell.
+// None of the three stages scopes by tienda, so the fixture never places the user
+// in one.
 abstract class NotaCargoFijaTestCase extends TestCase
 {
     use RefreshDatabase;
 
     protected const RUC = '20123456789';
 
+    protected ?Usuario $usuarioActual = null;
+
     protected function usuarioCon(string $permiso): Usuario
     {
         $user = Usuario::factory()->create();
         $user->menus()->attach(Menu::factory()->create(['permiso' => $permiso]));
+        $this->usuarioActual = $user;
 
         return $user;
     }
 
     protected function cliente(string $ruc = self::RUC): Cliente
     {
-        return Cliente::factory()->create(['ruc' => $ruc]);
+        $cliente = Cliente::factory()->create(['ruc' => $ruc]);
+        if ($this->usuarioActual !== null) {
+            AccesoAClientes::otorgar($cliente, $this->usuarioActual);
+        }
+
+        return $cliente;
     }
 
     protected function producto(): Producto
@@ -55,9 +63,6 @@ abstract class NotaCargoFijaTestCase extends TestCase
     }
 
     /**
-     * The payload the registro form posts, for a resolved client and a catalog
-     * product.
-     *
      * @param  array<string, mixed>  $overrides
      * @return array<string, mixed>
      */

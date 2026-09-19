@@ -116,10 +116,9 @@ class NcMovil extends Model
      * Every column a screen may write, across all four stages.
      *
      * The per-stage boundary is the form request, not this list: each screen
-     * fills from its own validated() payload, which is already an allowlist of
-     * that stage's columns. This list only keeps unvalidated input out, so the
-     * columns no screen ever writes (both estados, the identity and date stamps)
-     * stay off it and are assigned by name where a stage owns them.
+     * fills from its own validated() payload. This list only keeps unvalidated
+     * input out, so the columns no screen writes (both estados, the identity and
+     * date stamps) stay off it and are assigned by name.
      */
     protected $fillable = [
         // Registro.

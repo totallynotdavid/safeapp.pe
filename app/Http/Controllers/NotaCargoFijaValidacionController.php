@@ -12,12 +12,8 @@ use Illuminate\View\View;
 // Nota de cargo fija, VALIDACIÓN: a validador passes or rejects the cases
 // ejecutivos have filed. Nothing else on the case is theirs to change.
 //
-// The queue is global. Legacy shipped this screen twice, once filtered to the
-// reviewer's own tienda and once not, and the filtered one is unused: everyone
-// who holds it also holds the global one, which shows a superset of the same
-// rows. Worse, the column it filtered on is the case's región rather than the
-// reviewer's store, so a Lima validador saw none of the Piura cases. There is
-// one screen now.
+// One global queue. The per-tienda variant filtered on the case's región rather
+// than the reviewer's store, so a Lima validador saw none of the Piura cases.
 class NotaCargoFijaValidacionController extends Controller
 {
     public function index(Request $request): View

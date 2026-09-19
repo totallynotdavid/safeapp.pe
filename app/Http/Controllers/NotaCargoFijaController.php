@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Cockpit\AccesoAClientes;
 use App\Exports\ReporteNotaCargoFija;
 use App\Http\FiltroPeriodo;
 use App\Http\Requests\NotaCargoFija\StoreNotaCargoFijaRequest;
@@ -17,9 +18,6 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-// Nota de cargo fija, REGISTRO: an ejecutivo files a case against a client and
-// tracks their own. Validación and back are separate screens with their own
-// permisos; this one never writes their columns.
 class NotaCargoFijaController extends Controller
 {
     public function index(Request $request): View
@@ -27,7 +25,10 @@ class NotaCargoFijaController extends Controller
         $filtro = FiltroPeriodo::desde($request, NcFija::ESTADOS);
 
         return view('notas-cargo.fija.index', [
-            'cargos' => $this->mias($request->user()->id_usuario, $filtro)->orderByDesc('fecha_ingreso')->get(),
+            'cargos' => $this
+                ->mias($request->user()->id_usuario, $filtro)
+                ->orderByDesc('fecha_ingreso')
+                ->get(),
             'estados' => NcFija::ESTADOS,
             'filtro' => $filtro,
         ]);
@@ -37,7 +38,10 @@ class NotaCargoFijaController extends Controller
     {
         return ReporteNotaCargoFija::descargar(
             'mis-notas-cargo-fija',
-            $this->mias($request->user()->id_usuario, FiltroPeriodo::desde($request, NcFija::ESTADOS)),
+            $this->mias(
+                $request->user()->id_usuario,
+                FiltroPeriodo::desde($request, NcFija::ESTADOS),
+            ),
         );
     }
 
@@ -47,7 +51,11 @@ class NotaCargoFijaController extends Controller
 
         return view('notas-cargo.fija.create', [
             'ruc' => $ruc === '' ? null : $ruc,
-            'cliente' => $ruc === '' ? null : Cliente::porRuc($ruc),
+            'cliente' => $ruc === ''
+                ? null
+                : Cliente::visiblePara($request->user())
+                    ->where('ruc', $ruc)
+                    ->first(),
             'regiones' => Tienda::query()->orderBy('nombre')->get(),
             'catalogo' => Producto::catalogoFija(),
             'modalidades' => NcFija::MODALIDADES,
@@ -59,21 +67,21 @@ class NotaCargoFijaController extends Controller
     {
         $producto = Producto::findOrFail($request->integer('id_producto'));
 
-        $cargo = new NcFija($request->safe()->except(['id_producto', 'cargo_fijo']));
+        $cargo = new NcFija(
+            $request->safe()->except(['id_producto', 'cargo_fijo']),
+        );
 
-        // What was sold is copied off the catalog rather than posted, so the
-        // pair on the case is always one the catalog actually offered. The price
-        // is the catalog's unless the agent gave one.
+        // Snapshot catalog values instead of trusting posted product data.
         $cargo->subtipo = $producto->subtipo;
         $cargo->descripcion = $producto->descripcion;
         $cargo->cargo_fijo = $request->input('cargo_fijo') ?? $producto->cargo_fijo;
 
-        // Owner, supervisor and date come from the session and the clock. Legacy
-        // posted all three as hidden form fields.
         $cargo->id_usuario = $request->user()->id_usuario;
         $cargo->id_supervisor = $request->user()->id_supervisor;
         $cargo->fecha_ingreso = now()->toDateString();
         $cargo->save();
+
+        AccesoAClientes::otorgar((int) $cargo->id_cliente, $request->user());
 
         return redirect()
             ->route('notas-cargo.fija.index')
@@ -85,13 +93,21 @@ class NotaCargoFijaController extends Controller
         Gate::authorize('view', $ncFija);
 
         return view('notas-cargo.fija.edit', [
-            'cargo' => $ncFija->load('cliente', 'ejecutivo', 'supervisor', 'validador', 'region'),
+            'cargo' => $ncFija->load(
+                'cliente',
+                'ejecutivo',
+                'supervisor',
+                'validador',
+                'region',
+            ),
             'tecnologias' => NcFija::TECNOLOGIAS,
         ]);
     }
 
-    public function update(UpdateNotaCargoFijaRequest $request, NcFija $ncFija): RedirectResponse
-    {
+    public function update(
+        UpdateNotaCargoFijaRequest $request,
+        NcFija $ncFija,
+    ): RedirectResponse {
         Gate::authorize('update', $ncFija);
 
         $ncFija->fill($request->validated())->save();
@@ -101,18 +117,11 @@ class NotaCargoFijaController extends Controller
             ->with('status', 'Nota de cargo actualizada.');
     }
 
-    /**
-     * One ejecutivo's own cases for a period. Rejected cases are left out: the
-     * ejecutivo cannot act on them and legacy excluded them from every branch.
-     *
-     * Returned unresolved so the screen and the export run the same filter,
-     * including the scoping to the signed-in ejecutivo. Legacy's equivalent
-     * export took the user id from a hidden form field instead.
-     *
-     * @return NcFijaBuilder<NcFija>
-     */
-    private function mias(int $idUsuario, FiltroPeriodo $filtro): NcFijaBuilder
-    {
+    private function mias(
+        int $idUsuario,
+        FiltroPeriodo $filtro,
+    ): NcFijaBuilder {
+        // Rejected cases are no longer actionable by the ejecutivo.
         return NcFija::query()
             ->with('cliente')
             ->where('id_usuario', $idUsuario)

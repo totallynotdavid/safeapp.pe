@@ -4,7 +4,6 @@ namespace Tests\Feature\NotaCargoFija;
 
 use App\Models\NcFija;
 
-// What an ejecutivo sees on their own queue, and what they may still change.
 class ColaRegistroFijaTest extends NotaCargoFijaTestCase
 {
     private const PERMISO = 'notacargo.fija.registrar';

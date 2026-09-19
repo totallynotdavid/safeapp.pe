@@ -6,13 +6,9 @@ use Illuminate\Http\Request;
 
 /**
  * The período and estado a nota de cargo queue is filtered to, read once from
- * the request.
- *
- * Four screens filter this way (registro and back, over both productos) and each
- * now reads the filter twice, once to list and once to export. Without an owner
- * that is eight copies of the same four lines, and the export copy is exactly
- * where legacy's drifted: its endpoints re-parsed the period themselves and
- * disagreed with the screen they exported.
+ * the request. Four screens filter this way (registro and back, over both
+ * productos) and each reads it twice, to list and to export; one owner is what
+ * keeps an export from disagreeing with the screen it exports.
  *
  * An estado outside the screen's own vocabulary is dropped rather than rejected.
  * These arrive from a query string anyone can edit, and an unknown estado means

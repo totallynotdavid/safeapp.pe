@@ -3,13 +3,10 @@
 namespace App\Models\Concerns;
 
 /**
- * A case that a validador rules on before the back office can fulfil it.
- *
- * The three-way decision and the two state questions asked of it are identical
- * for every producto, and both the validación and back controllers guard on
- * them, so they have one owner here rather than a copy per nota de cargo table.
- * What differs per producto is the `estado` lifecycle the back office then runs,
- * which is why that stays on each model.
+ * A case a validador rules on before the back office can fulfil it. The
+ * three-way decision and the two state questions are identical for every
+ * producto, so they have one owner here. The `estado` lifecycle the back office
+ * then runs differs per producto and stays on each model.
  */
 trait Validable
 {

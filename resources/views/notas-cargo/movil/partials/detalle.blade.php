@@ -1,69 +1,103 @@
 {{--
-    What a nota de cargo móvil currently says, read-only, grouped by the stage
-    that owns each block. Every screen downstream of registro opens with this,
-    so the four of them cannot drift into showing different subsets of the same
-    case the way the legacy modals did.
-
-    The validación and back blocks only appear once that stage has run, so an
-    undecided case does not display an empty ruling.
-
-    Expects: $cargo (an NcMovil with cliente, ejecutivo, region, cartera loaded).
+    Expects: $cargo with cliente, ejecutivo, supervisor, validador, region and
+    cartera loaded. Set $mostrarSeguimientoEjecutivo=false when the registro
+    page renders those request-owned values as an editable form. Set
+    $mostrarSeguimientoBack=false when back office renders its values as a form.
 --}}
-<div class="rounded-lg border border-gray-200 bg-white p-6">
-    <h2 class="text-lg font-semibold text-gray-800">{{ $cargo->cliente?->razon_social }}</h2>
-    <p class="mb-4 text-sm text-gray-500">RUC {{ $cargo->cliente?->ruc }}</p>
+@php($mostrarSeguimientoEjecutivo = $mostrarSeguimientoEjecutivo ?? true)
+@php($mostrarSeguimientoBack = $mostrarSeguimientoBack ?? true)
 
-    <dl class="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
-        @include('partials.campo', ['label' => 'Fecha ingreso', 'value' => $cargo->fecha_ingreso?->format('Y-m-d')])
-        @include('partials.campo', ['label' => 'Estado', 'value' => $cargo->estado])
-        @include('partials.campo', ['label' => 'Región', 'value' => $cargo->region?->nombre])
-        @include('partials.campo', ['label' => 'Modalidad', 'value' => $cargo->modalidad])
-        @include('partials.campo', ['label' => 'Q líneas', 'value' => $cargo->q_lineas])
-        @include('partials.campo', ['label' => 'Cargo fijo', 'value' => $cargo->cargo_fijo])
-        @include('partials.campo', ['label' => 'Tipo de producto', 'value' => $cargo->tipo_producto])
-        @include('partials.campo', ['label' => 'Fase', 'value' => $cargo->etapa])
-        @include('partials.campo', ['label' => 'Probabilidad de cierre', 'value' => $cargo->nivel_negociacion ? $cargo->nivel_negociacion.' %' : null])
-        @include('partials.campo', ['label' => 'Fecha estimada de cierre', 'value' => $cargo->fecha_estimada?->format('Y-m-d')])
-        @include('partials.campo', ['label' => 'Contacto', 'value' => $cargo->contacto])
-        @include('partials.campo', ['label' => 'Teléfonos', 'value' => trim($cargo->telefono1.' '.$cargo->telefono2)])
-        {{-- Two different people: the app user who registered the case, and the
-             carrier account executive it is attributed to. --}}
-        @include('partials.campo', ['label' => 'Ejecutivo', 'value' => $cargo->ejecutivo?->personal])
-        @include('partials.campo', ['label' => 'Supervisor', 'value' => $cargo->supervisor?->nombre])
-        @include('partials.campo', ['label' => 'Ejecutivo TDP', 'value' => $cargo->cartera?->propietario])
-        @include('partials.campo', ['label' => 'Cartera', 'value' => $cargo->cartera?->nombre])
-        @include('partials.campo', ['label' => 'Oportunidad', 'value' => $cargo->oportunidad])
-    </dl>
+<x-ui.card padding="6">
+    <x-ui.stack direction="vertical" gap="4">
+        <x-ui.stack direction="vertical" gap="0.5">
+            <x-ui.heading level="2">Registro de la oportunidad</x-ui.heading>
+            <x-ui.text type="supporting" color="secondary">Identidad, servicio y responsables definidos al registrar la nota de cargo.</x-ui.text>
+        </x-ui.stack>
 
-    <div class="mt-4">
-        @include('partials.campo', ['label' => 'Comentario del ejecutivo', 'value' => $cargo->comentario_ejecutivo])
-    </div>
+        <x-ui.metadata-list columns="multi">
+            @include('partials.campo', ['label' => 'Fecha de ingreso', 'value' => $cargo->fecha_ingreso?->format('d/m/Y')])
+            @include('partials.campo', ['label' => 'Región', 'value' => $cargo->region?->nombre])
+            @include('partials.campo', ['label' => 'Modalidad', 'value' => \App\Support\EtiquetasDeDominio::texto($cargo->modalidad, 'modalidad')])
+            @include('partials.campo', ['label' => 'Tipo de producto', 'value' => \App\Support\EtiquetasDeDominio::texto($cargo->tipo_producto, 'tipo_producto')])
+            @include('partials.campo', ['label' => 'Contacto', 'value' => $cargo->contacto])
+            @include('partials.campo', ['label' => 'Ejecutivo', 'value' => $cargo->ejecutivo?->personal])
+            @include('partials.campo', ['label' => 'Supervisor', 'value' => $cargo->supervisor?->nombre])
+            @include('partials.campo', ['label' => 'Ejecutivo TDP', 'value' => $cargo->cartera?->propietario])
+            @include('partials.campo', ['label' => 'Cartera', 'value' => $cargo->cartera?->nombre])
+        </x-ui.metadata-list>
+    </x-ui.stack>
+</x-ui.card>
 
-    @if ($cargo->fecha_validacion)
-        <div class="mt-4 border-t border-gray-100 pt-4">
-            <dl class="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
-                @include('partials.campo', ['label' => 'Validación', 'value' => $cargo->validacion])
-                @include('partials.campo', ['label' => 'Fecha validación', 'value' => $cargo->fecha_validacion?->format('Y-m-d')])
+@if ($mostrarSeguimientoEjecutivo)
+    <x-ui.card padding="6">
+        <x-ui.stack direction="vertical" gap="4">
+            <x-ui.stack direction="vertical" gap="0.5">
+                <x-ui.heading level="2">Negociación del ejecutivo</x-ui.heading>
+                <x-ui.text type="supporting" color="secondary">Alcance económico, contacto y avance comercial informados por el ejecutivo.</x-ui.text>
+            </x-ui.stack>
+
+            <x-ui.metadata-list columns="multi">
+                @include('partials.campo', ['label' => 'Líneas', 'value' => $cargo->q_lineas])
+                @include('partials.campo', ['label' => 'Cargo fijo', 'value' => $cargo->cargo_fijo])
+                @include('partials.campo', ['label' => 'Teléfono principal', 'value' => $cargo->telefono1])
+                @include('partials.campo', ['label' => 'Teléfono adicional', 'value' => $cargo->telefono2])
+                @include('partials.campo', ['label' => 'Fase', 'value' => \App\Support\EtiquetasDeDominio::texto($cargo->etapa, 'etapa')])
+                @include('partials.campo', ['label' => 'Probabilidad de cierre', 'value' => filled($cargo->nivel_negociacion) ? $cargo->nivel_negociacion.' %' : null])
+                @include('partials.campo', ['label' => 'Fecha estimada de cierre', 'value' => $cargo->fecha_estimada?->format('d/m/Y')])
+                @include('partials.campo', ['label' => 'Oportunidad', 'value' => $cargo->oportunidad])
+            </x-ui.metadata-list>
+
+            <x-ui.divider />
+            <x-ui.metadata-list>
+                @include('partials.campo', ['label' => 'Comentario del ejecutivo', 'value' => $cargo->comentario_ejecutivo])
+            </x-ui.metadata-list>
+        </x-ui.stack>
+    </x-ui.card>
+@endif
+
+@if ($cargo->fecha_validacion)
+    <x-ui.card padding="6">
+        <x-ui.stack direction="vertical" gap="4">
+            <x-ui.stack direction="vertical" gap="0.5">
+                <x-ui.heading level="2">Validación</x-ui.heading>
+                <x-ui.text type="supporting" color="secondary">Decisión registrada por el equipo validador.</x-ui.text>
+            </x-ui.stack>
+
+            <x-ui.metadata-list columns="multi">
+                @include('partials.campo', ['label' => 'Decisión', 'value' => \App\Support\EtiquetasDeDominio::texto($cargo->validacion, 'validacion')])
+                @include('partials.campo', ['label' => 'Fecha de validación', 'value' => $cargo->fecha_validacion?->format('d/m/Y')])
                 @include('partials.campo', ['label' => 'Validador', 'value' => $cargo->validador?->personal])
-            </dl>
-            <div class="mt-4">
-                @include('partials.campo', ['label' => 'Comentario del validador', 'value' => $cargo->comentario_validador])
-            </div>
-        </div>
-    @endif
+            </x-ui.metadata-list>
 
-    @if ($cargo->fecha_actualizacion)
-        <div class="mt-4 border-t border-gray-100 pt-4">
-            <dl class="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
-                @include('partials.campo', ['label' => 'Actualización', 'value' => $cargo->fecha_actualizacion?->format('Y-m-d')])
+            <x-ui.divider />
+            <x-ui.metadata-list>
+                @include('partials.campo', ['label' => 'Comentario del validador', 'value' => $cargo->comentario_validador])
+            </x-ui.metadata-list>
+        </x-ui.stack>
+    </x-ui.card>
+@endif
+
+@if ($cargo->fecha_actualizacion && $mostrarSeguimientoBack)
+    <x-ui.card padding="6">
+        <x-ui.stack direction="vertical" gap="4">
+            <x-ui.stack direction="vertical" gap="0.5">
+                <x-ui.heading level="2">Seguimiento de back office</x-ui.heading>
+                <x-ui.text type="supporting" color="secondary">Estado operativo y referencias registradas durante la atención.</x-ui.text>
+            </x-ui.stack>
+
+            <x-ui.metadata-list columns="multi">
+                @include('partials.campo', ['label' => 'Estado', 'value' => \App\Support\EtiquetasDeDominio::texto($cargo->estado, 'estado')])
+                @include('partials.campo', ['label' => 'Fecha de actualización', 'value' => $cargo->fecha_actualizacion?->format('d/m/Y')])
                 @include('partials.campo', ['label' => 'Nodo', 'value' => $cargo->nodo])
                 @include('partials.campo', ['label' => 'Caso FWA', 'value' => $cargo->casofwa])
                 @include('partials.campo', ['label' => 'Ciclo', 'value' => $cargo->ciclo])
                 @include('partials.campo', ['label' => 'Cuenta financiera', 'value' => $cargo->cuenta_financiera])
-            </dl>
-            <div class="mt-4">
-                @include('partials.campo', ['label' => 'Comentario del back', 'value' => $cargo->comentario_back])
-            </div>
-        </div>
-    @endif
-</div>
+            </x-ui.metadata-list>
+
+            <x-ui.divider />
+            <x-ui.metadata-list>
+                @include('partials.campo', ['label' => 'Comentario de back office', 'value' => $cargo->comentario_back])
+            </x-ui.metadata-list>
+        </x-ui.stack>
+    </x-ui.card>
+@endif

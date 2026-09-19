@@ -1,97 +1,105 @@
 @extends('layouts.app')
 
-@section('title', 'Nota de cargo móvil')
+@section('title', 'Nota de cargo móvil #'.$cargo->id_cargo)
+@section('page', true)
 
 @section('content')
-    @php($field = 'mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none')
-    @php($label = 'block text-sm font-medium text-gray-700')
+    @php
+        $nivelOptions = collect($niveles)->map(fn ($nivel) => [
+            'value' => $nivel,
+            'label' => $nivel.' %',
+        ])->all();
+    @endphp
 
-    <div class="mx-auto max-w-4xl space-y-6">
-        <a href="{{ route('notas-cargo.movil.index') }}" class="text-sm font-medium text-gray-600 hover:text-gray-800">&larr; Volver a la lista</a>
+    <x-ui.detail-page title="Nota de cargo móvil #{{ $cargo->id_cargo }}"
+        :subtitle="$cargo->cliente?->razon_social"
+        :back-href="route('notas-cargo.movil.index')" back-label="Volver a mis notas de cargo">
+        <x-slot:metadata>
+            <x-ui.text type="supporting" color="secondary">・ RUC {{ $cargo->cliente?->ruc }}</x-ui.text>
+            <x-ui.text type="supporting" color="secondary">・</x-ui.text>
+            <x-ui.badge>{{ \App\Support\EtiquetasDeDominio::texto($cargo->estado, 'estado') }}</x-ui.badge>
+            <x-ui.text type="supporting" color="secondary">・ {{ $cargo->fecha_ingreso?->format('d/m/Y') }}</x-ui.text>
+        </x-slot:metadata>
 
-        @include('notas-cargo.movil.partials.detalle')
+        @include('notas-cargo.movil.partials.detalle', [
+            'mostrarSeguimientoEjecutivo' => ! $cargo->esEditable(),
+        ])
 
         @if ($cargo->esEditable())
-            <div class="rounded-lg border border-gray-200 bg-white p-6">
-                <h2 class="mb-4 text-lg font-semibold text-gray-800">Actualizar la nota de cargo</h2>
-
-                @if ($errors->any())
-                    <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800">
-                        <ul class="list-disc pl-4">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                <form method="POST" action="{{ route('notas-cargo.movil.update', $cargo) }}" class="space-y-4">
+            <x-ui.card padding="6">
+                <form method="POST" action="{{ route('notas-cargo.movil.update', $cargo) }}">
                     @csrf
                     @method('PUT')
 
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                        <div>
-                            <label for="q_lineas" class="{{ $label }}">Q líneas</label>
-                            <input type="number" min="1" id="q_lineas" name="q_lineas" value="{{ old('q_lineas', $cargo->q_lineas) }}" required class="{{ $field }}">
-                        </div>
-                        <div>
-                            <label for="cargo_fijo" class="{{ $label }}">Cargo fijo</label>
-                            <input type="number" step="0.01" min="0" id="cargo_fijo" name="cargo_fijo" value="{{ old('cargo_fijo', $cargo->cargo_fijo) }}" required class="{{ $field }}">
-                        </div>
-                        <div>
-                            <label for="etapa" class="{{ $label }}">Fase</label>
-                            <select id="etapa" name="etapa" required class="{{ $field }}">
-                                @foreach ($etapas as $opcion)
-                                    <option value="{{ $opcion }}" @selected(old('etapa', $cargo->etapa) === $opcion)>{{ $opcion }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div>
-                            <label for="telefono1" class="{{ $label }}">Teléfono 1</label>
-                            <input id="telefono1" name="telefono1" value="{{ old('telefono1', $cargo->telefono1) }}" required class="{{ $field }}">
-                        </div>
-                        <div>
-                            <label for="telefono2" class="{{ $label }}">Teléfono 2 (opcional)</label>
-                            <input id="telefono2" name="telefono2" value="{{ old('telefono2', $cargo->telefono2) }}" class="{{ $field }}">
-                        </div>
-                        <div>
-                            <label for="nivel_negociacion" class="{{ $label }}">Probabilidad de cierre</label>
-                            <select id="nivel_negociacion" name="nivel_negociacion" required class="{{ $field }}">
-                                @foreach ($niveles as $opcion)
-                                    <option value="{{ $opcion }}" @selected(old('nivel_negociacion', $cargo->nivel_negociacion) === $opcion)>{{ $opcion }} %</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div>
-                            <label for="fecha_estimada" class="{{ $label }}">Fecha estimada de cierre</label>
-                            <input type="date" id="fecha_estimada" name="fecha_estimada" value="{{ old('fecha_estimada', $cargo->fecha_estimada?->format('Y-m-d')) }}" required class="{{ $field }}">
-                        </div>
-                        <div class="sm:col-span-2">
-                            <label for="oportunidad" class="{{ $label }}">Oportunidad (opcional)</label>
-                            <input id="oportunidad" name="oportunidad" value="{{ old('oportunidad', $cargo->oportunidad) }}" class="{{ $field }}">
-                        </div>
-                    </div>
+                    <x-ui.form-layout>
+                        <x-ui.stack direction="vertical" gap="0.5">
+                            <x-ui.heading level="2">Actualizar negociación</x-ui.heading>
+                            <x-ui.text type="supporting" color="secondary">Ajuste el alcance, los teléfonos y el avance comercial mientras la nota siga pendiente de validación.</x-ui.text>
+                        </x-ui.stack>
 
-                    <div>
-                        <label for="comentario_ejecutivo" class="{{ $label }}">Comentario</label>
-                        <textarea id="comentario_ejecutivo" name="comentario_ejecutivo" rows="4" class="{{ $field }}">{{ old('comentario_ejecutivo', $cargo->comentario_ejecutivo) }}</textarea>
-                    </div>
+                        <x-ui.stack direction="vertical" gap="3">
+                            <x-ui.stack direction="vertical" gap="0.5">
+                                <x-ui.heading level="3">Alcance económico</x-ui.heading>
+                                <x-ui.text type="supporting" color="secondary">Valores que revisará el equipo validador.</x-ui.text>
+                            </x-ui.stack>
+                            <x-ui.grid min-width="180" repeat="fit" gap="3">
+                                <x-ui.text-input name="q_lineas" label="Líneas" type="number" min="1"
+                                    :value="old('q_lineas', $cargo->q_lineas)" :error="$errors->first('q_lineas')" required />
+                                <x-ui.text-input name="cargo_fijo" label="Cargo fijo" type="number" min="0" step="0.01"
+                                    :value="old('cargo_fijo', $cargo->cargo_fijo)" :error="$errors->first('cargo_fijo')" required />
+                            </x-ui.grid>
+                        </x-ui.stack>
 
-                    <div class="flex items-center gap-3 pt-2">
-                        <button type="submit" class="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">
-                            Guardar
-                        </button>
-                        <a href="{{ route('notas-cargo.movil.index') }}" class="text-sm font-medium text-gray-600 hover:text-gray-800">Cancelar</a>
-                    </div>
+                        <x-ui.divider />
+
+                        <x-ui.stack direction="vertical" gap="3">
+                            <x-ui.stack direction="vertical" gap="0.5">
+                                <x-ui.heading level="3">Contacto</x-ui.heading>
+                                <x-ui.text type="supporting" color="secondary">Teléfonos para coordinar con {{ $cargo->contacto }}.</x-ui.text>
+                            </x-ui.stack>
+                            <x-ui.grid min-width="180" repeat="fit" gap="3">
+                                <x-ui.text-input name="telefono1" label="Teléfono principal" maxlength="50"
+                                    :value="old('telefono1', $cargo->telefono1)" :error="$errors->first('telefono1')" required />
+                                <x-ui.text-input name="telefono2" label="Teléfono adicional" maxlength="50"
+                                    :value="old('telefono2', $cargo->telefono2)" :error="$errors->first('telefono2')" optional />
+                            </x-ui.grid>
+                        </x-ui.stack>
+
+                        <x-ui.divider />
+
+                        <x-ui.stack direction="vertical" gap="3">
+                            <x-ui.stack direction="vertical" gap="0.5">
+                                <x-ui.heading level="3">Avance comercial</x-ui.heading>
+                                <x-ui.text type="supporting" color="secondary">Probabilidad, fecha objetivo y fase actual de la oportunidad.</x-ui.text>
+                            </x-ui.stack>
+                            <x-ui.grid min-width="180" repeat="fit" gap="3">
+                                <x-ui.selector name="nivel_negociacion" label="Probabilidad de cierre" :options="$nivelOptions"
+                                    :value="old('nivel_negociacion', $cargo->nivel_negociacion)"
+                                    :error="$errors->first('nivel_negociacion')" required />
+                                <x-ui.date-input name="fecha_estimada" label="Fecha estimada de cierre"
+                                    :value="old('fecha_estimada', $cargo->fecha_estimada?->format('Y-m-d'))"
+                                    :error="$errors->first('fecha_estimada')" required />
+                                <x-ui.selector name="etapa" label="Fase" :options="\App\Support\EtiquetasDeDominio::opciones($etapas, 'etapa')"
+                                    :value="old('etapa', $cargo->etapa)" :error="$errors->first('etapa')" required />
+                            </x-ui.grid>
+
+                            <x-ui.text-input name="oportunidad" label="Oportunidad" maxlength="100"
+                                :value="old('oportunidad', $cargo->oportunidad)" :error="$errors->first('oportunidad')" optional />
+                            <x-ui.text-area name="comentario_ejecutivo" label="Comentario del ejecutivo"
+                                :value="old('comentario_ejecutivo', $cargo->comentario_ejecutivo)"
+                                :error="$errors->first('comentario_ejecutivo')" rows="4" optional />
+                        </x-ui.stack>
+
+                        <x-ui.stack direction="horizontal" gap="2" h-align="end" wrap="wrap">
+                            <x-ui.button :href="route('notas-cargo.movil.index')" variant="secondary">Cancelar</x-ui.button>
+                            <x-ui.button type="submit" variant="primary">Guardar cambios</x-ui.button>
+                        </x-ui.stack>
+                    </x-ui.form-layout>
                 </form>
-            </div>
+            </x-ui.card>
         @else
-            {{-- Once the validador has ruled, the figures they ruled on are
-                 frozen. Legacy showed the form anyway and enforced this in
-                 JavaScript. --}}
-            <div class="rounded-md border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
-                Esta nota de cargo ya fue validada y no admite cambios.
-            </div>
+            <x-ui.banner status="warning" title="Negociación cerrada"
+                description="Esta nota ya fue validada. La información registrada por el ejecutivo se conserva en modo de solo lectura." />
         @endif
-    </div>
+    </x-ui.detail-page>
 @endsection

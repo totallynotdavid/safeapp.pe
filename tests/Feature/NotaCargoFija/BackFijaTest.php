@@ -6,7 +6,6 @@ use App\Models\NcFija;
 use App\Models\Tienda;
 use App\Models\Usuario;
 
-// BACK: the office that owns `estado` and moves a validated case through it.
 class BackFijaTest extends NotaCargoFijaTestCase
 {
     private const PERMISO = 'notacargo.fija.back';

@@ -4,7 +4,6 @@ namespace Tests\Feature\NotaCargoMovil;
 
 use App\Models\NcMovil;
 
-// What an ejecutivo sees on their own queue, and what they may still change.
 class ColaRegistroMovilTest extends NotaCargoMovilTestCase
 {
     private const PERMISO = 'notacargo.movil.registrar';

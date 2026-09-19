@@ -6,14 +6,12 @@ use App\Models\NcFija;
 use App\Models\Usuario;
 
 // Row-level rules for a nota de cargo fija that depend on who is asking. Entry
-// to each screen is gated by its permiso on the route. Legacy scoped only the
-// lists and left every detail and update endpoint trusting the posted id, so any
-// user could open or overwrite any case.
+// to each screen is gated by its permiso on the route; these cover the detail and
+// update endpoints, which must not trust the posted id.
 //
-// The validación and back screens have no per-user rule (both are global
-// queues), only a per-state one; that guard is NcFija::esEditable/esValidado
-// applied at those controllers rather than a policy method that ignores its
-// user.
+// Validación and back have no per-user rule, both being global queues, only a
+// per-state one: NcFija::esEditable/esValidado, applied at those controllers
+// rather than a policy method that ignores its user.
 class NcFijaPolicy
 {
     // REGISTRO is the ejecutivo's own queue: a case is theirs to read only if

@@ -56,19 +56,11 @@ abstract class NotaCargoBuilder extends Builder
 
     /**
      * How much each ejecutivo has in each estado, over whatever window is
-     * already applied.
-     *
-     * This lives on the builder because both productos aggregate identically and
-     * because the numbers have to come from the same window the queues use.
-     * Legacy computed them with one correlated subquery per estado, each picking
-     * its own date column, so the dashboard and the queue disagreed about which
-     * month a case belonged to. One of those subqueries bounded PENDIENTE with a
-     * hardcoded `month(fecha_validacion) <= 6`, ignoring the chosen month
-     * entirely.
+     * already applied. It lives on the builder because both productos aggregate
+     * identically and the numbers must come from the window the queues use.
      *
      * Returns ids rather than names: resolving an ejecutivo is the caller's job,
-     * and joining `usuario` here would both overreach and collide, since that
-     * table has an `estado` column of its own.
+     * and joining `usuario` here would collide with its own `estado` column.
      *
      * @return Collection<int, object{id_usuario: int, estado: string, total: float}>
      */

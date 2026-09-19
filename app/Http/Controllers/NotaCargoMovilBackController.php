@@ -15,12 +15,10 @@ use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 // Nota de cargo móvil, BACK: the back office moves validated cases through the
-// lifecycle and records what fulfilment produced. `estado` is this stage's
-// column and no other screen writes it.
+// lifecycle. `estado` is this stage's column and no other screen writes it.
 //
-// Global queue, for the same reason as validación: the per-tienda copy of this
-// screen filtered the case's región against the reviewer's own store, and every
-// user who holds it also holds the unfiltered one.
+// One global queue. The per-tienda variant filtered the case's región against the
+// reviewer's own store, and everyone who held it also held the unfiltered one.
 class NotaCargoMovilBackController extends Controller
 {
     public function index(Request $request): View

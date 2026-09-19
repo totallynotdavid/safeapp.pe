@@ -1,109 +1,107 @@
 @extends('layouts.app')
 
-@section('title', 'Seguimiento de nota de cargo móvil')
+@section('title', 'Seguimiento móvil #'.$cargo->id_cargo)
+@section('page', true)
 
 @section('content')
-    @php($field = 'mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none')
-    @php($label = 'block text-sm font-medium text-gray-700')
+    @php
+        $regionOptions = $regiones->map(fn ($region) => [
+            'value' => $region->id_tienda,
+            'label' => $region->nombre,
+        ])->all();
+        $carteraOptions = collect([['value' => '', 'label' => 'Sin asignar']])
+            ->concat($carteras->map(fn ($cartera) => [
+                'value' => $cartera->id_cartera,
+                'label' => $cartera->propietario,
+            ]))->all();
+    @endphp
 
-    <div class="mx-auto max-w-4xl space-y-6">
-        <a href="{{ route('notas-cargo.movil.back.index') }}" class="text-sm font-medium text-gray-600 hover:text-gray-800">&larr; Volver a la lista</a>
+    <x-ui.detail-page title="Seguimiento móvil #{{ $cargo->id_cargo }}"
+        :subtitle="$cargo->cliente?->razon_social"
+        :back-href="route('notas-cargo.movil.back.index')" back-label="Volver a notas en seguimiento">
+        <x-slot:metadata>
+            <x-ui.text type="supporting" color="secondary">・ RUC {{ $cargo->cliente?->ruc }}</x-ui.text>
+            <x-ui.text type="supporting" color="secondary">・</x-ui.text>
+            <x-ui.badge>{{ \App\Support\EtiquetasDeDominio::texto($cargo->estado, 'estado') }}</x-ui.badge>
+            <x-ui.text type="supporting" color="secondary">・ {{ $cargo->fecha_ingreso?->format('d/m/Y') }}</x-ui.text>
+        </x-slot:metadata>
 
-        @include('notas-cargo.movil.partials.detalle')
+        @include('notas-cargo.movil.partials.detalle', ['mostrarSeguimientoBack' => false])
 
-        <div class="rounded-lg border border-gray-200 bg-white p-6">
-            <h2 class="mb-4 text-lg font-semibold text-gray-800">Actualizar el seguimiento</h2>
-
-            @if ($errors->any())
-                <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800">
-                    <ul class="list-disc pl-4">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-            <form method="POST" action="{{ route('notas-cargo.movil.back.update', $cargo) }}" class="space-y-4">
+        <x-ui.card padding="6">
+            <form method="POST" action="{{ route('notas-cargo.movil.back.update', $cargo) }}">
                 @csrf
                 @method('PUT')
 
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    {{-- estado is this stage's column: no other screen writes it. --}}
-                    <div>
-                        <label for="estado" class="{{ $label }}">Estado</label>
-                        <select id="estado" name="estado" required class="{{ $field }}">
-                            @foreach ($estados as $opcion)
-                                <option value="{{ $opcion }}" @selected(old('estado', $cargo->estado) === $opcion)>{{ $opcion }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label for="fecha_actualizacion" class="{{ $label }}">Fecha del estado</label>
-                        <input type="date" id="fecha_actualizacion" name="fecha_actualizacion" value="{{ old('fecha_actualizacion', $cargo->fecha_actualizacion?->format('Y-m-d')) }}" required class="{{ $field }}">
-                    </div>
-                    <div>
-                        <label for="etapa" class="{{ $label }}">Fase</label>
-                        <select id="etapa" name="etapa" required class="{{ $field }}">
-                            @foreach ($etapas as $opcion)
-                                <option value="{{ $opcion }}" @selected(old('etapa', $cargo->etapa) === $opcion)>{{ $opcion }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    {{-- Back may correct the región the ejecutivo chose. Legacy
-                         wrote the correction to a second column instead, so the
-                         two disagreed on 46 cases. --}}
-                    <div>
-                        <label for="zonal" class="{{ $label }}">Región</label>
-                        <select id="zonal" name="zonal" required class="{{ $field }}">
-                            @foreach ($regiones as $region)
-                                <option value="{{ $region->id_tienda }}" @selected((int) old('zonal', $cargo->zonal) === $region->id_tienda)>{{ $region->nombre }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label for="id_cartera" class="{{ $label }}">Ejecutivo TDP</label>
-                        <select id="id_cartera" name="id_cartera" class="{{ $field }}">
-                            <option value="">-- Sin asignar --</option>
-                            @foreach ($carteras as $cartera)
-                                <option value="{{ $cartera->id_cartera }}" @selected((int) old('id_cartera', $cargo->id_cartera) === $cartera->id_cartera)>{{ $cartera->propietario }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label for="nodo" class="{{ $label }}">Nodo</label>
-                        <input id="nodo" name="nodo" value="{{ old('nodo', $cargo->nodo) }}" required class="{{ $field }}">
-                    </div>
-                    <div>
-                        <label for="oportunidad" class="{{ $label }}">Oportunidad (opcional)</label>
-                        <input id="oportunidad" name="oportunidad" value="{{ old('oportunidad', $cargo->oportunidad) }}" class="{{ $field }}">
-                    </div>
-                    <div>
-                        <label for="casofwa" class="{{ $label }}">Caso FWA (opcional)</label>
-                        <input id="casofwa" name="casofwa" value="{{ old('casofwa', $cargo->casofwa) }}" class="{{ $field }}">
-                    </div>
-                    <div>
-                        <label for="ciclo" class="{{ $label }}">Ciclo (opcional)</label>
-                        <input id="ciclo" name="ciclo" value="{{ old('ciclo', $cargo->ciclo) }}" class="{{ $field }}">
-                    </div>
-                    <div>
-                        <label for="cuenta_financiera" class="{{ $label }}">Cuenta financiera (opcional)</label>
-                        <input id="cuenta_financiera" name="cuenta_financiera" value="{{ old('cuenta_financiera', $cargo->cuenta_financiera) }}" class="{{ $field }}">
-                    </div>
-                </div>
+                <x-ui.form-layout>
+                    <x-ui.stack direction="vertical" gap="0.5">
+                        <x-ui.heading level="2">Actualizar seguimiento</x-ui.heading>
+                        <x-ui.text type="supporting" color="secondary">Registre el avance operativo y las referencias producidas por back office.</x-ui.text>
+                    </x-ui.stack>
 
-                <div>
-                    <label for="comentario_back" class="{{ $label }}">Comentario</label>
-                    <textarea id="comentario_back" name="comentario_back" rows="4" required class="{{ $field }}">{{ old('comentario_back', $cargo->comentario_back) }}</textarea>
-                </div>
+                    <x-ui.stack direction="vertical" gap="3">
+                        <x-ui.stack direction="vertical" gap="0.5">
+                            <x-ui.heading level="3">Estado operativo</x-ui.heading>
+                            <x-ui.text type="supporting" color="secondary">Situación actual, fecha del cambio y fase comercial.</x-ui.text>
+                        </x-ui.stack>
+                        <x-ui.grid min-width="180" repeat="fit" gap="3">
+                            <x-ui.selector name="estado" label="Estado" :options="\App\Support\EtiquetasDeDominio::opciones($estados, 'estado')"
+                                :value="old('estado', $cargo->estado)" :error="$errors->first('estado')" required />
+                            <x-ui.date-input name="fecha_actualizacion" label="Fecha del estado"
+                                :value="old('fecha_actualizacion', $cargo->fecha_actualizacion?->format('Y-m-d'))"
+                                :error="$errors->first('fecha_actualizacion')" required />
+                            <x-ui.selector name="etapa" label="Fase" :options="\App\Support\EtiquetasDeDominio::opciones($etapas, 'etapa')"
+                                :value="old('etapa', $cargo->etapa)" :error="$errors->first('etapa')" required />
+                        </x-ui.grid>
+                    </x-ui.stack>
 
-                <div class="flex items-center gap-3 pt-2">
-                    <button type="submit" class="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">
-                        Guardar seguimiento
-                    </button>
-                    <a href="{{ route('notas-cargo.movil.back.index') }}" class="text-sm font-medium text-gray-600 hover:text-gray-800">Cancelar</a>
-                </div>
+                    <x-ui.divider />
+
+                    <x-ui.stack direction="vertical" gap="3">
+                        <x-ui.stack direction="vertical" gap="0.5">
+                            <x-ui.heading level="3">Asignación técnica</x-ui.heading>
+                            <x-ui.text type="supporting" color="secondary">Corrija la región si corresponde y complete la atribución operativa.</x-ui.text>
+                        </x-ui.stack>
+                        <x-ui.grid min-width="180" repeat="fit" gap="3">
+                            <x-ui.selector name="zonal" label="Región" :options="$regionOptions"
+                                :value="old('zonal', $cargo->zonal)" :error="$errors->first('zonal')" required />
+                            <x-ui.selector name="id_cartera" label="Ejecutivo TDP" :options="$carteraOptions"
+                                :value="old('id_cartera', $cargo->id_cartera ?: '')" :error="$errors->first('id_cartera')" optional />
+                            <x-ui.text-input name="nodo" label="Nodo" maxlength="100"
+                                :value="old('nodo', $cargo->nodo)" :error="$errors->first('nodo')" required />
+                        </x-ui.grid>
+                    </x-ui.stack>
+
+                    <x-ui.divider />
+
+                    <x-ui.stack direction="vertical" gap="3">
+                        <x-ui.stack direction="vertical" gap="0.5">
+                            <x-ui.heading level="3">Referencias del caso</x-ui.heading>
+                            <x-ui.text type="supporting" color="secondary">Identificadores complementarios generados durante la atención.</x-ui.text>
+                        </x-ui.stack>
+                        <x-ui.grid min-width="180" repeat="fit" gap="3">
+                            <x-ui.text-input name="oportunidad" label="Oportunidad" maxlength="100"
+                                :value="old('oportunidad', $cargo->oportunidad)" :error="$errors->first('oportunidad')" optional />
+                            <x-ui.text-input name="casofwa" label="Caso FWA" maxlength="100"
+                                :value="old('casofwa', $cargo->casofwa)" :error="$errors->first('casofwa')" optional />
+                            <x-ui.text-input name="ciclo" label="Ciclo" maxlength="50"
+                                :value="old('ciclo', $cargo->ciclo)" :error="$errors->first('ciclo')" optional />
+                            <x-ui.text-input name="cuenta_financiera" label="Cuenta financiera" maxlength="100"
+                                :value="old('cuenta_financiera', $cargo->cuenta_financiera)"
+                                :error="$errors->first('cuenta_financiera')" optional />
+                        </x-ui.grid>
+                    </x-ui.stack>
+
+                    <x-ui.text-area name="comentario_back" label="Comentario de back office"
+                        :value="old('comentario_back', $cargo->comentario_back)" :error="$errors->first('comentario_back')"
+                        rows="4" required />
+
+                    <x-ui.stack direction="horizontal" gap="2" h-align="end" wrap="wrap">
+                        <x-ui.button :href="route('notas-cargo.movil.back.index')" variant="secondary">Cancelar</x-ui.button>
+                        <x-ui.button type="submit" variant="primary">Guardar seguimiento</x-ui.button>
+                    </x-ui.stack>
+                </x-ui.form-layout>
             </form>
-        </div>
-    </div>
+        </x-ui.card>
+    </x-ui.detail-page>
 @endsection

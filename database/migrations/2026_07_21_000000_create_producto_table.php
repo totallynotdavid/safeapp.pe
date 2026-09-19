@@ -8,12 +8,10 @@ use Illuminate\Support\Facades\Schema;
 // agent picks a subtipo, then a descripción within it, and the monthly charge
 // comes from the matching row.
 //
-// `tipo` is kept even though only FIJA is read today. The production table holds
-// 65 FIJA rows and 21 MOVIL ones, and dropping the column would mean the cutover
-// silently discards the MOVIL half; no screen reads it (the móvil registro form
-// has its own fixed M4/COMBO list), but that is a reason to leave the rows
-// alone, not to delete them. AVANZADO is a third tipo the legacy code queries
-// and the table has never had a row for, which is half of why that screen was
+// `tipo` is kept even though only FIJA is read today: production holds 65 FIJA
+// rows and 21 MOVIL, and dropping the column would make the cutover silently
+// discard the MOVIL half. AVANZADO is a third tipo the legacy code queries and
+// the table has never had a row for, which is half of why that screen was
 // dropped: its product dropdowns came up empty.
 return new class extends Migration {
     public function up(): void
