@@ -7,7 +7,7 @@ agent queues, customer contacts, charge notes, outage cases, settlement,
 reporting, staff assignments, and access control.
 
 SafeApp is a Laravel monolith. The server renders Blade views, MariaDB stores
-application data, and Vite builds the Tailwind CSS and JavaScript assets.
+application data, and Vite builds the CSS and JavaScript assets.
 
 ## Repository map
 
@@ -23,16 +23,14 @@ application data, and Vite builds the Tailwind CSS and JavaScript assets.
   queries used by the application screens.
 - [`routes/`](routes/) groups the application shell, cockpit, and charge-note
   routes.
-- [`database/`](database/) contains the schema, factories, and development
-  data.
+- [`database/`](database/) contains the schema, factories, and development data.
 - [`tests/`](tests/) contains unit and feature tests for the operational
   workflows.
 
 ## Requirements
 
-Local development requires Linux or WSL on x86-64. The database helper
-downloads a Linux MariaDB binary and keeps its server and data files under
-`.mariadb/`.
+Local development requires Linux or WSL on x86-64. The database helper downloads
+a Linux MariaDB binary and keeps its server and data files under `.mariadb/`.
 
 [mise](https://mise.jdx.dev/getting-started.html) installs the pinned PHP, Bun,
 and Mago versions from [`mise.toml`](mise.toml). PHP is built locally and needs
