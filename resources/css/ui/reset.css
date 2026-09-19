@@ -1,0 +1,221 @@
+@layer reset {
+    :where(*, *::before, *::after) {
+        box-sizing: border-box;
+    }
+
+    :where(*, *::before, *::after) {
+        border-width: 0;
+        border-style: solid;
+        border-color: currentColor;
+    }
+
+    :where(html) {
+        line-height: 1.5;
+        -webkit-text-size-adjust: 100%;
+        tab-size: 4;
+
+        /* Enables light-dark() and native light/dark UI. XDSTheme may override it. */
+        color-scheme: light dark;
+    }
+
+    :where(body) {
+        margin: 0;
+        line-height: inherit;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    :where(h1, h2, h3, h4, h5, h6) {
+        font-size: inherit;
+        font-weight: inherit;
+    }
+
+    :where(h1, h2, h3, h4, h5, h6, p, blockquote, figure, pre, dl, dd) {
+        margin: 0;
+    }
+
+    :where(a) {
+        color: inherit;
+        text-decoration: inherit;
+    }
+
+    :where(b, strong) {
+        font-weight: bolder;
+    }
+
+    :where(code, kbd, samp, pre) {
+        font-family:
+            ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+            monospace;
+        font-size: 1em;
+    }
+
+    :where(small) {
+        font-size: 80%;
+    }
+
+    :where(sub, sup) {
+        font-size: 75%;
+        line-height: 0;
+        position: relative;
+        vertical-align: baseline;
+    }
+
+    :where(sub) {
+        bottom: -0.25em;
+    }
+
+    :where(sup) {
+        top: -0.5em;
+    }
+
+    :where(ol, ul, menu) {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    :where(img, svg, video, canvas, audio, iframe, embed, object) {
+        display: block;
+        vertical-align: middle;
+    }
+
+    :where(img, video) {
+        max-width: 100%;
+        height: auto;
+    }
+
+    /*
+     * AspectRatio marks the child's parent with the requested fit.
+     * These zero-specificity rules size media without exposing component structure.
+     */
+    :where([data-aspect-ratio-override="cover"], [data-aspect-ratio-override="contain"])
+        > :where(*) {
+        width: 100%;
+        height: 100%;
+    }
+
+    :where([data-aspect-ratio-override="cover"]) > :where(img, video) {
+        object-fit: cover;
+    }
+
+    :where([data-aspect-ratio-override="contain"]) > :where(img, video) {
+        object-fit: contain;
+    }
+
+    :where(button, input, optgroup, select, textarea) {
+        font: inherit;
+        color: inherit;
+        margin: 0;
+        padding: 0;
+    }
+
+    :where(button, [type="button"], [type="reset"], [type="submit"]) {
+        -webkit-appearance: button;
+        appearance: button;
+        background-color: transparent;
+        background-image: none;
+    }
+
+    :where(button, [role="button"]) {
+        cursor: pointer;
+    }
+
+    :where(:disabled) {
+        cursor: default;
+    }
+
+    :where(textarea) {
+        resize: vertical;
+    }
+
+    /* Firefox lowers placeholder opacity by default. */
+    :where(input::placeholder, textarea::placeholder) {
+        opacity: 1;
+        color: var(--color-text-secondary, #9ca3af);
+    }
+
+    /* Remove WebKit search decorations. */
+    :where(
+        [type="search"]::-webkit-search-decoration,
+        [type="search"]::-webkit-search-cancel-button
+    ) {
+        -webkit-appearance: none;
+    }
+
+    :where(fieldset) {
+        margin: 0;
+        padding: 0;
+    }
+
+    :where(legend) {
+        padding: 0;
+    }
+
+    :where(table) {
+        text-indent: 0;
+        border-color: inherit;
+        border-collapse: collapse;
+    }
+
+    :where(hr) {
+        height: 0;
+        color: inherit;
+        border-top-width: 1px;
+    }
+
+    :where(summary) {
+        display: list-item;
+    }
+
+    :where(dialog) {
+        padding: 0;
+        outline: none;
+    }
+
+    :where([hidden]) {
+        display: none;
+    }
+
+    :where(html) {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /*
+     * Touch-only devices have no keyboard focus path, so focus rings would only
+     * flash on tap or programmatic focus. Hybrid devices are unaffected.
+     */
+    @media (hover: none) and (pointer: coarse) {
+        :where(:focus-visible) {
+            outline: none;
+        }
+    }
+
+    /*
+     * Root data-theme controls native UI and light-dark().
+     * Omitted data-theme follows the system scheme.
+     */
+    :where(html[data-theme="light"]) {
+        color-scheme: light;
+    }
+
+    :where(html[data-theme="dark"]) {
+        color-scheme: dark;
+    }
+
+    :where(html:not([data-theme])) {
+        color-scheme: light dark;
+    }
+
+    /*
+     * Media surfaces flip color-scheme so light-dark() base tokens resolve
+     * against the surface instead of the surrounding theme.
+     */
+    :where([data-media="dark"]) {
+        color-scheme: dark;
+    }
+
+    :where([data-media="light"]) {
+        color-scheme: light;
+    }
+}
