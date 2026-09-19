@@ -1,10 +1,5 @@
 <?php
 
-// FUNNEL: the screens an agent works a client through. Split out of web.php
-// because they are one coherent cluster with its own vocabulary (queue, pool,
-// contact, off-list intake), and because web.php was becoming a single closure
-// holding every module in the app.
-
 use App\Http\Controllers\DistribucionController;
 use App\Http\Controllers\GestionController;
 use App\Http\Controllers\HistoricoController;
@@ -12,10 +7,8 @@ use App\Http\Controllers\ProduccionController;
 use App\Http\Controllers\SeguimientoController;
 use Illuminate\Support\Facades\Route;
 
-// GESTION MOVIL and GESTION FIJA are one screen over two segments. The
-// segment is a route default so each keeps its own permiso. The shared
-// client detail and write routes carry no permiso here, so the controller
-// re-checks both the segment permiso and agent ownership.
+// Movil and fija are one screen over two segments. The segment is a route
+// default so each keeps its own permiso.
 Route::middleware('can:gestion.movil')->group(function () {
     Route::get('/gestion/movil', [GestionController::class, 'index'])
         ->defaults('tipo', 'MOVIL')
@@ -66,12 +59,11 @@ Route::middleware('can:seguimiento.equipo')->group(function () {
     Route::get('/seguimiento/exportar', [SeguimientoController::class, 'exportar'])->name('seguimiento.exportar');
 });
 
+// No permiso here: the controller re-checks both the segment permiso and agent
+// ownership.
 Route::get('/gestion/dato/{dato}', [GestionController::class, 'show'])->name('gestion.show');
 Route::post('/gestion/dato/{dato}', [GestionController::class, 'store'])->name('gestion.store');
 
-// What each ejecutivo has on the board this period, per producto. Legacy's
-// DASHBOARD EJE REAL; see ProduccionController for why three of its four tables
-// could not have worked.
 Route::middleware('can:produccion.ver')
     ->get('/produccion', [ProduccionController::class, 'index'])
     ->name('produccion.index');
