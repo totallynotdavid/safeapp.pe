@@ -1,4 +1,3 @@
-import "./bootstrap";
 import "./shell";
 import "./date-input";
 import "./file-input";
