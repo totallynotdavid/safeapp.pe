@@ -1,12 +1,5 @@
-@if ($tiendasAsignadas->count() > 1)
-    @php
-        $controlId = ($idPrefix ?? '').'id_tienda';
-        $storeOptions = $tiendasAsignadas->map(fn ($asignacion) => [
-            'value' => (string) $asignacion->id_tienda,
-            'label' => $asignacion->tienda?->nombre ?? 'Tienda '.$asignacion->id_tienda,
-        ])->all();
-        $activeStore = (string) ($tiendasAsignadas->firstWhere('estado', 0)?->id_tienda ?? '');
-    @endphp
+@if (count($tiendasDisponibles) > 1)
+    @php($controlId = ($idPrefix ?? '').'id_tienda')
 
     <form method="POST" action="{{ route('tienda-activa.update') }}" class="store-switcher">
         @csrf
@@ -15,8 +8,8 @@
             :id="$controlId"
             name="id_tienda"
             label="Tienda activa"
-            :options="$storeOptions"
-            :value="$activeStore"
+            :options="$tiendasDisponibles"
+            :value="$tiendaActiva"
             :required="true"
             :auto-submit="true"
         />
