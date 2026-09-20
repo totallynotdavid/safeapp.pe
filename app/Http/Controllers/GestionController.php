@@ -11,6 +11,7 @@ use App\Http\Requests\Gestion\StoreGestionRequest;
 use App\Models\Cliente;
 use App\Models\Dato;
 use App\Models\Respuesta;
+use App\Navigation\RutaDeGestion;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -52,7 +53,7 @@ class GestionController extends Controller
             'tipo' => $tipo,
             'origenes' => DistribucionDeDatos::origenesDisponibles($tipo),
             'lote' => DistribucionDeDatos::LOTE,
-            'rutaBase' => self::rutaIndex($tipo),
+            'rutaBase' => RutaDeGestion::index($tipo),
             'busqueda' => $busqueda,
         ]);
     }
@@ -63,8 +64,8 @@ class GestionController extends Controller
 
         return view('gestion.create', [
             'tipo' => $tipo,
-            'rutaBase' => self::rutaIndex($tipo),
-            'rutaGuardar' => self::rutaAgregar($tipo).'.store',
+            'rutaBase' => RutaDeGestion::index($tipo),
+            'rutaGuardar' => RutaDeGestion::agregar($tipo).'.store',
         ]);
     }
 
@@ -108,7 +109,7 @@ class GestionController extends Controller
             'dato' => $dato,
             'cliente' => $cliente,
             'respuestas' => Respuesta::query()->orderBy('descripcion')->get()->groupBy('tipo'),
-            'rutaBase' => self::rutaIndex($dato->tipo_data),
+            'rutaBase' => RutaDeGestion::index($dato->tipo_data),
             'historial' => $historial,
             'telefonos' => $cliente->telefonosConocidosPara($request->user()),
             // Fall back to the imported record when there is no prior contact.
@@ -123,7 +124,7 @@ class GestionController extends Controller
         $dato->registrarGestion($request->user()->id_usuario, $request->contacto());
 
         return redirect()
-            ->route(self::rutaIndex($dato->tipo_data))
+            ->route(RutaDeGestion::index($dato->tipo_data))
             ->with('status', 'Gestión registrada.');
     }
 
@@ -151,15 +152,5 @@ class GestionController extends Controller
 
         abort_if($permiso === null, 404);
         abort_unless($request->user()->can($permiso), 403);
-    }
-
-    public static function rutaIndex(string $tipoData): string
-    {
-        return 'gestion.'.mb_strtolower($tipoData);
-    }
-
-    public static function rutaAgregar(string $tipoData): string
-    {
-        return self::rutaIndex($tipoData).'.agregar';
     }
 }
