@@ -8,18 +8,18 @@ use App\Cockpit\DistribucionDeDatos;
 use App\Cockpit\MezclaDeLineas;
 use App\Http\Requests\Gestion\StoreGestionClienteRequest;
 use App\Http\Requests\Gestion\StoreGestionRequest;
-use App\Models\Cliente;
 use App\Models\Dato;
 use App\Models\Respuesta;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class GestionController extends Controller
 {
     private const POR_PAGINA = 50;
 
-    private const PERMISOS = [
+    public const PERMISOS = [
         'MOVIL' => 'gestion.movil',
         'FIJA' => 'gestion.fija',
     ];
@@ -92,7 +92,7 @@ class GestionController extends Controller
 
     public function show(Request $request, Dato $dato): View
     {
-        $this->autorizarGestion($request, $dato);
+        Gate::authorize('view', $dato);
 
         $cliente = $dato->cliente;
 
@@ -118,31 +118,13 @@ class GestionController extends Controller
 
     public function store(StoreGestionRequest $request, Dato $dato): RedirectResponse
     {
-        $this->autorizarGestion($request, $dato);
+        Gate::authorize('view', $dato);
 
         $dato->registrarGestion($request->user()->id_usuario, $request->contacto());
 
         return redirect()
             ->route(self::rutaIndex($dato->tipo_data))
             ->with('status', 'Gestión registrada.');
-    }
-
-    private function autorizarGestion(Request $request, Dato $dato): void
-    {
-        $permiso = self::PERMISOS[$dato->tipo_data] ?? null;
-
-        abort_if($permiso === null, 404);
-        abort_unless($request->user()->can($permiso), 403);
-        abort_unless(
-            $dato->asignacionActiva?->id_usuario === $request->user()->id_usuario,
-            403,
-        );
-        abort_unless(
-            Cliente::visiblePara($request->user())
-                ->whereKey($dato->id_cliente)
-                ->exists(),
-            403,
-        );
     }
 
     private function autorizarTipo(Request $request, string $tipo): void

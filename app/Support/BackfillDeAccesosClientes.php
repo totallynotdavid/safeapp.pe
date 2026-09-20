@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Cockpit;
+namespace App\Support;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;

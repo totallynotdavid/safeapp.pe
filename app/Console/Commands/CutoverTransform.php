@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Cockpit\BackfillDeAccesosClientes;
 use App\Cutover\MapaDeClientes;
 use App\Cutover\Traslado;
 use App\Cutover\TrasladoDeAverias;
@@ -13,6 +12,7 @@ use App\Cutover\TrasladoDeCuentas;
 use App\Cutover\TrasladoDeNotasFija;
 use App\Cutover\TrasladoDeNotasMovil;
 use App\Cutover\TrasladoDePermisos;
+use App\Support\BackfillDeAccesosClientes;
 use Database\Seeders\MenuSeeder;
 use Database\Seeders\RespuestaSeeder;
 use Illuminate\Console\Command;

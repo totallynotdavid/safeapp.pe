@@ -60,11 +60,12 @@ and the screens call it. The owners are named in the sections below.
 | Administración        | `web.php`       | `UsuarioController`, `RolController`, `PersonalController`, `AsignacionController` | `usuarios.manage`, `roles.manage`, `personal.gestionar`, `asignacion.gestionar` |
 | Cuenta                | `web.php`       | `AccountSettingsController`, `ConfiguracionController`, `EquipoController`, `TiendaActivaController` | none, any authenticated user                        |
 
-Three routes carry no `can:` middleware, each for a reason. The `gestion.show`
-and `gestion.store` routes re-check the segment permiso and the agent's
-ownership in `GestionController`, because the segment depends on the record. The
-`tienda-activa` route lets a user change the active store among their own
-assignments.
+The `tienda-activa` route carries no permission check because `activarTienda()`
+is self-scoped: it only lets a user switch among their own assignments. The
+`gestion.show` and `gestion.store` routes carry no `can:` middleware either, for
+the reason no other record-bound route does: the permiso depends on the bound
+`Dato`, so `GestionController` calls `Gate::authorize()` and `DatoPolicy` decides,
+not route middleware.
 
 ## Cockpit
 
@@ -149,6 +150,9 @@ id.
 - `QuiebrePolicy` follows the same view and update rules. Its `validar` ability
   allows a user to validate only a quiebre whose `zonal_telefonica` is their
   assigned tienda.
+- `DatoPolicy` lets an agent view or register a gestión only when they hold the
+  permiso for the dato's segment, the dato is actively assigned to them, and its
+  cliente is visible to them.
 - `UsuarioPolicy` stops an operator from disabling their own account.
 
 **Customer visibility.** `cliente_acceso` records which users may see which
