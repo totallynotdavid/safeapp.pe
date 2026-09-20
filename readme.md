@@ -32,12 +32,22 @@ Setup and daily work:
 - [Database](docs/database.md): the local MariaDB server, resetting it, and the
   test database.
 - [Development](docs/development.md): the format, lint, test, and build checks
-  that CI runs.
+  that CI runs, and how the tests are laid out.
 
 How it works:
 
-- [Architecture](docs/architecture.md): the modules, the data model, access
-  control, and the flow of a case through the application.
+- [Architecture](docs/architecture.md): the modules and the flow of a request
+  through the application.
+- [Glossary](docs/glossary.md): the Spanish business terms used across the code
+  and docs.
+- [Cockpit](docs/cockpit.md): imports, queue distribution, contact handling, and
+  customer registration.
+- [Access control](docs/access-control.md): permisos, the sidebar, policies,
+  customer visibility, and password hashing.
+- [Notas de cargo](docs/notas-de-cargo.md): the four stages of a case and the
+  period windowing of its queues.
+- [Reports](docs/reports.md): the spreadsheet exports.
+- [Schema](docs/schema.md): the tables and the models behind them.
 
 Operations:
 
