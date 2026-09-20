@@ -115,11 +115,11 @@ directly. It creates or reuses the `cliente`, upserts an `INHOUSE` `dato`, and
 assigns it to the agent unless it is already assigned. Registering again does not
 reset a record that was already worked.
 
-**Line mix.** `Operadores` is the single owner of the carrier list and the
-`q_<carrier>` column naming. `MezclaDeLineas` is the one shape a screen renders
-for a customer's lines per carrier, whether they come from the campaign file
-(`datos`) or from what an agent confirmed on a call (`llamada`). The two sources
-are stored separately.
+**Line mix.** `Operadores` is the single owner of the carrier list, the
+`q_<carrier>` column naming, and the validation and coercion of the per-carrier
+counts. `MezclaDeLineas` is the one shape a screen renders for a customer's lines
+per carrier, whether they come from the campaign file (`datos`) or from what an
+agent confirmed on a call (`llamada`). The two sources are stored separately.
 
 ## Access control
 

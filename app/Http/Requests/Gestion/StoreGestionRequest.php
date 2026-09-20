@@ -19,7 +19,7 @@ class StoreGestionRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
+        return [
             'telefono' => ['required', 'string', 'max:30'],
             // The channel is deliberately not accepted from the request. It is
             // read from the chosen respuesta, so it cannot contradict it.
@@ -27,14 +27,9 @@ class StoreGestionRequest extends FormRequest
             'nombre_contacto' => ['nullable', 'string', 'max:150'],
             'correo' => ['nullable', 'email', 'max:150'],
             'comentario' => ['nullable', 'string', 'max:1000'],
+            // Built from the carrier list so adding a carrier needs no edit here.
+            ...Operadores::reglas(),
         ];
-
-        // Built from the carrier list so adding a carrier needs no edit here.
-        foreach (Operadores::TODOS as $operador) {
-            $rules[Operadores::columna($operador)] = ['nullable', 'integer', 'min:0', 'max:100000'];
-        }
-
-        return $rules;
     }
 
     /**
@@ -55,13 +50,9 @@ class StoreGestionRequest extends FormRequest
      */
     public function contacto(): array
     {
-        $contacto = $this->safe()->except(array_map(Operadores::columna(...), Operadores::TODOS));
-
-        foreach (Operadores::TODOS as $operador) {
-            $columna = Operadores::columna($operador);
-            $contacto[$columna] = (int) $this->input($columna, 0);
-        }
-
-        return $contacto;
+        return [
+            ...$this->safe()->except(array_map(Operadores::columna(...), Operadores::TODOS)),
+            ...Operadores::conteos($this->input(...)),
+        ];
     }
 }
