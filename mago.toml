@@ -13,13 +13,13 @@ preset = "laravel"
 integrations = ["laravel", "phpunit"]
 
 [linter.rules]
-# Laravel's own code omits declare(strict_types=1); matching the framework
+# Laravel's own code omits declare(strict_types=1). Matching the framework
 # convention beats fighting it on every file.
 strict-types = { enabled = false }
 # Laravel controllers extend a shared base and are not final by convention.
 final-controller = { enabled = false }
 # Positional literals read fine in Laravel's fluent builders (schema columns,
-# validation rules); named-argument nudges are noise here.
+# validation rules). Named-argument nudges are noise here.
 literal-named-argument = { enabled = false }
 # Our PHPUnit assertions follow a deliberate, consistent style already.
 assertion-style = { enabled = false }

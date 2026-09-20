@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v7
 
       # ext-zip is named explicitly because every spreadsheet export fails at
-      # runtime without it. The versions here duplicate mise.toml; nothing
+      # runtime without it. The versions here duplicate mise.toml. Nothing
       # checks that the two agree.
       - name: Install PHP
         uses: shivammathur/setup-php@v2
