@@ -27,7 +27,7 @@ class LegacyPasswordHasher
         }
 
         $esMd5Legado = preg_match('/^[0-9a-f]{32}$/', $usuario->clave) === 1;
-        if (! $esMd5Legado || md5($plain) !== $usuario->clave) {
+        if (! $esMd5Legado || ! hash_equals($usuario->clave, md5($plain))) {
             return false;
         }
 
