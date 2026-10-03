@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   php:
-    name: Format, lint, tests
+    name: Format, lint, analyze, tests
     runs-on: ubuntu-latest
 
     steps:
@@ -55,6 +55,7 @@ jobs:
 
       - run: make fmt-check
       - run: make lint
+      - run: make analyze
       - run: make test
 
   assets:
