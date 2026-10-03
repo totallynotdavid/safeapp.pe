@@ -87,12 +87,16 @@ final class LectorCsv
 
     private static function delimitadorDe(string $encabezado): string
     {
-        $conteos = array_map(
-            static fn (string $delimitador): int => substr_count($encabezado, $delimitador),
-            self::DELIMITADORES,
-        );
+        $elegido = self::DELIMITADORES[0];
 
-        return self::DELIMITADORES[array_search(max($conteos), $conteos, true)];
+        // The strict comparison keeps the first delimiter when counts tie.
+        foreach (self::DELIMITADORES as $delimitador) {
+            if (substr_count($encabezado, $delimitador) > substr_count($encabezado, $elegido)) {
+                $elegido = $delimitador;
+            }
+        }
+
+        return $elegido;
     }
 
     /**
