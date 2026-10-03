@@ -9,6 +9,45 @@ includes = ["vendor"]
 [formatter]
 preset = "laravel"
 
+[analyzer]
+# The baseline contains findings from request input, config(), and DB::table()
+# rows that still have mixed types. New code is held to the full check.
+# Regenerate the baseline only after fixing entries. Do not use it to admit
+# new findings.
+baseline = "analyzer-baseline.toml"
+# Unknown methods and properties are reported as warnings. The default level
+# would let them pass the gate.
+minimum-fail-level = "warning"
+ignore = [
+    # Eloquent forwards model scopes and static builder calls through __call at
+    # runtime. The analyzer cannot see them. A @method tag for each scope would
+    # only restate its signature. Each name is listed, so a mistyped method on a
+    # model or builder still fails.
+    { code = "non-documented-method", pattern = "call to `(?i:visiblePara|enPeriodo|seleccionables|ofrecibles|encola|insert|create|updateOrCreate|firstOrCreate|findOrFail)` on class `(Illuminate.Database.Eloquent.Builder|App.Models.[A-Za-z]+)`" },
+    # DB::table() rows are stdClass, so their columns have no declaration. Only
+    # the files that read such rows are listed.
+    { code = "ambiguous-object-property-access", in = ["app/Cutover/", "app/Cockpit/MezclaDeLineas.php", "app/Http/Controllers/ProduccionController.php", "app/Support/BackfillDeAccesosClientes.php"] },
+    # Laravel reads these arguments through func_get_args(). The methods accept
+    # more arguments at runtime than their declared signatures show.
+    { code = "too-many-arguments", pattern = "Eloquent.Builder::with`|Eloquent.Model::load`|Query.Builder::select`" },
+    # Auth::guard('web') exposes the Guard contract. The web guard also provides
+    # login and logout through StatefulGuard.
+    { code = "non-existent-method", pattern = "`(login|logout)` does not exist on type `Illuminate.Contracts.Auth.Guard`" },
+    # Factory::create() may return a model or a collection because count()
+    # changes the result. The analyzer cannot infer the single-model case in
+    # tests. It also cannot prove that find() and fresh() are non-null there.
+    # The columns and methods read off those results are listed by name, so a
+    # mistyped one still fails.
+    { code = "non-documented-property", pattern = "property access: \\$(agente|asignacionActiva|caso_sf|clave|cliente|comentario_back|comentario_validador|contacto|contacto1|contrata|correo|correo_verificado_en|estado|fecha_actualizacion|fecha_liberacion|fecha_nacimiento|fecha_validacion|id_back|id_cartera|id_cliente|id_dato|id_menu|id_rol|id_supervisor|id_tienda|id_usuario|id_validador|nombre_contacto|nombre_rol|origen|personal|q_entel|q_lineas|q_movistar|razon_social|respuesta|ruc|telefono|tipo_data|validacion|zonal) on class `Illuminate.Database.Eloquent.(Collection|Model)`", in = ["tests/", "database/"] },
+    { code = "non-documented-method", pattern = "call to `(?i:accesos|can|getAttributes|menus|refresh|sincronizarAsignaciones|tiendaAsignada)` on class `Illuminate.Database.Eloquent.Collection`", in = ["tests/", "database/"] },
+    { code = "non-documented-method", pattern = "call to `(?i:map|pluck)` on class `App.Models.Menu`", in = ["tests/", "database/"] },
+    { code = "possibly-invalid-argument", pattern = "Eloquent.Collection<int, App.Models", in = ["tests/"] },
+    { code = "invalid-return-statement", pattern = "Eloquent.Collection<int, App.Models", in = ["tests/"] },
+    { code = "invalid-property-assignment-value", pattern = "Eloquent.Collection<int, App.Models", in = ["tests/"] },
+    { code = "possibly-null-property-access", in = ["tests/"] },
+    { code = "possible-method-access-on-null", in = ["tests/"] },
+]
+
 [linter]
 integrations = ["laravel", "phpunit"]
 

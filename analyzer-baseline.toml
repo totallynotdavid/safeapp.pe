@@ -1,0 +1,1891 @@
+variant = "loose"
+
+[[issues]]
+file = "app/Cockpit/AccesoAClientes.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "app/Cockpit/AccesoAClientes.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 2
+
+[[issues]]
+file = "app/Cockpit/AccesoAClientes.php"
+code = "mixed-return-statement"
+message = 'Could not infer a precise return type for function `App\Cockpit\AccesoAClientes::resolverOCrear`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Cockpit/AltaDeClientes.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #2 of `App\Cockpit\AccesoAClientes::resolverOCrear`: expected `string`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Cockpit/AltaDeClientes.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #3 of `App\Cockpit\AccesoAClientes::resolverOCrear`: expected `string`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Cockpit/AltaDeClientes.php"
+code = "mixed-return-statement"
+message = 'Could not infer a precise return type for function `App\Cockpit\AltaDeClientes::registrar`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Cockpit/DistribucionDeDatos.php"
+code = "invalid-return-statement"
+message = 'Invalid return type for function `App\Cockpit\DistribucionDeDatos::origenesDisponibles`: expected `Illuminate\Support\Collection<int, object{disponibles: int, origen: string}>`, but found `Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>`.'
+count = 1
+
+[[issues]]
+file = "app/Cockpit/DistribucionDeDatos.php"
+code = "mixed-return-statement"
+message = 'Could not infer a precise return type for function `App\Cockpit\DistribucionDeDatos::asignarLote`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Cockpit/DistribucionDeDatos.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #1 of `App\Cockpit\DistribucionDeDatos::abrir`: expected `list<int>`, but possibly received `array<array-key, mixed>`.'
+count = 1
+
+[[issues]]
+file = "app/Cockpit/FormatoDeImportacion.php"
+code = "redundant-cast"
+message = "Redundant cast to `(string)`: the expression already has this type."
+count = 1
+
+[[issues]]
+file = "app/Cockpit/ImportacionDeClientes.php"
+code = "invalid-return-statement"
+message = 'Invalid return type for function `App\Cockpit\ImportacionDeClientes::erroresDeFila`: expected `list<string>`, but found `array<array-key, string>|non-empty-list<non-empty-string>`.'
+count = 1
+
+[[issues]]
+file = "app/Cockpit/ImportacionDeClientes.php"
+code = "less-specific-nested-argument-type"
+message = "Argument type mismatch for argument #2 of `implode`: expected `array<array-key, Stringable|null|scalar>|null`, but provided type `list{mixed, mixed, mixed}` is less specific."
+count = 1
+
+[[issues]]
+file = "app/Cockpit/ImportacionDeClientes.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #2 of `App\Cockpit\FormatoDeImportacion::valoresCampana`: expected `int`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Cockpit/MezclaDeLineas.php"
+code = "string-member-selector"
+message = "This member selector uses a non-literal string type (`string`); its specific value cannot be statically determined."
+count = 1
+
+[[issues]]
+file = "app/Console/Commands/CutoverTransform.php"
+code = "less-specific-nested-argument-type"
+message = "Argument type mismatch for argument #1 of `array_column`: expected `array<array-key, array<string('name'), ('V.array_column() extends mixed)>|object>|list<array<string('name'), ('V.array_column() extends mixed)>|object>`, but provided type `array<array-key, mixed>` is less specific."
+count = 1
+
+[[issues]]
+file = "app/Console/Commands/CutoverTransform.php"
+code = "less-specific-nested-argument-type"
+message = "Argument type mismatch for argument #2 of `implode`: expected `array<array-key, Stringable|null|scalar>|null`, but provided type `non-empty-array<array-key, mixed>` is less specific."
+count = 1
+
+[[issues]]
+file = "app/Cutover/MapaDeClientes.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "app/Cutover/MapaDeClientes.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 2
+
+[[issues]]
+file = "app/Cutover/MapaDeClientes.php"
+code = "redundant-cast"
+message = "Redundant cast to `(string)`: the expression already has this type."
+count = 1
+
+[[issues]]
+file = "app/Cutover/Saneamiento.php"
+code = "invalid-type-cast"
+message = "Casting `mixed` to `float`."
+count = 1
+
+[[issues]]
+file = "app/Cutover/TrasladoDeAverias.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "app/Cutover/TrasladoDeAverias.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 31
+
+[[issues]]
+file = "app/Cutover/TrasladoDeCampanas.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `App\Cutover\TrasladoDeCampanas::trasladar`: expected `object`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Cutover/TrasladoDeCampanas.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 2
+
+[[issues]]
+file = "app/Cutover/TrasladoDeCampanas.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "app/Cutover/TrasladoDeContactos.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "app/Cutover/TrasladoDeContactos.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 16
+
+[[issues]]
+file = "app/Cutover/TrasladoDeNotasFija.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "app/Cutover/TrasladoDeNotasFija.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 34
+
+[[issues]]
+file = "app/Cutover/TrasladoDeNotasMovil.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "app/Cutover/TrasladoDeNotasMovil.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 38
+
+[[issues]]
+file = "app/Cutover/TrasladoDePermisos.php"
+code = "less-specific-argument"
+message = 'Argument type mismatch for argument #1 of `App\Cutover\TrasladoDePermisos::copiarGrantsDeRol`: expected `array<int, int>`, but provided type `array<array-key, array-key>` is less specific.'
+count = 1
+
+[[issues]]
+file = "app/Cutover/TrasladoDePermisos.php"
+code = "less-specific-argument"
+message = 'Argument type mismatch for argument #1 of `App\Cutover\TrasladoDePermisos::copiarGrantsDeUsuario`: expected `array<int, int>`, but provided type `array<array-key, array-key>` is less specific.'
+count = 1
+
+[[issues]]
+file = "app/Cutover/TrasladoDePermisos.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 2
+
+[[issues]]
+file = "app/Exports/ReporteContacto.php"
+code = "invalid-argument"
+message = 'Invalid argument type for argument #4 of `App\Exports\Reporte::descargar`: expected `(closure(Illuminate\Database\Eloquent\Model): list<DateTimeInterface|null|scalar>)`, but found `(closure(App\Models\Llamada): list<DateTimeInterface|int|null|string>)`.'
+count = 1
+
+[[issues]]
+file = "app/Exports/ReporteContacto.php"
+code = "string-member-selector"
+message = "This member selector uses a non-literal string type (`string`); its specific value cannot be statically determined."
+count = 1
+
+[[issues]]
+file = "app/Exports/ReporteNotaCargoFija.php"
+code = "invalid-argument"
+message = 'Invalid argument type for argument #4 of `App\Exports\Reporte::descargar`: expected `(closure(Illuminate\Database\Eloquent\Model): list<DateTimeInterface|null|scalar>)`, but found `(closure(App\Models\NcFija): list<DateTimeInterface|float|null|string>)`.'
+count = 1
+
+[[issues]]
+file = "app/Exports/ReporteNotaCargoFija.php"
+code = "invalid-type-cast"
+message = "Non numeric string of type `string` implicitly cast to `float`."
+count = 1
+
+[[issues]]
+file = "app/Exports/ReporteNotaCargoMovil.php"
+code = "invalid-argument"
+message = 'Invalid argument type for argument #4 of `App\Exports\Reporte::descargar`: expected `(closure(Illuminate\Database\Eloquent\Model): list<DateTimeInterface|null|scalar>)`, but found `(closure(App\Models\NcMovil): list<DateTimeInterface|float|int|null|string>)`.'
+count = 1
+
+[[issues]]
+file = "app/Exports/ReporteNotaCargoMovil.php"
+code = "invalid-type-cast"
+message = "Non numeric string of type `string` implicitly cast to `float`."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/AccountSettingsController.php"
+code = "array-to-string-conversion"
+message = "Potential array in middle operand of string concatenation."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/AccountSettingsController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Illuminate\Support\Str::upper`: expected `string`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/AccountSettingsController.php"
+code = "mixed-argument"
+message = "Invalid argument type for argument #3 of `str_replace`: expected `array<array-key, string>|string`, but found `mixed`."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/AccountSettingsController.php"
+code = "mixed-array-access"
+message = "Unsafe array access on type `mixed`."
+count = 2
+
+[[issues]]
+file = "app/Http/Controllers/AccountSettingsController.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 5
+
+[[issues]]
+file = "app/Http/Controllers/AccountSettingsController.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/AccountSettingsController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$correo` (null|string)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/AccountSettingsController.php"
+code = "mixed-property-type-coercion"
+message = 'A value with a less specific type `mixed` is being assigned to property `$fecha_nacimiento` (Illuminate\Support\Carbon|null).'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/AccountSettingsController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$telefono` (null|string)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/AccountSettingsController.php"
+code = "property-type-coercion"
+message = 'A value of a less specific type `Carbon\CarbonInterface|Illuminate\Support\Carbon` is being assigned to property `$correo_verificado_en` (Illuminate\Support\Carbon|null).'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/AsignacionController.php"
+code = "mixed-argument"
+message = "Invalid argument type for argument #2 of `array_map`: expected `array<('K.array_map() extends array-key), mixed>`, but found `nonnull`."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/AsignacionController.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 2
+
+[[issues]]
+file = "app/Http/Controllers/AsignacionController.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #1 of `App\Models\Usuario::sincronizarAsignaciones`: expected `list<int>`, but possibly received `array<array-key, int>|list<int>`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/Auth/AuthenticatedSessionController.php"
+code = "invalid-destructuring-source"
+message = "Invalid destructuring assignment: Cannot unpack type `mixed` into variables."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/Auth/AuthenticatedSessionController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #2 of `App\Services\Auth\LegacyPasswordHasher::verifyAndUpgrade`: expected `string`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/Auth/AuthenticatedSessionController.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 2
+
+[[issues]]
+file = "app/Http/Controllers/ClienteIdentidadController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `App\Cockpit\AccesoAClientes::resolverOCrear`: expected `App\Models\Usuario`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/DistribucionController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `App\Cockpit\DistribucionDeDatos::asignarLote`: expected `int`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/DistribucionController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `App\Cockpit\DistribucionDeDatos::liberarPendientes`: expected `int`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/DistribucionController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #2 of `App\Cockpit\DistribucionDeDatos::asignarLote`: expected `int`, but found `nonnull`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/DistribucionController.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 2
+
+[[issues]]
+file = "app/Http/Controllers/DistribucionController.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/DistribucionController.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 2
+
+[[issues]]
+file = "app/Http/Controllers/EquipoController.php"
+code = "less-specific-nested-argument-type"
+message = "Argument type mismatch for argument #2 of `array_any`: expected `(callable(string('asignacion.gestionar')|string('personal.gestionar')|string('usuarios.manage'), non-negative-int): bool)`, but provided type `(closure(string): mixed)` is less specific."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/EquipoController.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/EquipoController.php"
+code = "mixed-return-statement"
+message = "Could not infer a precise return type for function `{closure:app/Http/Controllers/EquipoController.php:48:17}`. Saw type `mixed`."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/GestionController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `App\Models\Cliente::telefonosConocidosPara`: expected `App\Models\Usuario`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/GestionController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `App\Models\Dato::registrarGestion`: expected `int`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/GestionController.php"
+code = "mixed-argument"
+message = "Invalid argument type for argument #1 of `abort_unless`: expected `bool`, but found `mixed`."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/GestionController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #3 of `App\Cockpit\AltaDeClientes::registrar`: expected `App\Models\Usuario`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/GestionController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #4 of `App\Cockpit\AltaDeClientes::registrar`: expected `int`, but found `nonnull`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/GestionController.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 4
+
+[[issues]]
+file = "app/Http/Controllers/GestionController.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 13
+
+[[issues]]
+file = "app/Http/Controllers/GestionController.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 4
+
+[[issues]]
+file = "app/Http/Controllers/HistoricoController.php"
+code = "less-specific-argument"
+message = 'Argument type mismatch for argument #1 of `App\Http\Controllers\HistoricoController::buscar`: expected `Illuminate\Database\Eloquent\Builder<App\Models\Llamada>`, but provided type `Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>` is less specific.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/HistoricoController.php"
+code = "less-specific-return-statement"
+message = 'Returned type `Illuminate\Database\Eloquent\Builder<App\Models\Llamada>&static|Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>&static` is less specific than the declared return type `Illuminate\Database\Eloquent\Builder<App\Models\Llamada>` for function `App\Http\Controllers\HistoricoController::mios`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/HistoricoController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `App\Http\Controllers\HistoricoController::mios`: expected `int`, but found `mixed`.'
+count = 2
+
+[[issues]]
+file = "app/Http/Controllers/HistoricoController.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 2
+
+[[issues]]
+file = "app/Http/Controllers/ImportacionController.php"
+code = "possibly-false-argument"
+message = 'Argument #1 of method `App\Cockpit\ImportacionDeClientes::desdeArchivo` is possibly `false`, but parameter type `string` does not accept it.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/LiquidacionController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Illuminate\Database\Eloquent\Model::fill`: expected `array<string, mixed>`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/LiquidacionController.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #2 of `App\Http\Controllers\LiquidacionController::porLiquidar`: expected `null|string`, but possibly received `array<array-key, mixed>|null|string`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaBackController.php"
+code = "less-specific-argument"
+message = 'Argument type mismatch for argument #1 of `Illuminate\Database\Eloquent\Model::fill`: expected `array<string, mixed>`, but provided type `array<array-key, mixed>` is less specific.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaBackController.php"
+code = "mixed-array-access"
+message = "Unsafe array access on type `mixed`."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaBackController.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaBackController.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaBackController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$estado` (string)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaBackController.php"
+code = "mixed-property-type-coercion"
+message = 'A value with a less specific type `mixed` is being assigned to property `$fecha_liquidacion` (Illuminate\Support\Carbon|null).'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaBackController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$id_back` (int)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaBackController.php"
+code = "mixed-return-statement"
+message = 'Could not infer a precise return type for function `App\Http\Controllers\NotaCargoFijaBackController::enSeguimiento`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaController.php"
+code = "less-specific-argument"
+message = 'Argument type mismatch for argument #1 of `Illuminate\Database\Eloquent\Model::__construct`: expected `array<string, mixed>`, but provided type `array<array-key, mixed>` is less specific.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `App\Http\Controllers\NotaCargoFijaController::mias`: expected `int`, but found `mixed`.'
+count = 2
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Illuminate\Database\Eloquent\Model::fill`: expected `array<string, mixed>`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #2 of `App\Cockpit\AccesoAClientes::otorgar`: expected `App\Models\Usuario|int`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaController.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaController.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 2
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaController.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 7
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$cargo_fijo` (string)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$descripcion` (null|string)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$id_supervisor` (int)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$id_usuario` (int)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$subtipo` (null|string)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaController.php"
+code = "mixed-return-statement"
+message = 'Could not infer a precise return type for function `App\Http\Controllers\NotaCargoFijaController::mias`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaValidacionController.php"
+code = "mixed-array-access"
+message = "Unsafe array access on type `mixed`."
+count = 2
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaValidacionController.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaValidacionController.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaValidacionController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$comentario_validador` (null|string)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaValidacionController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$id_validador` (int)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoFijaValidacionController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$validacion` (string)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilBackController.php"
+code = "less-specific-argument"
+message = 'Argument type mismatch for argument #1 of `Illuminate\Database\Eloquent\Model::fill`: expected `array<string, mixed>`, but provided type `array<array-key, mixed>` is less specific.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilBackController.php"
+code = "mixed-array-access"
+message = "Unsafe array access on type `mixed`."
+count = 2
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilBackController.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilBackController.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilBackController.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilBackController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$estado` (string)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilBackController.php"
+code = "mixed-property-type-coercion"
+message = 'A value with a less specific type `mixed` is being assigned to property `$fecha_actualizacion` (Illuminate\Support\Carbon|null|string).'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilBackController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$id_back` (int)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilBackController.php"
+code = "mixed-return-statement"
+message = 'Could not infer a precise return type for function `App\Http\Controllers\NotaCargoMovilBackController::enSeguimiento`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilController.php"
+code = "less-specific-argument"
+message = 'Argument type mismatch for argument #1 of `Illuminate\Database\Eloquent\Model::__construct`: expected `array<string, mixed>`, but provided type `array<array-key, mixed>` is less specific.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `App\Http\Controllers\NotaCargoMovilController::mias`: expected `int`, but found `mixed`.'
+count = 2
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Illuminate\Database\Eloquent\Model::fill`: expected `array<string, mixed>`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #2 of `App\Cockpit\AccesoAClientes::otorgar`: expected `App\Models\Usuario|int`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilController.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 3
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilController.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 4
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$id_supervisor` (int)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$id_usuario` (int)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilController.php"
+code = "mixed-return-statement"
+message = 'Could not infer a precise return type for function `App\Http\Controllers\NotaCargoMovilController::mias`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilValidacionController.php"
+code = "mixed-array-access"
+message = "Unsafe array access on type `mixed`."
+count = 4
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilValidacionController.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilValidacionController.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilValidacionController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$comentario_validador` (null|string)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilValidacionController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$id_validador` (int)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/NotaCargoMovilValidacionController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$validacion` (string)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/PersonalController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Illuminate\Support\Str::upper`: expected `string`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/PersonalController.php"
+code = "mixed-array-access"
+message = "Unsafe array access on type `mixed`."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/PersonalController.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/PersonalController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$correo` (null|string)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/PersonalController.php"
+code = "mixed-property-type-coercion"
+message = 'A value with a less specific type `mixed` is being assigned to property `$fecha_nacimiento` (Illuminate\Support\Carbon|null).'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/PersonalController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$telefono` (null|string)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/ProduccionController.php"
+code = "invalid-argument"
+message = '''Invalid argument type for argument #1 of `Illuminate\Support\Collection::map`: expected `(callable(Illuminate\Support\Collection<array-key, float>&static, array-key): array{'personal': nonnull, 'totales': Illuminate\Support\Collection<array-key, mixed>})`, but found `(closure(Illuminate\Support\Collection<array-key, mixed>, int): array{'personal': nonnull, 'totales': Illuminate\Support\Collection<array-key, mixed>})`.'''
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/ProduccionController.php"
+code = "invalid-array-element-key"
+message = "Invalid array key type."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/ProduccionController.php"
+code = "invalid-type-cast"
+message = "Casting `mixed` to `float`."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/ProduccionController.php"
+code = "less-specific-argument"
+message = 'Argument type mismatch for argument #1 of `App\Http\Controllers\ProduccionController::porEjecutivo`: expected `App\Models\Builders\NotaCargoBuilder<Illuminate\Database\Eloquent\Model>`, but provided type `$this(Illuminate\Database\Eloquent\Builder<App\Models\NcFija>)` is less specific.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/ProduccionController.php"
+code = "less-specific-argument"
+message = 'Argument type mismatch for argument #1 of `App\Http\Controllers\ProduccionController::porEjecutivo`: expected `App\Models\Builders\NotaCargoBuilder<Illuminate\Database\Eloquent\Model>`, but provided type `$this(Illuminate\Database\Eloquent\Builder<App\Models\NcMovil>)` is less specific.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/ProduccionController.php"
+code = "less-specific-nested-return-statement"
+message = '''Returned type `Illuminate\Support\Collection<int, array{'personal': nonnull, 'totales': Illuminate\Support\Collection<array-key, mixed>}>&static` is less specific than the declared return type `Illuminate\Support\Collection<int, array{'personal': string, 'totales': Illuminate\Support\Collection<string, float>}>` for function `App\Http\Controllers\ProduccionController::porEjecutivo` due to nested 'mixed'.'''
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreRegistroController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `App\Http\Controllers\QuiebreRegistroController::misQuiebres`: expected `int`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreRegistroController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Illuminate\Database\Eloquent\Model::__construct`: expected `array<string, mixed>`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreRegistroController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Illuminate\Database\Eloquent\Model::fill`: expected `array<string, mixed>`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreRegistroController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #2 of `App\Cockpit\AccesoAClientes::otorgar`: expected `App\Models\Usuario|int`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreRegistroController.php"
+code = "mixed-array-access"
+message = "Unsafe array access on type `mixed`."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreRegistroController.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 3
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreRegistroController.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 2
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreRegistroController.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 2
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreRegistroController.php"
+code = "mixed-property-type-coercion"
+message = 'A value with a less specific type `mixed` is being assigned to property `$fecha_inicio` (Illuminate\Support\Carbon|null).'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreRegistroController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$id_usuario` (int)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreRegistroController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `nonnull` is being assigned to property `$id_supervisor` (int)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreRegistroController.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #3 of `App\Http\Controllers\QuiebreRegistroController::misQuiebres`: expected `null|string`, but possibly received `array<array-key, mixed>|null|string`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreValidacionController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `App\Http\Controllers\QuiebreValidacionController::pendientes`: expected `int`, but found `nonnull`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreValidacionController.php"
+code = "mixed-array-access"
+message = "Unsafe array access on type `mixed`."
+count = 3
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreValidacionController.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 2
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreValidacionController.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreValidacionController.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreValidacionController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$caso_sf` (null|string)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreValidacionController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$comentario_validador` (null|string)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreValidacionController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$estado` (string)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreValidacionController.php"
+code = "mixed-property-type-coercion"
+message = "A value with a less specific type `mixed` is being assigned to property `$id_validador` (int)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/QuiebreValidacionController.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #3 of `App\Http\Controllers\QuiebreValidacionController::pendientes`: expected `null|string`, but possibly received `array<array-key, mixed>|null|string`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/RolController.php"
+code = "less-specific-nested-return-statement"
+message = '''Returned type `list<mixed>` is less specific than the declared return type `list<int>` for function `App\Http\Controllers\RolController::grantSet` due to nested 'mixed'.'''
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/RolController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `App\Http\Controllers\RolController::grantSet`: expected `list<int|string>`, but found `nonnull`.'
+count = 2
+
+[[issues]]
+file = "app/Http/Controllers/RolController.php"
+code = "mixed-array-access"
+message = "Unsafe array access on type `mixed`."
+count = 2
+
+[[issues]]
+file = "app/Http/Controllers/RolController.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 3
+
+[[issues]]
+file = "app/Http/Controllers/RolController.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 2
+
+[[issues]]
+file = "app/Http/Controllers/SeguimientoController.php"
+code = "less-specific-argument"
+message = 'Argument type mismatch for argument #1 of `App\Http\Controllers\SeguimientoController::buscar`: expected `Illuminate\Database\Eloquent\Builder<App\Models\Llamada>`, but provided type `Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>` is less specific.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/SeguimientoController.php"
+code = "less-specific-return-statement"
+message = 'Returned type `Illuminate\Database\Eloquent\Builder<App\Models\Llamada>&static|Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>&static` is less specific than the declared return type `Illuminate\Database\Eloquent\Builder<App\Models\Llamada>` for function `App\Http\Controllers\SeguimientoController::delEquipo`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/TiendaActivaController.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/UsuarioController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `App\Services\Auth\LegacyPasswordHasher::hash`: expected `string`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/UsuarioController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `App\Services\Auth\LegacyPasswordHasher::hash`: expected `string`, but found `nonnull`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Controllers/UsuarioController.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Illuminate\Support\Str::upper`: expected `string`, but found `mixed`.'
+count = 2
+
+[[issues]]
+file = "app/Http/Controllers/UsuarioController.php"
+code = "mixed-array-access"
+message = "Unsafe array access on type `mixed`."
+count = 8
+
+[[issues]]
+file = "app/Http/Controllers/UsuarioController.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 3
+
+[[issues]]
+file = "app/Http/RangoFechas.php"
+code = "less-specific-argument"
+message = 'Argument type mismatch for argument #1 of `App\Http\RangoFechas::__construct`: expected `Illuminate\Support\Carbon`, but provided type `Carbon\CarbonInterface|Illuminate\Support\Carbon` is less specific.'
+count = 2
+
+[[issues]]
+file = "app/Http/RangoFechas.php"
+code = "less-specific-argument"
+message = 'Argument type mismatch for argument #2 of `App\Http\RangoFechas::__construct`: expected `Illuminate\Support\Carbon`, but provided type `Carbon\CarbonInterface|Illuminate\Support\Carbon` is less specific.'
+count = 2
+
+[[issues]]
+file = "app/Http/Requests/Asignacion/UpdateAsignacionRequest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Illuminate\Validation\Rule::in`: expected `Illuminate\Contracts\Support\Arrayable<array-key, mixed>|UnitEnum|array<array-key, mixed>|string`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Requests/Gestion/StoreGestionClienteRequest.php"
+code = "less-specific-return-statement"
+message = 'Returned type `array<array-key, mixed>` is less specific than the declared return type `array<string, mixed>` for function `App\Http\Requests\Gestion\StoreGestionClienteRequest::cliente`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Requests/Gestion/StoreGestionRequest.php"
+code = "less-specific-return-statement"
+message = 'Returned type `array<array-key, mixed>` is less specific than the declared return type `array<string, mixed>` for function `App\Http\Requests\Gestion\StoreGestionRequest::contacto`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Requests/NotaCargoFija/StoreNotaCargoFijaRequest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #2 of `Illuminate\Validation\Rules\DatabaseRule::where`: expected `(closure(...mixed): mixed)|Illuminate\Contracts\Support\Arrayable<array-key, mixed>|UnitEnum|array<array-key, mixed>|bool|int|null|string`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Requests/NotaCargoFija/StoreNotaCargoFijaRequest.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "app/Http/Requests/NotaCargoMovil/StoreNotaCargoMovilRequest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #2 of `Illuminate\Validation\Rules\DatabaseRule::where`: expected `(closure(...mixed): mixed)|Illuminate\Contracts\Support\Arrayable<array-key, mixed>|UnitEnum|array<array-key, mixed>|bool|int|null|string`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Requests/NotaCargoMovil/StoreNotaCargoMovilRequest.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "app/Http/Requests/Quiebre/StoreQuiebreRegistroRequest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #2 of `Illuminate\Validation\Rules\DatabaseRule::where`: expected `(closure(...mixed): mixed)|Illuminate\Contracts\Support\Arrayable<array-key, mixed>|UnitEnum|array<array-key, mixed>|bool|int|null|string`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Http/Requests/Quiebre/StoreQuiebreRegistroRequest.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "app/Models/Builders/NotaCargoBuilder.php"
+code = "invalid-return-statement"
+message = 'Invalid return type for function `App\Models\Builders\NotaCargoBuilder::totalPorEstado`: expected `Illuminate\Support\Collection<int, object{estado: string, id_usuario: int, total: float}>`, but found `Illuminate\Support\Collection<int, stdClass>`.'
+count = 1
+
+[[issues]]
+file = "app/Models/Cliente.php"
+code = "invalid-return-statement"
+message = 'Invalid return type for function `App\Models\Cliente::telefonosConocidosPara`: expected `Illuminate\Support\Collection<int, object{telefono: string, ultimo_contacto: string, veces: int}>`, but found `Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>`.'
+count = 1
+
+[[issues]]
+file = "app/Models/Cliente.php"
+code = "invalid-return-statement"
+message = 'Invalid return type for function `App\Models\Cliente::telefonosConocidos`: expected `Illuminate\Support\Collection<int, object{telefono: string, ultimo_contacto: string, veces: int}>`, but found `Illuminate\Database\Eloquent\Collection<int, Illuminate\Database\Eloquent\Model>`.'
+count = 1
+
+[[issues]]
+file = "app/Models/Cliente.php"
+code = "less-specific-return-statement"
+message = 'Returned type `$this(Illuminate\Database\Eloquent\Builder<Illuminate\Database\Eloquent\Model>)` is less specific than the declared return type `Illuminate\Database\Eloquent\Builder<App\Models\Cliente>` for function `App\Models\Cliente::scopeVisiblePara`.'
+count = 1
+
+[[issues]]
+file = "app/Models/Dato.php"
+code = "less-specific-return-statement"
+message = 'Returned type `Illuminate\Database\Eloquent\Model` is less specific than the declared return type `App\Models\Llamada` for function `{closure:app/Models/Dato.php:88:32}`.'
+count = 1
+
+[[issues]]
+file = "app/Models/Dato.php"
+code = "mixed-return-statement"
+message = 'Could not infer a precise return type for function `App\Models\Dato::registrarGestion`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Models/Producto.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 2
+
+[[issues]]
+file = "app/Models/Producto.php"
+code = "mixed-return-statement"
+message = 'Could not infer a precise return type for function `App\Models\Producto::catalogoFija`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Models/Usuario.php"
+code = "mixed-return-statement"
+message = 'Could not infer a precise return type for function `App\Models\Usuario::activarTienda`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "app/Navigation/Sidebar.php"
+code = "impossible-nonnull-entry-check"
+message = '''Impossible `isset` check on key `'url'` accessed on `array{'hidden': bool, 'items': Illuminate\Support\Collection<array-key, mixed>, 'title': string}`.'''
+count = 1
+
+[[issues]]
+file = "app/Navigation/Sidebar.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Illuminate\Support\Collection::has`: expected `array-key|array<array-key, array-key>`, but found `nonnull`.'
+count = 1
+
+[[issues]]
+file = "app/Navigation/Sidebar.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Illuminate\Support\Str::is`: expected `iterable<mixed, string>|string`, but found `nonnull`.'
+count = 1
+
+[[issues]]
+file = "app/Navigation/Sidebar.php"
+code = "mixed-argument"
+message = '''Invalid argument type for argument #1 of `collect`: expected `Illuminate\Contracts\Support\Arrayable<('TKey.collect() extends array-key), ('TValue.collect() extends mixed)>|iterable<('TKey.collect() extends array-key), ('TValue.collect() extends mixed)>|null`, but found `mixed`.'''
+count = 1
+
+[[issues]]
+file = "app/Navigation/Sidebar.php"
+code = "mixed-argument"
+message = "Invalid argument type for argument #1 of `route`: expected `BackedEnum|string`, but found `mixed`."
+count = 1
+
+[[issues]]
+file = "app/Navigation/Sidebar.php"
+code = "mixed-assignment"
+message = "Assigning `nonnull` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "app/Navigation/Sidebar.php"
+code = "mixed-operand"
+message = "Invalid left operand: type `mixed` cannot be reliably used in string concatenation."
+count = 1
+
+[[issues]]
+file = "app/Navigation/Sidebar.php"
+code = "redundant-cast"
+message = "Redundant cast to `(bool)`: the expression already has this type."
+count = 1
+
+[[issues]]
+file = "app/Navigation/Sidebar.php"
+code = "redundant-null-coalesce"
+message = "Redundant null coalesce: left-hand side is always `null`."
+count = 1
+
+[[issues]]
+file = "app/Policies/DatoPolicy.php"
+code = "impossible-null-type-comparison"
+message = "Impossible condition: variable `$dato->asignacionActiva->id_usuario` (type `int`) will always be `null`."
+count = 1
+
+[[issues]]
+file = "app/Policies/DatoPolicy.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 2
+
+[[issues]]
+file = "app/Policies/DatoPolicy.php"
+code = "mixed-operand"
+message = "Right operand in `&&` operation has `mixed` type."
+count = 1
+
+[[issues]]
+file = "app/Services/AccountNotifications.php"
+code = "less-specific-return-statement"
+message = 'Returned type `Illuminate\Database\Eloquent\Model` is less specific than the declared return type `App\Models\NotificacionUsuario` for function `App\Services\AccountNotifications::record`.'
+count = 1
+
+[[issues]]
+file = "app/Support/EtiquetasDeDominio.php"
+code = "invalid-return-statement"
+message = '''Invalid return type for function `App\Support\EtiquetasDeDominio::opciones`: expected `list<array{'label': string, 'value': string}>`, but found `array<int, array{'label': string, 'value': string}>`.'''
+count = 1
+
+[[issues]]
+file = "app/Support/EtiquetasDeDominio.php"
+code = "possibly-null-array-index"
+message = 'Possibly using `null` as an array index to access elementof variable app\support\etiquetasdedominio::ETIQUETAS.'
+count = 1
+
+[[issues]]
+file = "app/Support/EtiquetasDeDominio.php"
+code = "redundant-cast"
+message = "Redundant cast to `(string)`: the expression already has this type."
+count = 1
+
+[[issues]]
+file = "app/Support/LectorCsv.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #1 of `App\Support\LectorCsv::asociar`: expected `list<null|string>`, but possibly received `non-empty-array<array-key, mixed>`.'
+count = 1
+
+[[issues]]
+file = "app/Support/LectorCsv.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #1 of `App\Support\LectorCsv::normalizar`: expected `list<null|string>`, but possibly received `array<array-key, mixed>`.'
+count = 1
+
+[[issues]]
+file = "app/Support/LectorCsv.php"
+code = "redundant-cast"
+message = "Redundant cast to `(string)`: the expression already has this type."
+count = 1
+
+[[issues]]
+file = "app/Support/LectorXlsx.php"
+code = "invalid-array-element-key"
+message = "Cannot use spread operator on an iterable with key type `mixed`."
+count = 1
+
+[[issues]]
+file = "app/Support/LectorXlsx.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "app/View/Composers/NavegacionDeConfiguracion.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `App\Navigation\Sidebar::settingsForUser`: expected `App\Models\Usuario`, but found `truthy-mixed`.'
+count = 1
+
+[[issues]]
+file = "app/View/Composers/NavegacionDeConfiguracion.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "app/View/Composers/NavegacionPrincipal.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `App\Navigation\Sidebar::forUser`: expected `App\Models\Usuario`, but found `truthy-mixed`.'
+count = 1
+
+[[issues]]
+file = "app/View/Composers/NavegacionPrincipal.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `App\Navigation\Sidebar::settingsUrlForUser`: expected `App\Models\Usuario`, but found `truthy-mixed`.'
+count = 1
+
+[[issues]]
+file = "app/View/Composers/NavegacionPrincipal.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "app/View/Composers/SelectorDeTienda.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "app/View/Composers/SelectorDeTienda.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 2
+
+[[issues]]
+file = "app/View/Composers/SelectorDeTienda.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`truthy-mixed`)."
+count = 1
+
+[[issues]]
+file = "app/View/Composers/SelectorDeTienda.php"
+code = "mixed-return-statement"
+message = 'Could not infer a precise return type for function `App\View\Composers\SelectorDeTienda::asignaciones`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "config/app.php"
+code = "mixed-operand"
+message = "Casting `mixed` to `bool`."
+count = 1
+
+[[issues]]
+file = "config/filesystems.php"
+code = "mixed-argument"
+message = "Invalid argument type for argument #1 of `rtrim`: expected `string`, but found `mixed`."
+count = 1
+
+[[issues]]
+file = "config/logging.php"
+code = "mixed-operand"
+message = "Invalid middle operand: type `mixed` cannot be reliably used in string concatenation."
+count = 1
+
+[[issues]]
+file = "config/logging.php"
+code = "mixed-operand"
+message = "Invalid right operand: type `mixed` cannot be reliably used in string concatenation."
+count = 1
+
+[[issues]]
+file = "database/factories/LlamadaFactory.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "database/factories/LlamadaFactory.php"
+code = "mixed-return-statement"
+message = "Could not infer a precise return type for function `{closure:database/factories/LlamadaFactory.php:44:31}`. Saw type `mixed`."
+count = 1
+
+[[issues]]
+file = "database/factories/MenuFactory.php"
+code = "possibly-invalid-argument"
+message = "Possible argument type mismatch for argument #1 of `mb_strtoupper`: expected `string`, but possibly received `array<array-key, mixed>|string`."
+count = 1
+
+[[issues]]
+file = "database/seeders/AccesoxrolSeeder.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Illuminate\Database\Query\Builder::insert`: expected `array<array-key, mixed>`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "database/seeders/AccesoxrolSeeder.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "database/seeders/AccesoxrolSeeder.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 2
+
+[[issues]]
+file = "database/seeders/CarteraSeeder.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "database/seeders/NotaCargoMovilSeeder.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Database\Factories\NcMovilFactory::atribuida`: expected `App\Models\Cartera`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "database/seeders/NotaCargoMovilSeeder.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "database/seeders/NotaCargoMovilSeeder.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "database/seeders/UsuarioSeeder.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "tests/Concerns/LeeFormulario.php"
+code = "possibly-false-argument"
+message = "Argument #2 of function `preg_match_all` is possibly `false`, but parameter type `string` does not accept it."
+count = 1
+
+[[issues]]
+file = "tests/Concerns/LeeFormulario.php"
+code = "possibly-undefined-variable"
+message = "Variable `$valor` might not have been defined on all execution paths leading to this point."
+count = 1
+
+[[issues]]
+file = "tests/Concerns/LeeFormulario.php"
+code = "reference-to-undefined-variable"
+message = "Reference created from a previously undefined variable `$inputs`."
+count = 1
+
+[[issues]]
+file = "tests/Concerns/LeeLibro.php"
+code = "non-existent-method"
+message = 'Method `asserttrue` does not exist on type `Tests\Concerns\LeeLibro`.'
+count = 1
+
+[[issues]]
+file = "tests/Concerns/LeeLibro.php"
+code = "possibly-false-argument"
+message = "Argument #1 of function `file_put_contents` is possibly `false`, but parameter type `string` does not accept it."
+count = 1
+
+[[issues]]
+file = "tests/Concerns/LeeLibro.php"
+code = "possibly-false-argument"
+message = "Argument #1 of method `ZipArchive::open` is possibly `false`, but parameter type `string` does not accept it."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Account/AccountSettingsTest.php"
+code = "mixed-argument"
+message = "Invalid argument type for argument #1 of `sha1`: expected `string`, but found `mixed`."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Account/AccountSettingsTest.php"
+code = "mixed-argument"
+message = "Invalid argument type for argument #2 of `password_verify`: expected `string`, but found `mixed`."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Account/AccountSettingsTest.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Account/NavegacionDeConfiguracionTest.php"
+code = "reference-to-undefined-variable"
+message = "Reference created from a previously undefined variable `$coincidencia`."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Asignacion/AsignacionManagementTest.php"
+code = "less-specific-nested-argument-type"
+message = 'Argument type mismatch for argument #1 of `App\Models\Usuario::sincronizarAsignaciones`: expected `list<int>`, but provided type `list{mixed, mixed}` is less specific.'
+count = 2
+
+[[issues]]
+file = "tests/Feature/Asignacion/AsignacionManagementTest.php"
+code = "less-specific-nested-argument-type"
+message = 'Argument type mismatch for argument #1 of `App\Models\Usuario::sincronizarAsignaciones`: expected `list<int>`, but provided type `list{mixed}` is less specific.'
+count = 1
+
+[[issues]]
+file = "tests/Feature/Asignacion/AsignacionManagementTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #2 of `App\Models\Usuario::sincronizarAsignaciones`: expected `int|null`, but found `mixed`.'
+count = 3
+
+[[issues]]
+file = "tests/Feature/Asignacion/AsignacionManagementTest.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Asignacion/SelectorDeTiendaTest.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Asignacion/SelectorDeTiendaTest.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #1 of `App\Models\Usuario::sincronizarAsignaciones`: expected `list<int>`, but possibly received `array<int, int>|list<int>`.'
+count = 1
+
+[[issues]]
+file = "tests/Feature/Asignacion/SelectorDeTiendaTest.php"
+code = "reference-to-undefined-variable"
+message = "Reference created from a previously undefined variable `$coincidencia`."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Asignacion/TiendaActivaTest.php"
+code = "less-specific-nested-argument-type"
+message = 'Argument type mismatch for argument #1 of `App\Models\Usuario::sincronizarAsignaciones`: expected `list<int>`, but provided type `list{mixed, mixed}` is less specific.'
+count = 1
+
+[[issues]]
+file = "tests/Feature/Asignacion/TiendaActivaTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #2 of `App\Models\Usuario::sincronizarAsignaciones`: expected `int|null`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "tests/Feature/Auth/LoginTest.php"
+code = "mixed-argument"
+message = "Invalid argument type for argument #2 of `password_verify`: expected `string`, but found `mixed`."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Auth/LoginTest.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Auth/PermissionGateTest.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 5
+
+[[issues]]
+file = "tests/Feature/Cliente/IdentidadPrivadaTest.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 3
+
+[[issues]]
+file = "tests/Feature/Cliente/ImportacionCargaTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Database\Factories\DatoFactory::asignadoA`: expected `int`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "tests/Feature/Cliente/ImportacionCargaTest.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 3
+
+[[issues]]
+file = "tests/Feature/Cliente/ImportacionCargaTest.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 2
+
+[[issues]]
+file = "tests/Feature/Cliente/ImportacionFormatoTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #2 of `PHPUnit\Framework\Assert::assertCount`: expected `Countable|iterable<mixed, mixed>`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "tests/Feature/Cliente/ImportacionFormatoTest.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Cutover/CampanaTrasladadaTest.php"
+code = "mixed-return-statement"
+message = 'Could not infer a precise return type for function `Tests\Feature\Cutover\CampanaTrasladadaTest::segmentoDe`. Saw type `mixed`.'
+count = 1
+
+[[issues]]
+file = "tests/Feature/Cutover/CampanaTrasladadaTest.php"
+code = "redundant-nullsafe-operator"
+message = "Redundant nullsafe operator (`?->`) used on an expression that is never `null`."
+count = 3
+
+[[issues]]
+file = "tests/Feature/Cutover/ClienteRecuperadoTest.php"
+code = "less-specific-nested-argument-type"
+message = "Argument type mismatch for argument #1 of `mb_convert_encoding`: expected `array<array-key, string>|string`, but provided type `array<array-key, mixed>|false|string` is less specific."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Cutover/ClienteRecuperadoTest.php"
+code = "possibly-false-argument"
+message = "Argument #1 of function `mb_convert_encoding` is possibly `false`, but parameter type `array<array-key, string>|string` does not accept it."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Cutover/ClienteRecuperadoTest.php"
+code = "possibly-false-argument"
+message = 'Argument #2 of method `PHPUnit\Framework\Assert::assertStringContainsString` is possibly `false`, but parameter type `string` does not accept it.'
+count = 1
+
+[[issues]]
+file = "tests/Feature/Cutover/ClienteRecuperadoTest.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #2 of `PHPUnit\Framework\Assert::assertStringContainsString`: expected `string`, but possibly received `array<array-key, mixed>|false|string`.'
+count = 1
+
+[[issues]]
+file = "tests/Feature/Cutover/CutoverTestCase.php"
+code = "invalid-method-access"
+message = "Attempting to access a method on a non-object type (`int`)."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Cutover/TransformCommandTest.php"
+code = "invalid-method-access"
+message = "Attempting to access a method on a non-object type (`int`)."
+count = 2
+
+[[issues]]
+file = "tests/Feature/Cutover/TransformCommandTest.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 2
+
+[[issues]]
+file = "tests/Feature/Exports/ExportacionTestCase.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Gestion/AltaClienteTest.php"
+code = "less-specific-return-statement"
+message = '''Returned type `array{'q_claro': int(2), 'q_entel': int(4), 'razon_social': string('CLIENTE NUEVO SAC'), 'ruc': string('20123456789'), 'zonal': string('LIMA'), ...}` is less specific than the declared return type `array<string, mixed>` for function `Tests\Feature\Gestion\AltaClienteTest::datosValidos`.'''
+count = 1
+
+[[issues]]
+file = "tests/Feature/Gestion/GestionColaTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #2 of `Database\Factories\DatoFactory::asignadoA`: expected `int|null`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "tests/Feature/Gestion/GestionDistribucionTest.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Gestion/GestionDistribucionTest.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Gestion/GestionPanelesTest.php"
+code = "possibly-false-argument"
+message = 'Argument #2 of method `PHPUnit\Framework\Assert::assertStringContainsString` is possibly `false`, but parameter type `string` does not accept it.'
+count = 1
+
+[[issues]]
+file = "tests/Feature/Gestion/GestionPanelesTest.php"
+code = "possibly-false-argument"
+message = 'Argument #2 of method `PHPUnit\Framework\Assert::assertStringNotContainsString` is possibly `false`, but parameter type `string` does not accept it.'
+count = 1
+
+[[issues]]
+file = "tests/Feature/Gestion/GestionTestCase.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `App\Cockpit\AccesoAClientes::otorgar`: expected `App\Models\Cliente|int`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "tests/Feature/Gestion/GestionTestCase.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Gestion/GestionTestCase.php"
+code = "possibly-false-argument"
+message = "Argument #1 of function `strip_tags` is possibly `false`, but parameter type `string` does not accept it."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Liquidacion/CarteraTest.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 4
+
+[[issues]]
+file = "tests/Feature/Liquidacion/LiquidacionTestCase.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Llamada/LlamadaFoundationTest.php"
+code = "mixed-property-access"
+message = "Attempting to access a property on a non-object type (`mixed`)."
+count = 2
+
+[[issues]]
+file = "tests/Feature/NotaCargoFija/BackFijaTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #2 of `PHPUnit\Framework\Assert::assertArrayNotHasKey`: expected `ArrayAccess<array-key, mixed>|array<array-key, mixed>`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "tests/Feature/NotaCargoFija/BackFijaTest.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "tests/Feature/NotaCargoFija/NotaCargoFijaTestCase.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "tests/Feature/NotaCargoFija/ValidacionFijaTest.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "tests/Feature/NotaCargoMovil/BackMovilTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #2 of `PHPUnit\Framework\Assert::assertArrayNotHasKey`: expected `ArrayAccess<array-key, mixed>|array<array-key, mixed>`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "tests/Feature/NotaCargoMovil/NotaCargoMovilTestCase.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Personal/PersonalManagementTest.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 2
+
+[[issues]]
+file = "tests/Feature/Produccion/ProduccionTest.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Quiebre/QuiebreClienteTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `App\Cockpit\AccesoAClientes::otorgar`: expected `App\Models\Cliente|int`, but found `mixed`.'
+count = 2
+
+[[issues]]
+file = "tests/Feature/Quiebre/QuiebreTestCase.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Quiebre/QuiebreValidacionTest.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 3
+
+[[issues]]
+file = "tests/Feature/Rol/RolManagementTest.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 3
+
+[[issues]]
+file = "tests/Feature/Seguimiento/SeguimientoTest.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Usuario/UsuarioManagementTest.php"
+code = "mixed-argument"
+message = 'Invalid argument type for argument #1 of `Illuminate\Database\Query\Builder::insert`: expected `array<array-key, mixed>`, but found `mixed`.'
+count = 1
+
+[[issues]]
+file = "tests/Feature/Usuario/UsuarioManagementTest.php"
+code = "mixed-argument"
+message = "Invalid argument type for argument #2 of `password_verify`: expected `string`, but found `mixed`."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Usuario/UsuarioManagementTest.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 1
+
+[[issues]]
+file = "tests/Feature/Usuario/UsuarioManagementTest.php"
+code = "mixed-method-access"
+message = "Attempting to access a method on a non-object type (`mixed`)."
+count = 3
+
+[[issues]]
+file = "tests/Feature/ValidacionMensajesTest.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #2 of `PHPUnit\Framework\Assert::assertStringContainsString`: expected `string`, but possibly received `array<array-key, mixed>|string`.'
+count = 1
+
+[[issues]]
+file = "tests/Feature/ValidacionMensajesTest.php"
+code = "possibly-invalid-argument"
+message = 'Possible argument type mismatch for argument #2 of `PHPUnit\Framework\Assert::assertStringNotContainsString`: expected `string`, but possibly received `array<array-key, mixed>|string`.'
+count = 2
+
+[[issues]]
+file = "tests/Unit/Auth/LegacyPasswordHasherTest.php"
+code = "mixed-argument"
+message = "Invalid argument type for argument #2 of `password_verify`: expected `string`, but found `mixed`."
+count = 1
+
+[[issues]]
+file = "tests/Unit/Auth/LegacyPasswordHasherTest.php"
+code = "mixed-assignment"
+message = "Assigning `mixed` type to a variable may lead to unexpected behavior."
+count = 2
