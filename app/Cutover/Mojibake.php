@@ -41,7 +41,7 @@ final class Mojibake
         for ($vuelta = 0; $vuelta < self::MAX_VUELTAS; $vuelta++) {
             $previo = mb_convert_encoding($actual, 'ISO-8859-1', 'UTF-8');
 
-            if ($previo === '' || $previo === $actual || ! mb_check_encoding($previo, 'UTF-8')) {
+            if ($previo === false || $previo === '' || $previo === $actual || ! mb_check_encoding($previo, 'UTF-8')) {
                 return $texto;
             }
 
