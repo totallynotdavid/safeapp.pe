@@ -9,9 +9,9 @@ use App\Models\Builders\NcMovilBuilder;
 use App\Models\Cartera;
 use App\Models\NcMovil;
 use App\Models\Tienda;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 // Nota de cargo móvil, BACK: the back office moves validated cases through the

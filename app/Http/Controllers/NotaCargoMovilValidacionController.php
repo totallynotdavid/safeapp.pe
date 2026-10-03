@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\NotaCargoMovil\UpdateValidacionMovilRequest;
 use App\Models\NcMovil;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\View\View;
 
 // Nota de cargo móvil, VALIDACIÓN: a validador passes or rejects the cases
 // ejecutivos have filed, and may correct the line count and the monthly charge

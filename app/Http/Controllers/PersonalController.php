@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Personal\UpdatePersonalRequest;
 use App\Models\Usuario;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
-use Illuminate\View\View;
 
 class PersonalController extends Controller
 {

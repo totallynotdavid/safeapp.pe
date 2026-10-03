@@ -12,10 +12,10 @@ use App\Models\Cartera;
 use App\Models\Cliente;
 use App\Models\NcMovil;
 use App\Models\Tienda;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 // Nota de cargo móvil, REGISTRO: an ejecutivo files a case against a client and

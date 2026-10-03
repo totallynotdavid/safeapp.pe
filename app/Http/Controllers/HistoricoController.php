@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Exports\ReporteContacto;
 use App\Http\RangoFechas;
 use App\Models\Llamada;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class HistoricoController extends Controller

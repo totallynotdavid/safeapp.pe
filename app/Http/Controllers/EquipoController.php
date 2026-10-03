@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Usuario;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class EquipoController extends Controller
 {

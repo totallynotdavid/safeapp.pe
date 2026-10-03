@@ -8,9 +8,9 @@ use App\Http\Requests\NotaCargoFija\UpdateBackFijaRequest;
 use App\Models\Builders\NcFijaBuilder;
 use App\Models\NcFija;
 use App\Models\Tienda;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 // Nota de cargo fija, BACK: the back office moves validated cases through the

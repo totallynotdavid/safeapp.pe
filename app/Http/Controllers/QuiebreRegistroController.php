@@ -8,11 +8,11 @@ use App\Http\Requests\Quiebre\UpdateQuiebreSeguimientoRequest;
 use App\Models\Cliente;
 use App\Models\Quiebre;
 use App\Models\Tienda;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\View\View;
 
 class QuiebreRegistroController extends Controller
 {

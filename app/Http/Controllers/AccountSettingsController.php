@@ -10,13 +10,13 @@ use App\Models\PreferenciaNotificacionUsuario;
 use App\Models\Usuario;
 use App\Services\AccountNotifications;
 use App\Services\Auth\LegacyPasswordHasher;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
-use Illuminate\View\View;
 
 class AccountSettingsController extends Controller
 {
@@ -107,7 +107,7 @@ class AccountSettingsController extends Controller
         if (
             ! $this->hasher->verifyAndUpgrade(
                 $usuario,
-                $request->string('clave_actual'),
+                $request->string('clave_actual')->toString(),
             )
         ) {
             return back()->withErrors([
@@ -115,7 +115,7 @@ class AccountSettingsController extends Controller
             ]);
         }
 
-        $usuario->clave = $this->hasher->hash($request->string('clave'));
+        $usuario->clave = $this->hasher->hash($request->string('clave')->toString());
         $usuario->save();
 
         $this->notifications->record(

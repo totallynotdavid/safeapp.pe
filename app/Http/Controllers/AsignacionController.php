@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Asignacion\UpdateAsignacionRequest;
 use App\Models\Tienda;
 use App\Models\Usuario;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
 
 class AsignacionController extends Controller
 {

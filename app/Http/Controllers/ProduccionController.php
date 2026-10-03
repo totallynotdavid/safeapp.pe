@@ -7,9 +7,9 @@ use App\Models\Builders\NotaCargoBuilder;
 use App\Models\NcFija;
 use App\Models\NcMovil;
 use App\Models\Usuario;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\View\View;
 
 /**
  * What each ejecutivo has on the board this period, in money, per producto.

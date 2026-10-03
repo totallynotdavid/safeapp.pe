@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Cockpit\ImportacionDeClientes;
 use App\Cockpit\PlantillaDeImportacion;
 use App\Http\Requests\Cliente\ImportarClientesRequest;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
+use Illuminate\Http\UploadedFile;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ImportacionController extends Controller
@@ -18,6 +19,7 @@ class ImportacionController extends Controller
 
     public function store(ImportarClientesRequest $request): RedirectResponse
     {
+        /** @var UploadedFile $archivo */
         $archivo = $request->file('archivo');
 
         $resultado = ImportacionDeClientes::desdeArchivo(

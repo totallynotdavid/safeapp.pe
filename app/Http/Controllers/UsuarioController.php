@@ -7,11 +7,11 @@ use App\Http\Requests\Usuario\UpdateUsuarioRequest;
 use App\Models\Rol;
 use App\Models\Usuario;
 use App\Services\Auth\LegacyPasswordHasher;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
-use Illuminate\View\View;
 
 class UsuarioController extends Controller
 {
@@ -52,7 +52,7 @@ class UsuarioController extends Controller
             ]);
 
             // estado is guarded, so new users are enabled explicitly.
-            $usuario->estado = 1;
+            $usuario->estado = true;
             $usuario->save();
 
             // The role provides the initial menu grants; user grants may diverge later.
@@ -99,7 +99,7 @@ class UsuarioController extends Controller
     {
         Gate::authorize('disable', $usuario);
 
-        $usuario->estado = $usuario->estado ? 0 : 1;
+        $usuario->estado = ! $usuario->estado;
         $usuario->save();
 
         return redirect()

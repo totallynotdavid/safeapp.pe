@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Quiebre\UpdateQuiebreValidacionRequest;
 use App\Models\Quiebre;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\View\View;
 
 // Averías → Seguimiento: a validator reviews quiebres registered against their
 // assigned tienda and records a decision. Registration lives in

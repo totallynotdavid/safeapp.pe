@@ -12,10 +12,10 @@ use App\Models\Cliente;
 use App\Models\NcFija;
 use App\Models\Producto;
 use App\Models\Tienda;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class NotaCargoFijaController extends Controller

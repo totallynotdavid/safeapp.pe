@@ -11,10 +11,10 @@ use App\Http\Requests\Gestion\StoreGestionRequest;
 use App\Models\Dato;
 use App\Models\Respuesta;
 use App\Navigation\RutaDeGestion;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\View\View;
 
 class GestionController extends Controller
 {

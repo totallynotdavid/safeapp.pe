@@ -7,11 +7,11 @@ use App\Http\RangoFechas;
 use App\Models\Llamada;
 use App\Models\Supervisor;
 use App\Models\Usuario;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SeguimientoController extends Controller

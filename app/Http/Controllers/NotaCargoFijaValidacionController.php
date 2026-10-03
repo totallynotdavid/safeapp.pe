@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\NotaCargoFija\UpdateValidacionFijaRequest;
 use App\Models\NcFija;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\View\View;
 
 // Nota de cargo fija, VALIDACIÓN: a validador passes or rejects the cases
 // ejecutivos have filed. Nothing else on the case is theirs to change.

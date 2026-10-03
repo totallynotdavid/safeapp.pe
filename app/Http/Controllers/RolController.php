@@ -6,9 +6,9 @@ use App\Http\Requests\Rol\StoreRolRequest;
 use App\Http\Requests\Rol\UpdateRolRequest;
 use App\Models\Menu;
 use App\Models\Rol;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
-use Illuminate\View\View;
 
 class RolController extends Controller
 {
