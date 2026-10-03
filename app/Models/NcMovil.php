@@ -8,7 +8,55 @@ use Database\Factories\NcMovilFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id_cargo
+ * @property string $estado
+ * @property string $validacion
+ * @property int $id_usuario
+ * @property int $id_supervisor
+ * @property-read Carbon|null $fecha_ingreso
+ * @property-write Carbon|string|null $fecha_ingreso
+ * @property int $id_cliente
+ * @property int $q_lineas
+ * @property string $cargo_fijo
+ * @property string|null $modalidad
+ * @property string|null $contacto
+ * @property string|null $telefono1
+ * @property string|null $telefono2
+ * @property string|null $comentario_ejecutivo
+ * @property int|null $zonal
+ * @property int $id_cartera
+ * @property string|null $oportunidad
+ * @property string|null $nivel_negociacion
+ * @property Carbon|null $fecha_estimada
+ * @property string|null $tipo_producto
+ * @property string|null $etapa
+ * @property int $id_validador
+ * @property-read Carbon|null $fecha_validacion
+ * @property-write Carbon|string|null $fecha_validacion
+ * @property string|null $comentario_validador
+ * @property-read Carbon|null $fecha_actualizacion
+ * @property-write Carbon|string|null $fecha_actualizacion
+ * @property int $id_back
+ * @property string|null $comentario_back
+ * @property string $nodo
+ * @property string|null $casofwa
+ * @property string|null $ciclo
+ * @property string|null $cuenta_financiera
+ * @property string|null $comision
+ * @property string|null $observacion
+ * @property string|null $descuento
+ * @property Carbon|null $fecha_liquidacion
+ * @property string|null $comentario_liquidador
+ * @property-read Cliente|null $cliente
+ * @property-read Usuario|null $ejecutivo
+ * @property-read Usuario|null $validador
+ * @property-read Tienda|null $region
+ * @property-read Cartera|null $cartera
+ * @property-read Supervisor|null $supervisor
+ */
 // A nota de cargo móvil. The whole lifecycle lives on this one row and each
 // stage owns a disjoint set of columns: registro (the ejecutivo) writes the
 // case, validación writes the decision, back writes `estado` and the fulfilment

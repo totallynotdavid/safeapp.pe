@@ -4,7 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id_acceso
+ * @property int $id_cliente
+ * @property int $id_usuario
+ * @property Carbon $fecha_otorgado
+ * @property-read Cliente $cliente
+ * @property-read Usuario $usuario
+ */
 class AccesoCliente extends Model
 {
     public const CREATED_AT = 'fecha_otorgado';

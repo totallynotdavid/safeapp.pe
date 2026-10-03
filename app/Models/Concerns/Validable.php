@@ -7,6 +7,8 @@ namespace App\Models\Concerns;
  * three-way decision and the two state questions are identical for every
  * producto, so they have one owner here. The `estado` lifecycle the back office
  * then runs differs per producto and stays on each model.
+ *
+ * @property string $validacion
  */
 trait Validable
 {

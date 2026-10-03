@@ -6,6 +6,11 @@ use Database\Factories\SupervisorFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id_supervisor
+ * @property string $nombre
+ * @property int $estado
+ */
 class Supervisor extends Model
 {
     /** @use HasFactory<SupervisorFactory> */

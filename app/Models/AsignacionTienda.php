@@ -7,6 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id_tienda
+ * @property int $id_usuario
+ * @property int $estado
+ * @property-read Tienda|null $tienda
+ */
 // User -> tienda assignment. estado 0 is the active assignment. The asignacion
 // module owns the write side; operational screens read it to scope their rows
 // to the operator's tienda via Usuario::tiendaAsignada().

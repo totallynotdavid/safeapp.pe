@@ -2,9 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id_respuesta
+ * @property string $descripcion
+ * @property string $tipo
+ * @property bool|null $contactabilidad
+ * @property bool|null $negociacion
+ * @property bool|null $volverllamar
+ * @property-read EloquentCollection<int, Llamada> $llamadas
+ */
 // The fixed catalog of contact dispositions, seeded as reference data in every
 // environment because the gestión form cannot be used without it.
 class Respuesta extends Model

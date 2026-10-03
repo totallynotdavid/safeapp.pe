@@ -4,6 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id_usuario
+ * @property bool $correo_cuenta
+ * @property bool $correo_seguridad
+ */
 class PreferenciaNotificacionUsuario extends Model
 {
     protected $table = 'preferencia_notificacion_usuario';

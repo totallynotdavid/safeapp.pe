@@ -6,7 +6,31 @@ use Database\Factories\LlamadaFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id_llamada
+ * @property int $id_usuario
+ * @property int $id_respuesta
+ * @property Carbon $fecha
+ * @property int $id_cliente
+ * @property int|null $id_dato
+ * @property string|null $razon_social
+ * @property string|null $telefono
+ * @property string|null $nombre_contacto
+ * @property string|null $correo
+ * @property string|null $comentario
+ * @property string|null $gestion
+ * @property string|null $tipo_data
+ * @property int $q_movistar
+ * @property int $q_entel
+ * @property int $q_claro
+ * @property int $q_bitel
+ * @property-read Usuario|null $agente
+ * @property-read Respuesta|null $respuesta
+ * @property-read Cliente|null $cliente
+ * @property-read Dato|null $dato
+ */
 // One contact an agent logged against a customer. Append-only: rows are never
 // edited, and the accumulated history is what the client screen and the
 // seguimiento reports read. Dato::registrarGestion owns the write.

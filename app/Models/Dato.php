@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\DatoFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,6 +20,22 @@ use Illuminate\Support\Facades\DB;
  * same customer delivered by two campaigns is two rows here and one in `cliente`,
  * which is what lets a campaign be reloaded without disturbing the customer or
  * the agent working them.
+ *
+ * @property int $id_dato
+ * @property int $id_cliente
+ * @property string $origen
+ * @property string $tipo_data
+ * @property int $estado
+ * @property string|null $zonal
+ * @property string|null $nodo
+ * @property int $q_movistar
+ * @property int $q_entel
+ * @property int $q_claro
+ * @property int $q_bitel
+ * @property-read Cliente $cliente
+ * @property-read AsignacionDato|null $asignacionActiva
+ * @property-read EloquentCollection<int, AsignacionDato> $asignaciones
+ * @property-read EloquentCollection<int, Llamada> $llamadas
  */
 class Dato extends Model
 {

@@ -3,14 +3,38 @@
 namespace App\Models;
 
 use Database\Factories\UsuarioFactory;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @property int $id_usuario
+ * @property string $usuario
+ * @property string $clave
+ * @property int $id_rol
+ * @property string $personal
+ * @property bool $estado
+ * @property string $sexo
+ * @property int $id_supervisor
+ * @property Carbon|null $fecha_nacimiento
+ * @property string|null $telefono
+ * @property string|null $correo
+ * @property Carbon|null $correo_verificado_en
+ * @property-read Rol|null $rol
+ * @property-read Supervisor|null $supervisor
+ * @property-read EloquentCollection<int, Menu> $menus
+ * @property-read EloquentCollection<int, AsignacionTienda> $asignaciones
+ * @property-read PreferenciaNotificacionUsuario|null $preferenciasNotificacion
+ * @property-read EloquentCollection<int, NotificacionUsuario> $notificaciones
+ * @property-read EloquentCollection<int, AccesoCliente> $accesosClientes
+ * @property-read AsignacionTienda|null $asignacionActiva
+ */
 class Usuario extends Authenticatable
 {
     /** @use HasFactory<UsuarioFactory> */

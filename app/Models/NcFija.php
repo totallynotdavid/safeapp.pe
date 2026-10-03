@@ -8,7 +8,51 @@ use Database\Factories\NcFijaFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id_cargo
+ * @property string $estado
+ * @property string $validacion
+ * @property int $id_usuario
+ * @property int $id_supervisor
+ * @property-read Carbon|null $fecha_ingreso
+ * @property-write Carbon|string|null $fecha_ingreso
+ * @property int $id_cliente
+ * @property string|null $subtipo
+ * @property string|null $descripcion
+ * @property string $cargo_fijo
+ * @property string|null $modalidad
+ * @property string|null $contacto
+ * @property string|null $telefono1
+ * @property string|null $telefono2
+ * @property string|null $direccion
+ * @property string|null $coordenadas
+ * @property string|null $tecnologia
+ * @property int|null $zonal
+ * @property string|null $comentario
+ * @property int $id_validador
+ * @property-read Carbon|null $fecha_validacion
+ * @property-write Carbon|string|null $fecha_validacion
+ * @property string|null $comentario_validador
+ * @property-read Carbon|null $fecha_actualizacion
+ * @property-write Carbon|string|null $fecha_actualizacion
+ * @property Carbon|null $fecha_liquidacion
+ * @property int $id_back
+ * @property string|null $comentario_back
+ * @property string|null $peticion
+ * @property string|null $contrata
+ * @property string|null $nasignado
+ * @property string|null $caso_sf
+ * @property string $nodo
+ * @property string|null $ncfinanciera
+ * @property string|null $ncfe
+ * @property-read Cliente|null $cliente
+ * @property-read Usuario|null $ejecutivo
+ * @property-read Usuario|null $validador
+ * @property-read Tienda|null $region
+ * @property-read Supervisor|null $supervisor
+ */
 // Registro, validación and back office own separate parts of the row.
 class NcFija extends Model
 {

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * An agent's hold on one campaign record, open while they are working it and
@@ -12,6 +13,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * Rows are kept after release. Legacy overwrote the three assignment columns on
  * the work row, so a released record forgot it had ever been held: an agent
  * could draw a batch, never call any of it, hand it back, and leave no trace.
+ *
+ * @property int $id_asignacion
+ * @property int $id_dato
+ * @property int $id_usuario
+ * @property int $id_tienda
+ * @property Carbon $fecha_asignacion
+ * @property Carbon|null $fecha_liberacion
+ * @property int|null $activa
+ * @property-read Dato $dato
+ * @property-read Usuario|null $agente
+ * @property-read Tienda|null $tienda
  */
 class AsignacionDato extends Model
 {

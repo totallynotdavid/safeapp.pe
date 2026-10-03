@@ -3,12 +3,25 @@
 namespace App\Models;
 
 use Database\Factories\MenuFactory;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id_menu
+ * @property string $descripcion
+ * @property string $icono
+ * @property int $estado
+ * @property int $id_ref
+ * @property string|null $permiso
+ * @property-read Menu|null $padre
+ * @property-read EloquentCollection<int, Menu> $hijos
+ * @property-read EloquentCollection<int, Rol> $roles
+ * @property-read EloquentCollection<int, Usuario> $usuarios
+ */
 class Menu extends Model
 {
     /** @use HasFactory<MenuFactory> */

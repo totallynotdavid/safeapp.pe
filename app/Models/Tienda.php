@@ -6,6 +6,10 @@ use Database\Factories\TiendaFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id_tienda
+ * @property string $nombre
+ */
 class Tienda extends Model
 {
     /** @use HasFactory<TiendaFactory> */

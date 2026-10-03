@@ -4,11 +4,20 @@ namespace App\Models;
 
 use Database\Factories\ClienteFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 
+/**
+ * @property int $id_cliente
+ * @property string $ruc
+ * @property string|null $razon_social
+ * @property-read EloquentCollection<int, Dato> $datos
+ * @property-read EloquentCollection<int, Llamada> $llamadas
+ * @property-read EloquentCollection<int, AccesoCliente> $accesos
+ */
 class Cliente extends Model
 {
     /** @use HasFactory<ClienteFactory> */

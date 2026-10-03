@@ -8,6 +8,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id_cartera
+ * @property string $nombre
+ * @property string $propietario
+ * @property int $id_tienda
+ * @property int $estado
+ * @property string|null $DNI
+ * @property-read Tienda|null $tienda
+ */
 class Cartera extends Model
 {
     /** @use HasFactory<CarteraFactory> */

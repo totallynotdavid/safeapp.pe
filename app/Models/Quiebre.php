@@ -8,6 +8,45 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id_quiebre
+ * @property string $estado
+ * @property int $id_validador
+ * @property-read Carbon|null $fecha_validacion
+ * @property-write Carbon|string|null $fecha_validacion
+ * @property string|null $caso_sf
+ * @property string|null $comentario_validador
+ * @property int $id_usuario
+ * @property int $id_supervisor
+ * @property int|null $zonal_telefonica
+ * @property int $id_cliente
+ * @property string|null $servicio
+ * @property string|null $numero_problema
+ * @property string|null $tipo_averia
+ * @property string|null $problema_equipo
+ * @property string|null $detalle_equipo
+ * @property Carbon|null $fecha_inicio_averia
+ * @property Carbon|null $fecha_activacion
+ * @property Carbon|null $fecha_inicio
+ * @property string|null $ticket_atencion
+ * @property string|null $numero_ticket
+ * @property Carbon|null $fecha_ticket_atencion
+ * @property string|null $contacto1
+ * @property string|null $celular1
+ * @property string|null $correo1
+ * @property string|null $contacto2
+ * @property string|null $celular2
+ * @property string|null $correo2
+ * @property string|null $comentario_ejecutivo
+ * @property string|null $back
+ * @property-read Carbon|null $fecha_registro
+ * @property-write Carbon|string|null $fecha_registro
+ * @property string|null $validacion
+ * @property-read Cliente|null $cliente
+ * @property-read Usuario|null $ejecutivo
+ * @property-read Usuario|null $validador
+ * @property-read Tienda|null $tienda
+ */
 class Quiebre extends Model
 {
     /** @use HasFactory<QuiebreFactory> */

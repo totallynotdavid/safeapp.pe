@@ -8,6 +8,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
+/**
+ * @property int $id
+ * @property string $tipo
+ * @property string $subtipo
+ * @property string $descripcion
+ * @property string $cargo_fijo
+ * @property int $estado
+ */
 // A sellable product in the catalog behind the nota de cargo fija form. See the
 // create_producto_table migration for why `tipo` survives.
 class Producto extends Model
