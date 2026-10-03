@@ -5,6 +5,7 @@ Run the same PHP checks used by CI:
 ```sh
 make fmt-check
 make lint
+make analyze
 make test
 ```
 
@@ -15,10 +16,13 @@ bun run build
 ```
 
 CI runs these commands in [`ci.yml`](../.github/workflows/ci.yml). The PHP job
-runs the three `make` targets and the assets job runs the build.
+runs the four `make` targets and the assets job runs the build.
 
-`make fmt` updates PHP formatting. `make analyze` runs Mago static analysis. It
-is not a CI gate.
+`make fmt` updates PHP formatting. `make analyze` runs Mago static analysis.
+Issues that predate the gate are listed in
+[`analyzer-baseline.toml`](../analyzer-baseline.toml) and the analyzer reports
+only new ones. When you fix a baselined issue, run
+`mago analyze --remove-outdated-baseline-entries` to drop its entry.
 
 ## Tests
 
