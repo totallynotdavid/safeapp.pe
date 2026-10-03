@@ -18,12 +18,12 @@ class AppServiceProvider extends ServiceProvider
     {
         // migrate:fresh, migrate:refresh, migrate:reset, migrate:rollback and
         // db:wipe. A production run of any of these ends the business.
-        DB::prohibitDestructiveCommands($this->app->isProduction());
+        DB::prohibitDestructiveCommands(app()->isProduction());
 
         // Off in production, where the extra query beats a failed page. Outside
         // it, an unplanned lazy load is a bug in a list screen and should stop
         // the request that made it.
-        Model::preventLazyLoading(! $this->app->isProduction());
+        Model::preventLazyLoading(! app()->isProduction());
 
         // Null lets the model policy decide when the user lacks the permission.
         Gate::before(static fn (Usuario $user, string $ability): ?bool => $user->hasPermiso($ability) ? true : null);
