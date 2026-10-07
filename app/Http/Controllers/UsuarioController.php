@@ -6,7 +6,6 @@ use App\Http\Requests\Usuario\StoreUsuarioRequest;
 use App\Http\Requests\Usuario\UpdateUsuarioRequest;
 use App\Models\Rol;
 use App\Models\Usuario;
-use App\Services\Auth\LegacyPasswordHasher;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
@@ -15,10 +14,6 @@ use Illuminate\Support\Str;
 
 class UsuarioController extends Controller
 {
-    public function __construct(
-        private readonly LegacyPasswordHasher $hasher,
-    ) {}
-
     public function index(): View
     {
         $usuarios = Usuario::query()
@@ -40,12 +35,12 @@ class UsuarioController extends Controller
 
     public function store(StoreUsuarioRequest $request): RedirectResponse
     {
-        $data = $request->validated();
+        $data = $request->datos();
 
-        $usuario = DB::transaction(function () use ($data): Usuario {
+        $usuario = DB::connection()->transaction(static function () use ($data): Usuario {
             $usuario = new Usuario([
                 'usuario' => $data['usuario'],
-                'clave' => $this->hasher->hash($data['clave']),
+                'clave' => $data['clave'],
                 'personal' => Str::upper($data['personal']),
                 'id_rol' => $data['id_rol'],
                 'sexo' => $data['sexo'],
@@ -79,12 +74,11 @@ class UsuarioController extends Controller
         UpdateUsuarioRequest $request,
         Usuario $usuario,
     ): RedirectResponse {
-        $data = $request->validated();
+        $usuario->personal = Str::upper($request->personal());
 
-        $usuario->personal = Str::upper($data['personal']);
-
-        if (filled($data['clave'])) {
-            $usuario->clave = $this->hasher->hash($data['clave']);
+        $clave = $request->clave();
+        if ($clave !== null) {
+            $usuario->clave = $clave;
         }
 
         $usuario->save();

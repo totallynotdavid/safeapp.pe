@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Models\Usuario;
-use App\Services\Auth\LegacyPasswordHasher;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,24 +17,22 @@ class AuthenticatedSessionController extends Controller
         return view('auth.login');
     }
 
-    public function store(
-        LoginRequest $request,
-        LegacyPasswordHasher $hasher,
-    ): RedirectResponse {
-        ['usuario' => $usuarioInput, 'clave' => $clave] = $request->validated();
+    public function store(LoginRequest $request): RedirectResponse
+    {
+        // An account without a password never matches: the provider rejects a
+        // null hash.
+        $autenticado = Auth::attempt([
+            'usuario' => $request->string('usuario')->toString(),
+            'password' => $request->string('clave')->toString(),
+            'estado' => true,
+        ]);
 
-        $usuario = Usuario::query()
-            ->where('usuario', $usuarioInput)
-            ->where('estado', true)
-            ->first();
-
-        if (! $usuario || ! $hasher->verifyAndUpgrade($usuario, $clave)) {
+        if (! $autenticado) {
             throw ValidationException::withMessages([
                 'usuario' => 'Credenciales inválidas.',
             ]);
         }
 
-        Auth::guard('web')->login($usuario);
         $request->session()->regenerate();
 
         return redirect()->intended(route('home'));
@@ -44,7 +40,7 @@ class AuthenticatedSessionController extends Controller
 
     public function destroy(Request $request): RedirectResponse
     {
-        Auth::guard('web')->logout();
+        Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

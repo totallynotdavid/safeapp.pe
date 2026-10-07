@@ -26,4 +26,16 @@ class StoreUsuarioRequest extends FormRequest
             'sexo' => ['required', Rule::in(['M', 'F'])],
         ];
     }
+
+    /** @return array{usuario: string, clave: string, personal: string, id_rol: int, sexo: string} */
+    public function datos(): array
+    {
+        return [
+            'usuario' => $this->string('usuario')->toString(),
+            'clave' => $this->string('clave')->toString(),
+            'personal' => $this->string('personal')->toString(),
+            'id_rol' => $this->integer('id_rol'),
+            'sexo' => $this->string('sexo')->toString(),
+        ];
+    }
 }

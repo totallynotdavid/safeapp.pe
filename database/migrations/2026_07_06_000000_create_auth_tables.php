@@ -31,7 +31,9 @@ return new class extends Migration {
         Schema::create('usuario', static function (Blueprint $table) {
             $table->increments('id_usuario');
             $table->string('usuario', 50);
-            $table->string('clave', 255);
+            // Null means the account has no password and cannot sign in until
+            // one is set. The cutover leaves every migrated account this way.
+            $table->string('clave', 255)->nullable();
             $table->integer('id_rol');
             $table->string('personal', 50);
             // 1 means active here (opposite of menu.estado).

@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 /**
  * @property int $id_usuario
  * @property string $usuario
- * @property string $clave
+ * @property string|null $clave
  * @property int $id_rol
  * @property string $personal
  * @property bool $estado
@@ -68,48 +68,60 @@ class Usuario extends Authenticatable
     protected function casts(): array
     {
         return [
+            'clave' => 'hashed',
             'estado' => 'boolean',
             'fecha_nacimiento' => 'date',
             'correo_verificado_en' => 'datetime',
         ];
     }
 
+    /** @return BelongsTo<Rol, $this> */
     public function rol(): BelongsTo
     {
         return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
     }
 
-    // id_supervisor uses 0 to mean no supervisor.
+    /**
+     * id_supervisor uses 0 to mean no supervisor.
+     *
+     * @return BelongsTo<Supervisor, $this>
+     */
     public function supervisor(): BelongsTo
     {
         return $this->belongsTo(Supervisor::class, 'id_supervisor', 'id_supervisor');
     }
 
+    /** @return BelongsToMany<Menu, $this> */
     public function menus(): BelongsToMany
     {
         return $this->belongsToMany(Menu::class, 'acceso', 'id_usuario', 'id_menu');
     }
 
+    /** @return HasMany<AsignacionTienda, $this> */
     public function asignaciones(): HasMany
     {
         return $this->hasMany(AsignacionTienda::class, 'id_usuario', 'id_usuario');
     }
 
+    /** @return HasOne<PreferenciaNotificacionUsuario, $this> */
     public function preferenciasNotificacion(): HasOne
     {
         return $this->hasOne(PreferenciaNotificacionUsuario::class, 'id_usuario', 'id_usuario');
     }
 
+    /** @return HasMany<NotificacionUsuario, $this> */
     public function notificaciones(): HasMany
     {
         return $this->hasMany(NotificacionUsuario::class, 'id_usuario', 'id_usuario');
     }
 
+    /** @return HasMany<AccesoCliente, $this> */
     public function accesosClientes(): HasMany
     {
         return $this->hasMany(AccesoCliente::class, 'id_usuario', 'id_usuario');
     }
 
+    /** @return HasOne<AsignacionTienda, $this> */
     public function asignacionActiva(): HasOne
     {
         return $this->hasOne(AsignacionTienda::class, 'id_usuario', 'id_usuario')
@@ -147,7 +159,7 @@ class Usuario extends Authenticatable
      */
     public function activarTienda(int $idTienda): bool
     {
-        return DB::transaction(function () use ($idTienda): bool {
+        return $this->getConnection()->transaction(function () use ($idTienda): bool {
             if (! $this->asignaciones()->where('id_tienda', $idTienda)->exists()) {
                 return false;
             }

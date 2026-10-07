@@ -29,7 +29,7 @@
                                             label="Nueva contraseña"
                                             type="password"
                                             value=""
-                                            description="Déjala en blanco para conservar la contraseña actual."
+                                            :description="$usuario->clave === null ? 'Esta cuenta no tiene contraseña y no puede iniciar sesión hasta que le asignes una.' : 'Déjala en blanco para conservar la contraseña actual.'"
                                             :error="$errors->first('clave')"
                                             optional
                                             autocomplete="new-password"

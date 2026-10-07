@@ -9,11 +9,12 @@ use App\Mail\AccountEmail;
 use App\Models\PreferenciaNotificacionUsuario;
 use App\Models\Usuario;
 use App\Services\AccountNotifications;
-use App\Services\Auth\LegacyPasswordHasher;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -21,15 +22,11 @@ use Illuminate\Support\Str;
 class AccountSettingsController extends Controller
 {
     public function __construct(
-        private readonly LegacyPasswordHasher $hasher,
         private readonly AccountNotifications $notifications,
     ) {}
 
-    public function profile(Request $request): View
+    public function profile(#[CurrentUser] Usuario $usuario): View
     {
-        /** @var Usuario $usuario */
-        $usuario = $request->user();
-
         return view('configuracion.cuenta.perfil', [
             'usuario' => $usuario->loadMissing('rol'),
         ]);
@@ -37,29 +34,27 @@ class AccountSettingsController extends Controller
 
     public function updateProfile(
         UpdateProfileRequest $request,
+        #[CurrentUser]
+        Usuario $usuario,
     ): RedirectResponse {
-        /** @var Usuario $usuario */
-        $usuario = $request->user();
-
-        $data = $request->validated();
-        $field = $data['campo'];
+        $field = $request->string('campo')->toString();
         $emailChanged = false;
 
         switch ($field) {
             case 'personal':
-                $usuario->personal = Str::upper($data['personal']);
+                $usuario->personal = Str::upper($request->string('personal')->toString());
                 break;
 
             case 'fecha_nacimiento':
-                $usuario->fecha_nacimiento = $data['fecha_nacimiento'] ?? null;
+                $usuario->fecha_nacimiento = $request->date('fecha_nacimiento');
                 break;
 
             case 'telefono':
-                $usuario->telefono = $data['telefono'] ?? null;
+                $usuario->telefono = $request->filled('telefono') ? $request->string('telefono')->toString() : null;
                 break;
 
             case 'correo':
-                $email = $data['correo'] ?? null;
+                $email = $request->filled('correo') ? $request->string('correo')->toString() : null;
                 $emailChanged = $email !== $usuario->correo;
                 $usuario->correo = $email;
 
@@ -91,31 +86,25 @@ class AccountSettingsController extends Controller
         );
     }
 
-    public function security(Request $request): View
+    public function security(#[CurrentUser] Usuario $usuario): View
     {
         return view('configuracion.cuenta.seguridad', [
-            'usuario' => $request->user(),
+            'usuario' => $usuario,
         ]);
     }
 
     public function updatePassword(
         UpdatePasswordRequest $request,
+        #[CurrentUser]
+        Usuario $usuario,
     ): RedirectResponse {
-        /** @var Usuario $usuario */
-        $usuario = $request->user();
-
-        if (
-            ! $this->hasher->verifyAndUpgrade(
-                $usuario,
-                $request->string('clave_actual')->toString(),
-            )
-        ) {
+        if ($usuario->clave === null || ! Hash::check($request->string('clave_actual')->toString(), $usuario->clave)) {
             return back()->withErrors([
                 'clave_actual' => 'La contraseña actual no es correcta.',
             ]);
         }
 
-        $usuario->clave = $this->hasher->hash($request->string('clave')->toString());
+        $usuario->clave = $request->string('clave')->toString();
         $usuario->save();
 
         $this->notifications->record(
@@ -128,12 +117,9 @@ class AccountSettingsController extends Controller
         return back()->with('status', 'Contraseña actualizada.');
     }
 
-    public function notifications(Request $request): View
+    public function notifications(#[CurrentUser] Usuario $usuario): View
     {
-        /** @var Usuario $usuario */
-        $usuario = $request->user();
-
-        $preferences = PreferenciaNotificacionUsuario::firstOrCreate(
+        $preferences = PreferenciaNotificacionUsuario::query()->firstOrCreate(
             ['id_usuario' => $usuario->id_usuario],
             [
                 'correo_cuenta' => true,
@@ -154,11 +140,10 @@ class AccountSettingsController extends Controller
 
     public function updateNotifications(
         UpdateNotificationPreferencesRequest $request,
+        #[CurrentUser]
+        Usuario $usuario,
     ): JsonResponse|RedirectResponse {
-        /** @var Usuario $usuario */
-        $usuario = $request->user();
-
-        $preferences = PreferenciaNotificacionUsuario::updateOrCreate(
+        $preferences = PreferenciaNotificacionUsuario::query()->updateOrCreate(
             ['id_usuario' => $usuario->id_usuario],
             [
                 'correo_cuenta' => $request->boolean('correo_cuenta'),
@@ -179,12 +164,13 @@ class AccountSettingsController extends Controller
     }
 
     public function verifyEmail(
-        Request $request,
+        #[CurrentUser]
+        Usuario $actual,
         Usuario $usuario,
         string $hash,
     ): RedirectResponse {
         abort_unless(
-            (int) $request->user()->id_usuario === (int) $usuario->id_usuario,
+            (int) $actual->id_usuario === (int) $usuario->id_usuario,
             403,
         );
 
@@ -193,7 +179,10 @@ class AccountSettingsController extends Controller
             403,
         );
 
-        $usuario->correo_verificado_en ??= now();
+        if ($usuario->correo_verificado_en === null) {
+            $usuario->correo_verificado_en = Carbon::now();
+        }
+
         $usuario->save();
 
         return redirect()
@@ -204,11 +193,8 @@ class AccountSettingsController extends Controller
             );
     }
 
-    public function resendVerification(Request $request): RedirectResponse
+    public function resendVerification(#[CurrentUser] Usuario $usuario): RedirectResponse
     {
-        /** @var Usuario $usuario */
-        $usuario = $request->user();
-
         if ($usuario->correo && ! $usuario->correo_verificado_en) {
             $this->sendVerification($usuario);
         }

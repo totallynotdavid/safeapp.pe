@@ -27,4 +27,15 @@ class UpdateUsuarioRequest extends FormRequest
             'clave' => ['nullable', 'string', 'min:6', 'max:255'],
         ];
     }
+
+    public function personal(): string
+    {
+        return $this->string('personal')->toString();
+    }
+
+    /** The replacement password, or null when the field was left blank. */
+    public function clave(): ?string
+    {
+        return $this->filled('clave') ? $this->string('clave')->toString() : null;
+    }
 }

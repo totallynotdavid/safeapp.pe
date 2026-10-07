@@ -70,9 +70,11 @@ final class TrasladoDeCuentas implements Traslado
             $usuarios->agregar([
                 'id_usuario' => (int) $fila->id_usuario,
                 'usuario' => Saneamiento::texto($fila->usuario, 50),
-                // Carried verbatim. The hashes are legacy's and the login path
-                // already reads them; rehashing would lock everyone out.
-                'clave' => (string) $fila->clave,
+                // Never carried over. Legacy's hashes are unsalted MD5, which a
+                // leaked copy of this table would crack in minutes. Every
+                // account starts without a password and gets one from
+                // `usuario:restablecer-clave` or the Usuarios screen.
+                'clave' => null,
                 'id_rol' => (int) $fila->id_rol,
                 'personal' => Saneamiento::texto($fila->personal, 50),
                 'estado' => (int) $fila->estado,

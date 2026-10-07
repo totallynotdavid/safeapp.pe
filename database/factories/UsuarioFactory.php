@@ -21,7 +21,7 @@ class UsuarioFactory extends Factory
     {
         return [
             'usuario' => fake()->unique()->userName(),
-            'clave' => password_hash(self::CLAVE, PASSWORD_BCRYPT),
+            'clave' => self::CLAVE,
             'id_rol' => Rol::factory(),
             'personal' => fake()->name(),
             'estado' => 1,
@@ -38,15 +38,14 @@ class UsuarioFactory extends Factory
         return $this->state(['estado' => 0]);
     }
 
-    // Stores a raw unsalted MD5 hash, reproducing an account that predates the
-    // bcrypt migration, to exercise LegacyPasswordHasher's fallback + upgrade.
-    public function claveMd5(string $plain): static
+    // An account the cutover created: it cannot sign in until a password is set.
+    public function sinClave(): static
     {
-        return $this->state(['clave' => md5($plain)]);
+        return $this->state(['clave' => null]);
     }
 
     public function clave(string $plain): static
     {
-        return $this->state(['clave' => password_hash($plain, PASSWORD_BCRYPT)]);
+        return $this->state(['clave' => $plain]);
     }
 }
