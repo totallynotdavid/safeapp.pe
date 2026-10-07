@@ -143,20 +143,26 @@ cmd_stop() {
   fi
 }
 
-# Loads a production export into its own scratch database, which is the source
-# `php artisan cutover:transform` reads. It is never the app's database: the
-# dump is the pre-rewrite schema (menu.url, not menu.permiso), so the app cannot
-# read it. Dev databases still come from migrations and seeders (`make db-reset`).
-#
-# phpMyAdmin exports open with CREATE DATABASE + USE naming the production
-# schema, which on this box is the same name the dev app uses. Running the file
-# as-is therefore drops tables into the app's own database, which is how this
-# was found. Both statements are stripped so the target is decided here and
-# nowhere else.
+# The legacy dump loads only into its scratch database, never the app's. A dump
+# that names a database (CREATE/DROP DATABASE, USE) would write into the app's
+# own, so the file is refused, not rewritten. This catches statements that start
+# a line; --one-database in the restore covers the rest.
+names_a_database() {
+  grep -q -i -E \
+    '^[[:space:]]*(/\*![0-9]*[[:space:]]*)?((CREATE|DROP|ALTER)[[:space:]]+(DATABASE|SCHEMA)|(USE|CONNECT)[[:space:]]|\\[ur][[:space:]])' \
+    "$1"
+}
+
 cmd_restore_legacy() {
   local dump="${1:-}"
   if [ -z "$dump" ] || [ ! -f "$dump" ]; then
     echo "Usage: $0 restore-legacy <dump.sql>" >&2
+    exit 1
+  fi
+
+  if names_a_database "$dump"; then
+    echo "${dump} names a database (CREATE DATABASE or USE)." >&2
+    echo "Take the export again with mariadb-dump --no-create-db." >&2
     exit 1
   fi
 
@@ -171,16 +177,9 @@ cmd_restore_legacy() {
   mdb -e "DROP DATABASE IF EXISTS \`${target}\`;
           CREATE DATABASE \`${target}\` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
-  # Stripped to a temp file rather than piped: the client reads a redirected
-  # file in about 20 seconds and a pipe in over ten minutes. The file holds real
-  # customer data, so it is mode 600 and removed on any exit. STRIPPED_DUMP is
-  # script-scoped because the EXIT trap fires after a local would be gone, and
-  # `set -u` turns that into an error on the way out of a successful run.
-  STRIPPED_DUMP="$(mktemp)"
-  chmod 600 "$STRIPPED_DUMP"
-  trap 'rm -f "${STRIPPED_DUMP:-}"' EXIT
-  sed -e '/^CREATE DATABASE /d' -e '/^USE `/d' "$dump" > "$STRIPPED_DUMP"
-  mdb "$target" < "$STRIPPED_DUMP"
+  # Redirected from the file, not piped: the client reads a file in about 20
+  # seconds and a pipe in over ten minutes.
+  mdb --one-database "$target" < "$dump"
 
   # SELECT only. The transform reads this database and writes the app's, and the
   # grant is what keeps that true even if a query is pointed at the wrong
@@ -190,14 +189,14 @@ cmd_restore_legacy() {
     GRANT SELECT ON \`${target}\`.* TO '${DB_USERNAME}'@'127.0.0.1';
     FLUSH PRIVILEGES;
   "
-  echo "Restored. Now: php artisan migrate:fresh && php artisan cutover:transform"
+  echo "Restored. Now: php artisan cutover:transform --fresh"
 }
 
 cmd_dump() {
   local file="${1:-${ROOT_DIR}/dev-dump.sql}"
   : "${DB_DATABASE:?DB_DATABASE not set}"
   cmd_start
-  "$(bin mariadb-dump)" --socket="$SOCKET" -u root "$DB_DATABASE" > "$file"
+  "$(bin mariadb-dump)" --socket="$SOCKET" -u root --no-create-db "$DB_DATABASE" > "$file"
   echo "Dumped to ${file}"
 }
 

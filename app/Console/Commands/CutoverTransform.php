@@ -22,13 +22,13 @@ use Illuminate\Support\Facades\Schema;
 /**
  * Only transfers data; the migrations own the destination schema.
  *
- * The destination must be empty. To rerun the cutover, rebuild it with:
- *
- *     php artisan migrate:fresh --drop-views
+ * The destination must be empty. `--fresh` rebuilds it first with
+ * `migrate:fresh --drop-views`, which is what a rerun needs.
  */
 class CutoverTransform extends Command
 {
-    protected $signature = 'cutover:transform';
+    protected $signature = 'cutover:transform
+        {--fresh : Drop every table and view in the destination and migrate it again first}';
 
     protected $description = 'Load a restored legacy export into the current schema';
 
@@ -56,6 +56,13 @@ class CutoverTransform extends Command
 
     public function handle(): int
     {
+        if ($this->option('fresh')) {
+            // Production refuses this (AppServiceProvider), which is the point.
+            if ($this->call('migrate:fresh', ['--drop-views' => true]) !== self::SUCCESS) {
+                return self::FAILURE;
+            }
+        }
+
         if (! $this->destinoVacio() || ! $this->destinoSinVistas()) {
             return self::FAILURE;
         }
@@ -103,6 +110,10 @@ class CutoverTransform extends Command
             ),
         );
 
+        $this->components->warn(
+            'No migrated account has a password. Set the first with `php artisan usuario:restablecer-clave <usuario>`.',
+        );
+
         return self::SUCCESS;
     }
 
@@ -131,7 +142,7 @@ class CutoverTransform extends Command
             }
 
             $this->components->error(
-                "`{$tabla}` already has rows. Run ".'`php artisan migrate:fresh --drop-views` first, without --seed.',
+                "`{$tabla}` already has rows. Run again with --fresh to rebuild the destination first.",
             );
 
             return false;
@@ -144,13 +155,14 @@ class CutoverTransform extends Command
     {
         $esquema = Schema::getCurrentSchemaName();
 
-        $vistas = array_column(
-            array_filter(
-                Schema::getViews(),
-                static fn (array $vista): bool => $vista['schema'] === $esquema,
-            ),
-            'name',
-        );
+        $vistas = [];
+        foreach (DB::connection()->getSchemaBuilder()->getViews() as $vista) {
+            if ($vista['schema'] !== $esquema) {
+                continue;
+            }
+
+            $vistas[] = $vista['name'];
+        }
 
         if ($vistas === []) {
             return true;
@@ -161,7 +173,7 @@ class CutoverTransform extends Command
         $this->components->error(
             'Views left over from the legacy schema: '
             .implode(', ', $vistas)
-            .'. Run `php artisan migrate:fresh --drop-views`, which removes them.',
+            .'. Run again with --fresh, which removes them.',
         );
 
         return false;
