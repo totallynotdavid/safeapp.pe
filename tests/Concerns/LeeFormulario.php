@@ -22,15 +22,17 @@ trait LeeFormulario
      */
     protected function casillas(TestResponse $respuesta, string $campo): array
     {
+        $inputs = [];
         preg_match_all(
             '/<input\b[^>]*name="'.preg_quote($campo, '/').'"[^>]*>/',
-            $respuesta->getContent(),
+            (string) $respuesta->getContent(),
             $inputs,
         );
 
         $casillas = [];
 
         foreach ($inputs[0] as $input) {
+            $valor = [];
             preg_match('/\bvalue="([^"]*)"/', $input, $valor);
             $casillas[$valor[1]] = str_contains($input, 'checked');
         }

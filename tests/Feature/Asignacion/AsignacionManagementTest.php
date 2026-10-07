@@ -16,7 +16,7 @@ class AsignacionManagementTest extends TestCase
     private function gestor(): Usuario
     {
         $menu = Menu::factory()->create(['permiso' => 'asignacion.gestionar']);
-        $user = Usuario::factory()->create();
+        $user = Usuario::factory()->createOne();
         $user->menus()->attach($menu);
 
         return $user;
@@ -50,9 +50,9 @@ class AsignacionManagementTest extends TestCase
 
     public function test_assigns_tiendas_and_sets_the_active_one(): void
     {
-        $agente = Usuario::factory()->create();
-        $centro = Tienda::factory()->create();
-        $norte = Tienda::factory()->create();
+        $agente = Usuario::factory()->createOne();
+        $centro = Tienda::factory()->createOne();
+        $norte = Tienda::factory()->createOne();
 
         $this
             ->actingAs($this->gestor())
@@ -68,9 +68,9 @@ class AsignacionManagementTest extends TestCase
 
     public function test_keeps_a_single_active_tienda_when_the_active_one_changes(): void
     {
-        $agente = Usuario::factory()->create();
-        $centro = Tienda::factory()->create();
-        $norte = Tienda::factory()->create();
+        $agente = Usuario::factory()->createOne();
+        $centro = Tienda::factory()->createOne();
+        $norte = Tienda::factory()->createOne();
         $agente->sincronizarAsignaciones([$centro->id_tienda, $norte->id_tienda], $centro->id_tienda);
 
         $this
@@ -90,9 +90,9 @@ class AsignacionManagementTest extends TestCase
 
     public function test_removing_a_tienda_deletes_its_assignment(): void
     {
-        $agente = Usuario::factory()->create();
-        $centro = Tienda::factory()->create();
-        $norte = Tienda::factory()->create();
+        $agente = Usuario::factory()->createOne();
+        $centro = Tienda::factory()->createOne();
+        $norte = Tienda::factory()->createOne();
         $agente->sincronizarAsignaciones([$centro->id_tienda, $norte->id_tienda], $centro->id_tienda);
 
         $this
@@ -109,8 +109,8 @@ class AsignacionManagementTest extends TestCase
 
     public function test_clears_every_assignment_when_no_tienda_is_chosen(): void
     {
-        $agente = Usuario::factory()->create();
-        $centro = Tienda::factory()->create();
+        $agente = Usuario::factory()->createOne();
+        $centro = Tienda::factory()->createOne();
         $agente->sincronizarAsignaciones([$centro->id_tienda], $centro->id_tienda);
 
         $this
@@ -124,9 +124,9 @@ class AsignacionManagementTest extends TestCase
 
     public function test_rejects_an_active_tienda_outside_the_assigned_set(): void
     {
-        $agente = Usuario::factory()->create();
-        $centro = Tienda::factory()->create();
-        $norte = Tienda::factory()->create();
+        $agente = Usuario::factory()->createOne();
+        $centro = Tienda::factory()->createOne();
+        $norte = Tienda::factory()->createOne();
 
         $this
             ->actingAs($this->gestor())
@@ -141,8 +141,8 @@ class AsignacionManagementTest extends TestCase
 
     public function test_requires_an_active_tienda_when_tiendas_are_chosen(): void
     {
-        $agente = Usuario::factory()->create();
-        $centro = Tienda::factory()->create();
+        $agente = Usuario::factory()->createOne();
+        $centro = Tienda::factory()->createOne();
 
         $this
             ->actingAs($this->gestor())

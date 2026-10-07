@@ -102,7 +102,7 @@ class ProduccionTest extends TestCase
 
     private function usuarioCon(string $permiso): Usuario
     {
-        $user = Usuario::factory()->create();
+        $user = Usuario::factory()->createOne();
         $user->menus()->attach(Menu::factory()->create(['permiso' => $permiso]));
 
         return $user;

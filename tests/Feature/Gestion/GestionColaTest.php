@@ -48,7 +48,7 @@ class GestionColaTest extends GestionTestCase
     public function test_the_queue_is_scoped_to_the_agents_active_tienda(): void
     {
         $agente = $this->agente('gestion.movil');
-        $otraTienda = Tienda::factory()->create();
+        $otraTienda = Tienda::factory()->createOne();
         Dato::factory()
             ->asignadoA($agente->id_usuario, $otraTienda->id_tienda)
             ->create(['razon_social' => 'CLIENTE DE OTRA TIENDA']);

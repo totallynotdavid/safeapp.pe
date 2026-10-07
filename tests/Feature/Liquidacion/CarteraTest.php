@@ -11,12 +11,12 @@ class CarteraTest extends LiquidacionTestCase
 {
     public function test_only_active_executives_are_selectable(): void
     {
-        $activa = Cartera::factory()->create(['id_tienda' => Tienda::factory(), 'propietario' => 'ANA VIGIL']);
+        $activa = Cartera::factory()->createOne(['id_tienda' => Tienda::factory(), 'propietario' => 'ANA VIGIL']);
         Cartera::factory()->retirada()->create(['propietario' => 'LUIS RETIRADO']);
 
         $this->assertSame(
             [$activa->id_cartera],
-            Cartera::query()->seleccionables()->pluck('id_cartera')->all(),
+            Cartera::seleccionables()->pluck('id_cartera')->all(),
         );
     }
 
@@ -30,7 +30,7 @@ class CarteraTest extends LiquidacionTestCase
 
         $this->assertSame(
             ['ANA LIMA', 'JOSE PIURA'],
-            Cartera::query()->seleccionables()->pluck('propietario')->all(),
+            Cartera::seleccionables()->pluck('propietario')->all(),
         );
     }
 

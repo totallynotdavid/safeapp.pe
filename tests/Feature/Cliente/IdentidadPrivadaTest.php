@@ -33,7 +33,7 @@ class IdentidadPrivadaTest extends TestCase
         string $ruta,
         string $destino,
     ): void {
-        $agente = Usuario::factory()->create();
+        $agente = Usuario::factory()->createOne();
         $agente->menus()->attach(Menu::factory()->create(['permiso' => $permiso]));
 
         $this
@@ -50,10 +50,10 @@ class IdentidadPrivadaTest extends TestCase
 
     public function test_an_existing_private_identity_cannot_be_discovered_or_claimed(): void
     {
-        $agente = Usuario::factory()->create();
+        $agente = Usuario::factory()->createOne();
         $agente->menus()->attach(Menu::factory()->create(['permiso' => 'notacargo.movil.registrar']));
-        $otro = Usuario::factory()->create();
-        $cliente = Cliente::factory()->create(['ruc' => '20123456789']);
+        $otro = Usuario::factory()->createOne();
+        $cliente = Cliente::factory()->createOne(['ruc' => '20123456789']);
         $cliente->accesos()->create(['id_usuario' => $otro->id_usuario]);
 
         $this

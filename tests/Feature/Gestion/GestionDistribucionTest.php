@@ -106,7 +106,7 @@ class GestionDistribucionTest extends GestionTestCase
     {
         // Otherwise the batch would be written with a null tienda and disappear
         // from the queue that is scoped by it.
-        $agente = Usuario::factory()->create();
+        $agente = Usuario::factory()->createOne();
         $agente->menus()->attach(Menu::factory()->create(['permiso' => 'gestion.movil']));
         Dato::factory()->count(3)->create(['origen' => 'DB_UNO']);
 
@@ -126,7 +126,7 @@ class GestionDistribucionTest extends GestionTestCase
         $gestionado = Dato::factory()
             ->gestionado()
             ->asignadoA($agente->id_usuario, $this->tienda->id_tienda)
-            ->create();
+            ->createOne();
 
         $this
             ->actingAs($agente)

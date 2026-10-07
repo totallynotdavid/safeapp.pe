@@ -137,8 +137,10 @@ class ImportacionFormatoTest extends TestCase
                 'archivo' => $this->csv("ruc;razon_social\n20123456789;ACME SAC\n20123456780;OTRA SAC"),
             ]);
 
-        $this->assertCount(1, session('errores'));
-        $respuesta->assertSessionHas('errores');
+        $respuesta->assertSessionHas(
+            'errores',
+            static fn (mixed $errores): bool => is_countable($errores) && count($errores) === 1,
+        );
     }
 
     private function csv(string $contenido): UploadedFile
@@ -148,7 +150,7 @@ class ImportacionFormatoTest extends TestCase
 
     private function cargador(): Usuario
     {
-        $user = Usuario::factory()->create();
+        $user = Usuario::factory()->createOne();
         $user->menus()->attach(Menu::factory()->create(['permiso' => self::PERMISO]));
 
         return $user;

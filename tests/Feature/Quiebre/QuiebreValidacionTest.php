@@ -18,7 +18,7 @@ class QuiebreValidacionTest extends TestCase
     private function agente(Tienda $tienda): Usuario
     {
         $menu = Menu::factory()->create(['permiso' => 'quiebre.validar']);
-        $user = Usuario::factory()->create();
+        $user = Usuario::factory()->createOne();
         $user->menus()->attach($menu);
         AsignacionTienda::factory()->create([
             'id_usuario' => $user->id_usuario,
@@ -89,7 +89,7 @@ class QuiebreValidacionTest extends TestCase
     public function test_shows_a_notice_when_the_agent_has_no_assignment(): void
     {
         $menu = Menu::factory()->create(['permiso' => 'quiebre.validar']);
-        $user = Usuario::factory()->create();
+        $user = Usuario::factory()->createOne();
         $user->menus()->attach($menu);
 
         $this
@@ -117,7 +117,7 @@ class QuiebreValidacionTest extends TestCase
     {
         $tienda = Tienda::factory()->create();
         $agente = $this->agente($tienda);
-        $quiebre = Quiebre::factory()->create(['zonal_telefonica' => $tienda->id_tienda]);
+        $quiebre = Quiebre::factory()->createOne(['zonal_telefonica' => $tienda->id_tienda]);
 
         $this->actingAs($agente)->put(route('quiebres.validacion.update', $quiebre), [
             'estado' => 'ATENDIDO',
@@ -155,7 +155,7 @@ class QuiebreValidacionTest extends TestCase
     {
         $tienda = Tienda::factory()->create();
         $agente = $this->agente($tienda);
-        $quiebre = Quiebre::factory()->create(['zonal_telefonica' => $tienda->id_tienda]);
+        $quiebre = Quiebre::factory()->createOne(['zonal_telefonica' => $tienda->id_tienda]);
 
         $this->actingAs($agente)->put(route('quiebres.validacion.update', $quiebre), [
             'estado' => 'INVENTADO',

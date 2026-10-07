@@ -69,8 +69,8 @@ class GestionPanelesTest extends GestionTestCase
         $respuesta = $this->actingAs($agente)->get(route('gestion.show', $dato))->assertOk();
 
         $respuesta->assertSee('CONTACTO PROPIO')->assertDontSee('CONTACTO PRIVADO');
-        $this->assertStringContainsString('911111111', $respuesta->getContent());
-        $this->assertStringNotContainsString('922222222', $respuesta->getContent());
+        $respuesta->assertSee('911111111');
+        $respuesta->assertDontSee('922222222');
     }
 
     public function test_known_phones_are_derived_from_the_contacts(): void

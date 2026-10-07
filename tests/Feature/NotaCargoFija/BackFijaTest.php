@@ -37,7 +37,7 @@ class BackFijaTest extends NotaCargoFijaTestCase
     {
         $operador = $this->usuarioCon(self::PERMISO);
         $region = Tienda::factory()->create();
-        $cargo = NcFija::factory()->deRuc(self::RUC)->create(['estado' => 'XINGRESAR']);
+        $cargo = NcFija::factory()->deRuc(self::RUC)->createOne(['estado' => 'XINGRESAR']);
 
         $this->actingAs($operador)->put(route('notas-cargo.fija.back.update', $cargo), [
             'estado' => 'COMPLETADO',
@@ -97,7 +97,7 @@ class BackFijaTest extends NotaCargoFijaTestCase
         // left the original standing, so the two disagreed on 1,835 of the 4,478
         // cases where both were set, and different screens read different ones.
         $destino = Tienda::factory()->create();
-        $cargo = NcFija::factory()->deRuc(self::RUC)->create(['zonal' => Tienda::factory()]);
+        $cargo = NcFija::factory()->deRuc(self::RUC)->createOne(['zonal' => Tienda::factory()]);
 
         $this->actingAs($this->usuarioCon(self::PERMISO))->put(route('notas-cargo.fija.back.update', $cargo), [
             'estado' => 'OBSERVADO',
@@ -107,6 +107,7 @@ class BackFijaTest extends NotaCargoFijaTestCase
         ]);
 
         $fresh = $cargo->fresh();
+        $this->assertNotNull($fresh);
         $this->assertSame($destino->id_tienda, $fresh->zonal);
         $this->assertArrayNotHasKey('zonal_telefonica', $fresh->getAttributes());
     }

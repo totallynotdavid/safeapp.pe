@@ -46,10 +46,10 @@ class SelectorDeTiendaTest extends TestCase
      */
     private function operadorEn(array $tiendas, Tienda $activa): Usuario
     {
-        $operador = Usuario::factory()->create();
+        $operador = Usuario::factory()->createOne();
         $operador->menus()->attach(Menu::factory()->create(['permiso' => 'gestion.movil']));
         $operador->sincronizarAsignaciones(
-            array_map(static fn (Tienda $t): int => $t->id_tienda, $tiendas),
+            array_values(array_map(static fn (Tienda $t): int => $t->id_tienda, $tiendas)),
             $activa->id_tienda,
         );
 
@@ -59,6 +59,7 @@ class SelectorDeTiendaTest extends TestCase
     /** The id the switcher would post back, read off its hidden input. */
     private function tiendaElegida(TestResponse $respuesta): ?int
     {
+        $coincidencia = [];
         $encontrado = preg_match(
             '/name="id_tienda"\s+value="(\d+)"/',
             (string) $respuesta->getContent(),

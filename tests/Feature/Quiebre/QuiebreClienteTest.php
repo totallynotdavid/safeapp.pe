@@ -15,7 +15,7 @@ class QuiebreClienteTest extends QuiebreTestCase
     public function test_the_form_appears_only_once_a_ruc_resolves_to_a_client(): void
     {
         $ejecutivo = $this->ejecutivo();
-        $dato = Dato::factory()->create(['ruc' => self::RUC, 'razon_social' => 'ACME SAC']);
+        $dato = Dato::factory()->createOne(['ruc' => self::RUC, 'razon_social' => 'ACME SAC']);
         AccesoAClientes::otorgar($dato->id_cliente, $ejecutivo);
 
         $this
@@ -39,7 +39,7 @@ class QuiebreClienteTest extends QuiebreTestCase
     public function test_the_client_name_is_never_an_input(): void
     {
         $ejecutivo = $this->ejecutivo();
-        $cliente = Dato::factory()->create(['ruc' => '20555555555', 'razon_social' => 'NOMBRE REAL']);
+        $cliente = Dato::factory()->createOne(['ruc' => '20555555555', 'razon_social' => 'NOMBRE REAL']);
         AccesoAClientes::otorgar($cliente->id_cliente, $ejecutivo);
 
         // A posted name must be ignored, not stored: the client record owns it.

@@ -25,12 +25,14 @@ class ValidacionMensajesTest extends TestCase
         // ":Attribute seleccionado no existe" reads as "La región seleccionado
         // no existe". The messages agree with a noun they supply themselves.
         foreach (['zonal', 'id_cliente'] as $campo) {
-            $atributo = Lang::get('validation.attributes.'.$campo);
+            $atributo = $this->mensaje('validation.attributes.'.$campo);
 
-            $this->assertStringNotContainsString('seleccionado', Lang::get('validation.exists', [
+            $this->assertStringNotContainsString('seleccionado', $this->mensaje('validation.exists', [
                 'attribute' => $atributo,
             ]));
-            $this->assertStringContainsString('opción válida', Lang::get('validation.in', ['attribute' => $atributo]));
+            $this->assertStringContainsString('opción válida', $this->mensaje('validation.in', [
+                'attribute' => $atributo,
+            ]));
         }
     }
 
@@ -41,8 +43,17 @@ class ValidacionMensajesTest extends TestCase
         foreach (['required', 'exists', 'in', 'date', 'numeric', 'url', 'ipv4'] as $regla) {
             $this->assertStringNotContainsString(
                 'validation.',
-                Lang::get('validation.'.$regla, ['attribute' => 'x']),
+                $this->mensaje('validation.'.$regla, ['attribute' => 'x']),
             );
         }
+    }
+
+    /** @param  array<string, string>  $reemplazos */
+    private function mensaje(string $clave, array $reemplazos = []): string
+    {
+        $mensaje = Lang::get($clave, $reemplazos);
+        $this->assertIsString($mensaje);
+
+        return $mensaje;
     }
 }

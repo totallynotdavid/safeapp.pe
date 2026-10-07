@@ -22,7 +22,7 @@ abstract class QuiebreTestCase extends TestCase
 
     protected function ejecutivo(): Usuario
     {
-        $user = Usuario::factory()->create();
+        $user = Usuario::factory()->createOne();
         $user->menus()->attach(Menu::factory()->create(['permiso' => 'quiebre.registrar']));
         $this->ejecutivoActual = $user;
 

@@ -41,9 +41,9 @@ class LlamadaFoundationTest extends TestCase
     public function test_a_llamada_reads_back_its_agent_and_disposition(): void
     {
         $this->seed(RespuestaSeeder::class);
-        $agente = Usuario::factory()->create();
+        $agente = Usuario::factory()->createOne();
 
-        $llamada = Llamada::factory()->create([
+        $llamada = Llamada::factory()->createOne([
             'id_usuario' => $agente->id_usuario,
             'id_respuesta' => 2,
         ]);

@@ -36,7 +36,7 @@ abstract class GestionTestCase extends TestCase
      */
     protected function agente(string ...$permisos): Usuario
     {
-        $agente = Usuario::factory()->create();
+        $agente = Usuario::factory()->createOne();
 
         foreach ($permisos as $permiso) {
             $agente->menus()->attach(Menu::factory()->create(['permiso' => $permiso]));
@@ -58,7 +58,7 @@ abstract class GestionTestCase extends TestCase
         $dato = Dato::factory()
             ->tipoData($tipoData)
             ->asignadoA($agente->id_usuario, $this->tienda->id_tienda)
-            ->create($atributos);
+            ->createOne($atributos);
 
         AccesoAClientes::otorgar($dato->id_cliente, $agente);
 
@@ -74,7 +74,7 @@ abstract class GestionTestCase extends TestCase
      */
     protected function textoVisible(TestResponse $respuesta): string
     {
-        return trim((string) preg_replace('/\s+/u', ' ', strip_tags($respuesta->getContent())));
+        return trim((string) preg_replace('/\s+/u', ' ', strip_tags((string) $respuesta->getContent())));
     }
 
     /**

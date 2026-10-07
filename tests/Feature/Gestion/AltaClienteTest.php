@@ -9,7 +9,10 @@ use App\Models\Dato;
 
 class AltaClienteTest extends GestionTestCase
 {
-    /** @return array<string, mixed> */
+    /**
+     * @param  array<string, mixed>  $overrides
+     * @return array<string, mixed>
+     */
     private function datosValidos(array $overrides = []): array
     {
         return array_merge([

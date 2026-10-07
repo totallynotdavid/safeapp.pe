@@ -51,7 +51,7 @@ class ValidacionFijaTest extends NotaCargoFijaTestCase
     public function test_it_records_the_ruling_and_stamps_the_validator(): void
     {
         $validador = $this->usuarioCon(self::PERMISO);
-        $cargo = NcFija::factory()->registrada()->deRuc(self::RUC)->create();
+        $cargo = NcFija::factory()->registrada()->deRuc(self::RUC)->createOne();
 
         $this->actingAs($validador)->put(route('notas-cargo.fija.validacion.update', $cargo), [
             'validacion' => NcFija::VALIDACION_PROCEDE,
@@ -70,7 +70,7 @@ class ValidacionFijaTest extends NotaCargoFijaTestCase
     {
         // `estado` belongs to the back office. A validated case is still
         // XINGRESAR until the back office moves it.
-        $cargo = NcFija::factory()->registrada()->deRuc(self::RUC)->create();
+        $cargo = NcFija::factory()->registrada()->deRuc(self::RUC)->createOne();
 
         $this->actingAs($this->usuarioCon(self::PERMISO))->put(route('notas-cargo.fija.validacion.update', $cargo), [
             'validacion' => NcFija::VALIDACION_PROCEDE,
@@ -99,7 +99,7 @@ class ValidacionFijaTest extends NotaCargoFijaTestCase
 
     public function test_leaving_a_case_pending_is_not_a_decision(): void
     {
-        $cargo = NcFija::factory()->registrada()->deRuc(self::RUC)->create();
+        $cargo = NcFija::factory()->registrada()->deRuc(self::RUC)->createOne();
 
         $this
             ->actingAs($this->usuarioCon(self::PERMISO))

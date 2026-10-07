@@ -14,7 +14,7 @@ class PermissionGateTest extends TestCase
     public function test_grants_an_ability_the_user_has_an_acceso_row_for(): void
     {
         $menu = Menu::factory()->create(['permiso' => 'usuarios.manage']);
-        $usuario = Usuario::factory()->create();
+        $usuario = Usuario::factory()->createOne();
         $usuario->menus()->attach($menu);
 
         $this->assertTrue($usuario->can('usuarios.manage'));
@@ -23,7 +23,7 @@ class PermissionGateTest extends TestCase
     public function test_denies_an_ability_the_user_has_no_grant_for(): void
     {
         Menu::factory()->create(['permiso' => 'usuarios.manage']);
-        $usuario = Usuario::factory()->create();
+        $usuario = Usuario::factory()->createOne();
 
         $this->assertFalse($usuario->can('usuarios.manage'));
     }
@@ -31,7 +31,7 @@ class PermissionGateTest extends TestCase
     public function test_a_section_header_grant_confers_no_permission(): void
     {
         $header = Menu::factory()->header()->create();
-        $usuario = Usuario::factory()->create();
+        $usuario = Usuario::factory()->createOne();
         $usuario->menus()->attach($header);
 
         // Regression: a null permiso must not match the empty ability (loose ==).
@@ -41,7 +41,7 @@ class PermissionGateTest extends TestCase
     public function test_the_same_grant_cannot_be_recorded_twice(): void
     {
         $menu = Menu::factory()->create(['permiso' => 'usuarios.manage']);
-        $usuario = Usuario::factory()->create();
+        $usuario = Usuario::factory()->createOne();
         $usuario->menus()->attach($menu);
 
         // Today the composite primary key refuses the second write, but a

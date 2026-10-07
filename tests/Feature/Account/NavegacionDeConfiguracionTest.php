@@ -56,6 +56,7 @@ class NavegacionDeConfiguracionTest extends TestCase
     /** The link inside the item the nav marks with aria-selected. */
     private function rutaMarcadaComoActual(TestResponse $respuesta): ?string
     {
+        $coincidencia = [];
         $encontrado = preg_match(
             '/<li aria-selected="true".*?href="([^"]+)"/s',
             (string) $respuesta->getContent(),

@@ -18,7 +18,7 @@ class RolManagementTest extends TestCase
     private function manager(): Usuario
     {
         $menu = Menu::factory()->create(['permiso' => 'roles.manage']);
-        $manager = Usuario::factory()->create();
+        $manager = Usuario::factory()->createOne();
         $manager->menus()->attach($menu);
 
         return $manager;
@@ -97,7 +97,7 @@ class RolManagementTest extends TestCase
     public function test_updating_a_role_renames_and_resyncs_permisos(): void
     {
         ['header' => $header, 'leaves' => [$antes, $despues]] = $this->section();
-        $rol = Rol::factory()->create(['nombre_rol' => 'VIEJO']);
+        $rol = Rol::factory()->createOne(['nombre_rol' => 'VIEJO']);
         DB::table('accesoxrol')->insert([
             ['id_rol' => $rol->id_rol, 'id_menu' => $header->id_menu],
             ['id_rol' => $rol->id_rol, 'id_menu' => $antes->id_menu],

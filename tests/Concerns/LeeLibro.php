@@ -3,6 +3,7 @@
 namespace Tests\Concerns;
 
 use Illuminate\Testing\TestResponse;
+use Tests\TestCase;
 use ZipArchive;
 
 /**
@@ -10,12 +11,18 @@ use ZipArchive;
  * also the check that the download is the format it claims: legacy's exports
  * were HTML tables under a spreadsheet content type and would fail to open
  * here.
+ *
+ * @require-extends TestCase
  */
 trait LeeLibro
 {
     protected function libro(TestResponse $respuesta): ZipArchive
     {
         $ruta = tempnam(sys_get_temp_dir(), 'xlsx');
+        if ($ruta === false) {
+            $this->fail('no se pudo crear un archivo temporal');
+        }
+
         file_put_contents($ruta, $respuesta->streamedContent());
 
         $zip = new ZipArchive;

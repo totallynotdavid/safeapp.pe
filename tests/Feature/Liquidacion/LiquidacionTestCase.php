@@ -16,7 +16,7 @@ abstract class LiquidacionTestCase extends TestCase
 
     protected function liquidador(): Usuario
     {
-        $user = Usuario::factory()->create();
+        $user = Usuario::factory()->createOne();
         $user->menus()->attach(Menu::factory()->create(['permiso' => 'liquidacion.gestionar']));
 
         return $user;

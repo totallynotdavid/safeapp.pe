@@ -53,9 +53,9 @@ class TiendaActivaTest extends TestCase
      */
     private function conDosTiendas(): array
     {
-        $operador = Usuario::factory()->create();
-        $lima = Tienda::factory()->create();
-        $arequipa = Tienda::factory()->create();
+        $operador = Usuario::factory()->createOne();
+        $lima = Tienda::factory()->createOne();
+        $arequipa = Tienda::factory()->createOne();
 
         $operador->sincronizarAsignaciones([$lima->id_tienda, $arequipa->id_tienda], $lima->id_tienda);
 

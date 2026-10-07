@@ -15,7 +15,7 @@ class PersonalManagementTest extends TestCase
     private function gestor(): Usuario
     {
         $menu = Menu::factory()->create(['permiso' => 'personal.gestionar']);
-        $user = Usuario::factory()->create();
+        $user = Usuario::factory()->createOne();
         $user->menus()->attach($menu);
 
         return $user;
@@ -54,7 +54,7 @@ class PersonalManagementTest extends TestCase
 
     public function test_updates_the_contact_data(): void
     {
-        $usuario = Usuario::factory()->create();
+        $usuario = Usuario::factory()->createOne();
 
         $this->actingAs($this->gestor())->put(route('personal.update', $usuario), [
             'personal' => 'maría ñoño',

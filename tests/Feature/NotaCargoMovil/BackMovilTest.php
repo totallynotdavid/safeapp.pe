@@ -64,7 +64,7 @@ class BackMovilTest extends NotaCargoMovilTestCase
         // left the original standing, so the two disagreed on 46 of the 1,202
         // cases where both were set, and different screens read different ones.
         $destino = Tienda::factory()->create();
-        $cargo = NcMovil::factory()->deRuc(self::RUC)->create(['zonal' => Tienda::factory()]);
+        $cargo = NcMovil::factory()->deRuc(self::RUC)->createOne(['zonal' => Tienda::factory()]);
 
         $this->actingAs($this->usuarioCon(self::PERMISO))->put(route('notas-cargo.movil.back.update', $cargo), [
             'estado' => 'ACTIVADO',
@@ -76,6 +76,7 @@ class BackMovilTest extends NotaCargoMovilTestCase
         ]);
 
         $fresh = $cargo->fresh();
+        $this->assertNotNull($fresh);
         $this->assertSame($destino->id_tienda, $fresh->zonal);
         $this->assertArrayNotHasKey('zonal_telefonica', $fresh->getAttributes());
     }

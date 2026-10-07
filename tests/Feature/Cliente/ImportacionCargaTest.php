@@ -49,11 +49,11 @@ class ImportacionCargaTest extends TestCase
      */
     public function test_a_load_cannot_disturb_the_agent_working_a_record(): void
     {
-        $agente = Usuario::factory()->create();
+        $agente = Usuario::factory()->createOne();
         $dato = Dato::factory()
             ->gestionado()
             ->asignadoA($agente->id_usuario, 1)
-            ->create(['ruc' => '20123456789', 'origen' => 'CAMPAÑA JULIO']);
+            ->createOne(['ruc' => '20123456789', 'origen' => 'CAMPAÑA JULIO']);
 
         $this->actingAs($this->cargador())->post(route('clientes.importar.store'), [
             'archivo' => $this->csv(self::ENCABEZADO."\n20123456789;OTRA RAZON;MOVIL;CAMPAÑA JULIO;LIMA;;0;0;0;0"),
@@ -73,7 +73,7 @@ class ImportacionCargaTest extends TestCase
      */
     public function test_a_load_refreshes_the_campaign_counts_and_leaves_the_contacts_alone(): void
     {
-        $dato = Dato::factory()->create([
+        $dato = Dato::factory()->createOne([
             'ruc' => '20123456789',
             'origen' => 'CAMPAÑA JULIO',
             'q_movistar' => 2,
@@ -111,7 +111,7 @@ class ImportacionCargaTest extends TestCase
 
     private function cargador(): Usuario
     {
-        $user = Usuario::factory()->create();
+        $user = Usuario::factory()->createOne();
         $user->menus()->attach(Menu::factory()->create(['permiso' => self::PERMISO]));
 
         return $user;
