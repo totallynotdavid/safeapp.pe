@@ -2,14 +2,14 @@
 
 namespace App\Http\Requests\NotaCargoMovil;
 
+use App\Http\Requests\Solicitud;
 use App\Models\NcMovil;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 // The validador passes or rejects a case, and may correct the two figures the
 // decision turns on before doing so. Their identity and the decision date come
 // from the session and the clock, never the form.
-class UpdateValidacionMovilRequest extends FormRequest
+class UpdateValidacionMovilRequest extends Solicitud
 {
     public function rules(): array
     {

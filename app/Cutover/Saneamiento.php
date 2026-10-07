@@ -67,7 +67,7 @@ final class Saneamiento
      */
     public static function monto(mixed $valor): float
     {
-        $monto = (float) $valor;
+        $monto = floatval($valor);
 
         return $monto < 0 || $monto >= 100_000_000 ? 0.0 : round($monto, 2);
     }

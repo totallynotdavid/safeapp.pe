@@ -35,12 +35,9 @@ class AsignacionController extends Controller
         UpdateAsignacionRequest $request,
         Usuario $usuario,
     ): RedirectResponse {
-        $data = $request->validated();
-        $activa = $data['activa'] ?? null;
-
         $usuario->sincronizarAsignaciones(
-            array_map('intval', $data['tiendas'] ?? []),
-            $activa === null ? null : (int) $activa,
+            $request->enteros('tiendas'),
+            $request->filled('activa') ? $request->integer('activa') : null,
         );
 
         return redirect()

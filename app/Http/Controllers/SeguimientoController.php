@@ -82,7 +82,7 @@ class SeguimientoController extends Controller
         RangoFechas $rango,
         string $busqueda = '',
     ): Builder {
-        return Llamada::query()
+        $contactos = Llamada::query()
             ->with('respuesta', 'agente', 'cliente')
             ->whereIn(
                 'id_usuario',
@@ -90,14 +90,15 @@ class SeguimientoController extends Controller
                     ->select('id_usuario')
                     ->where('id_supervisor', $supervisor),
             )
-            ->when(
-                $busqueda !== '',
-                fn (Builder $query) => $this->buscar($query, $busqueda),
-            )
             ->whereBetween('fecha', $rango->limites());
+
+        return $busqueda === '' ? $contactos : $this->buscar($contactos, $busqueda);
     }
 
-    /** @param Builder<Llamada> $query */
+    /**
+     * @param  Builder<Llamada>  $query
+     * @return Builder<Llamada>
+     */
     private function buscar(Builder $query, string $busqueda): Builder
     {
         $escaped = addcslashes($busqueda, '%_\\');

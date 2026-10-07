@@ -2,7 +2,9 @@
 
 namespace App\Cutover;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use stdClass;
 
 /**
  * Legacy had no customer table. Identity lived on the campaign row, so a
@@ -77,7 +79,7 @@ final class MapaDeClientes
         return $ruc === null ? null : $this->ids[$ruc] ?? null;
     }
 
-    /** @return array<string, string|null> ruc => razon_social */
+    /** @return array<array-key, string|null> ruc => razon_social. PHP turns an all-digit ruc into an int key. */
     private function recolectar(): array
     {
         $nombres = [];
@@ -87,24 +89,27 @@ final class MapaDeClientes
                 ->table($fuente['tabla'])
                 ->select('ruc', 'razon_social')
                 ->orderBy($fuente['orden'])
-                ->chunk(20_000, function (iterable $filas) use (&$nombres): void {
-                    foreach ($filas as $fila) {
-                        $ruc = self::normalizar($fila->ruc);
+                ->chunk(
+                    20_000,
+                    /** @param Collection<int, stdClass> $filas */ function (Collection $filas) use (&$nombres): void {
+                        foreach ($filas as $fila) {
+                            $ruc = self::normalizar($fila->ruc);
 
-                        if ($ruc !== null) {
-                            $nombres[$ruc] = Saneamiento::texto($fila->razon_social, 250);
+                            if ($ruc !== null) {
+                                $nombres[$ruc] = Saneamiento::texto($fila->razon_social, 250);
 
-                            continue;
+                                continue;
+                            }
+
+                            // A blank RUC is a row nobody filled in; a non-blank one
+                            // that is not digits is the imported header row. Only
+                            // the second is worth reporting.
+                            if (trim((string) $fila->ruc) !== '') {
+                                $this->descartados++;
+                            }
                         }
-
-                        // A blank RUC is a row nobody filled in; a non-blank one
-                        // that is not digits is the imported header row. Only
-                        // the second is worth reporting.
-                        if (trim((string) $fila->ruc) !== '') {
-                            $this->descartados++;
-                        }
-                    }
-                });
+                    },
+                );
         }
 
         return $nombres;

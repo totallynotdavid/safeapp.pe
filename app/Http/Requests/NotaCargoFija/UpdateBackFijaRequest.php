@@ -2,14 +2,14 @@
 
 namespace App\Http\Requests\NotaCargoFija;
 
+use App\Http\Requests\Solicitud;
 use App\Models\NcFija;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 // The back office moves a validated case through the lifecycle and records what
 // fulfilment produced. `estado` belongs to this stage alone: registro sets it to
 // XINGRESAR once and never touches it again.
-class UpdateBackFijaRequest extends FormRequest
+class UpdateBackFijaRequest extends Solicitud
 {
     public function rules(): array
     {

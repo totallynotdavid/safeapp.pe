@@ -115,7 +115,7 @@ final class FormatoDeImportacion
     /** @param  array<string, string>  $fila */
     private static function texto(array $fila, string $columna): ?string
     {
-        $valor = trim((string) ($fila[$columna] ?? ''));
+        $valor = trim($fila[$columna] ?? '');
 
         return $valor === '' ? null : $valor;
     }

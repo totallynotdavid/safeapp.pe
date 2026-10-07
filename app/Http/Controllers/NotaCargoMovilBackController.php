@@ -9,6 +9,8 @@ use App\Models\Builders\NcMovilBuilder;
 use App\Models\Cartera;
 use App\Models\NcMovil;
 use App\Models\Tienda;
+use App\Models\Usuario;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -49,23 +51,26 @@ class NotaCargoMovilBackController extends Controller
             'estados' => NcMovil::ESTADOS,
             'etapas' => NcMovil::ETAPAS,
             'regiones' => Tienda::query()->orderBy('nombre')->get(),
-            'carteras' => Cartera::query()->seleccionables()->get(),
+            'carteras' => Cartera::seleccionables()->get(),
         ]);
     }
 
-    public function update(UpdateBackMovilRequest $request, NcMovil $ncMovil): RedirectResponse
-    {
+    public function update(
+        UpdateBackMovilRequest $request,
+        NcMovil $ncMovil,
+        #[CurrentUser]
+        Usuario $agente,
+    ): RedirectResponse {
         // Only a validated case has anything to fulfil, and the queue only lists
         // those. Legacy trusted the posted id, so a rejected case could be moved
         // through the lifecycle anyway.
         abort_unless($ncMovil->esValidado(), 403);
 
-        $data = $request->validated();
-        $ncMovil->fill($request->safe()->except(['estado', 'fecha_actualizacion', 'id_cartera']));
-        $ncMovil->estado = $data['estado'];
-        $ncMovil->fecha_actualizacion = $data['fecha_actualizacion'];
-        $ncMovil->id_cartera = (int) ($data['id_cartera'] ?? 0);
-        $ncMovil->id_back = $request->user()->id_usuario;
+        $ncMovil->fill($request->atributos(['estado', 'fecha_actualizacion', 'id_cartera']));
+        $ncMovil->estado = $request->string('estado')->toString();
+        $ncMovil->fecha_actualizacion = $request->string('fecha_actualizacion')->toString();
+        $ncMovil->id_cartera = $request->integer('id_cartera');
+        $ncMovil->id_back = $agente->id_usuario;
         $ncMovil->save();
 
         return redirect()

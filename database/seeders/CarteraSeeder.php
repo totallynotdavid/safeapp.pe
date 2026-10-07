@@ -21,9 +21,9 @@ class CarteraSeeder extends Seeder
             return;
         }
 
-        foreach (Tienda::query()->pluck('id_tienda') as $idTienda) {
-            Cartera::factory()->count(self::POR_TIENDA)->create(['id_tienda' => $idTienda]);
-            Cartera::factory()->retirada()->create(['id_tienda' => $idTienda]);
+        foreach (Tienda::query()->get(['id_tienda']) as $tienda) {
+            Cartera::factory()->count(self::POR_TIENDA)->create(['id_tienda' => $tienda->id_tienda]);
+            Cartera::factory()->retirada()->create(['id_tienda' => $tienda->id_tienda]);
         }
     }
 }

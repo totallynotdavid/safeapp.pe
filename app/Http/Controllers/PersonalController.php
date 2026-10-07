@@ -28,14 +28,12 @@ class PersonalController extends Controller
 
     public function update(UpdatePersonalRequest $request, Usuario $usuario): RedirectResponse
     {
-        $data = $request->validated();
-
-        $usuario->personal = Str::upper($data['personal']);
+        $usuario->personal = Str::upper($request->string('personal')->toString());
 
         // Missing optional fields clear their existing values.
-        $usuario->fecha_nacimiento = $data['fecha_nacimiento'] ?? null;
-        $usuario->telefono = $data['telefono'] ?? null;
-        $usuario->correo = $data['correo'] ?? null;
+        $usuario->fecha_nacimiento = $request->date('fecha_nacimiento');
+        $usuario->telefono = $request->filled('telefono') ? $request->string('telefono')->toString() : null;
+        $usuario->correo = $request->filled('correo') ? $request->string('correo')->toString() : null;
 
         $usuario->save();
 

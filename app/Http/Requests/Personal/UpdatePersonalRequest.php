@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Personal;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\Solicitud;
 
-class UpdatePersonalRequest extends FormRequest
+class UpdatePersonalRequest extends Solicitud
 {
     // Access is gated by `can:personal.gestionar` on the route.
     public function authorize(): bool

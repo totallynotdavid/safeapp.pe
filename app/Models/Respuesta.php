@@ -38,6 +38,7 @@ class Respuesta extends Model
         ];
     }
 
+    /** @return HasMany<Llamada, $this> */
     public function llamadas(): HasMany
     {
         return $this->hasMany(Llamada::class, 'id_respuesta', 'id_respuesta');

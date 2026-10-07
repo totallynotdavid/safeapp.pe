@@ -32,10 +32,12 @@ final class Reporte
     }
 
     /**
+     * @template TModel of Model
+     *
      * @param  string  $nombre  filename stem, dated on the way out
      * @param  list<string>  $encabezados  column titles, in order
-     * @param  Builder<covariant Model>  $consulta  the screen's filter, unordered
-     * @param  Closure(Model): list<null|bool|DateTimeInterface|float|int|string>  $fila
+     * @param  Builder<TModel>  $consulta  the screen's filter, unordered
+     * @param  Closure(TModel): list<null|bool|DateTimeInterface|float|int|string>  $fila
      */
     public static function descargar(
         string $nombre,
@@ -56,9 +58,11 @@ final class Reporte
     }
 
     /**
+     * @template TModel of Model
+     *
      * @param  list<string>  $encabezados
-     * @param  Builder<covariant Model>  $consulta
-     * @param  Closure(Model): list<null|bool|DateTimeInterface|float|int|string>  $fila
+     * @param  Builder<TModel>  $consulta
+     * @param  Closure(TModel): list<null|bool|DateTimeInterface|float|int|string>  $fila
      */
     private function escribir(array $encabezados, Builder $consulta, Closure $fila): void
     {

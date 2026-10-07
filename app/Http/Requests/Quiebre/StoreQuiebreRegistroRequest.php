@@ -2,11 +2,11 @@
 
 namespace App\Http\Requests\Quiebre;
 
+use App\Http\Requests\Solicitud;
 use App\Models\Quiebre;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreQuiebreRegistroRequest extends FormRequest
+class StoreQuiebreRegistroRequest extends Solicitud
 {
     public function rules(): array
     {
@@ -19,7 +19,7 @@ class StoreQuiebreRegistroRequest extends FormRequest
             'id_cliente' => [
                 'required',
                 Rule::exists('cliente_acceso', 'id_cliente')
-                    ->where('id_usuario', $this->user()?->id_usuario),
+                    ->where('id_usuario', $this->agente()->id_usuario),
             ],
             'zonal_telefonica' => [
                 'required',

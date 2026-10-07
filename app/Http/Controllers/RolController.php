@@ -32,11 +32,12 @@ class RolController extends Controller
 
     public function store(StoreRolRequest $request): RedirectResponse
     {
-        $data = $request->validated();
+        $nombre = $request->string('nombre_rol')->toString();
+        $menus = $this->grantSet($request->enteros('menus'));
 
-        DB::transaction(function () use ($data): void {
-            $rol = Rol::create(['nombre_rol' => $data['nombre_rol']]);
-            $rol->menus()->sync($this->grantSet($data['menus'] ?? []));
+        DB::connection()->transaction(static function () use ($nombre, $menus): void {
+            $rol = Rol::query()->create(['nombre_rol' => $nombre]);
+            $rol->menus()->sync($menus);
         });
 
         return redirect()->route('roles.index')->with('status', 'Rol creado.');
@@ -53,11 +54,12 @@ class RolController extends Controller
 
     public function update(UpdateRolRequest $request, Rol $rol): RedirectResponse
     {
-        $data = $request->validated();
+        $nombre = $request->string('nombre_rol')->toString();
+        $menus = $this->grantSet($request->enteros('menus'));
 
-        DB::transaction(function () use ($data, $rol): void {
-            $rol->update(['nombre_rol' => $data['nombre_rol']]);
-            $rol->menus()->sync($this->grantSet($data['menus'] ?? []));
+        DB::connection()->transaction(static function () use ($nombre, $menus, $rol): void {
+            $rol->update(['nombre_rol' => $nombre]);
+            $rol->menus()->sync($menus);
         });
 
         return redirect()->route('roles.index')->with('status', 'Rol actualizado.');
@@ -73,7 +75,7 @@ class RolController extends Controller
             return back()->with('error', 'No se puede eliminar un rol con usuarios asignados.');
         }
 
-        DB::transaction(static function () use ($rol): void {
+        DB::connection()->transaction(static function () use ($rol): void {
             $rol->menus()->detach();
             $rol->delete();
         });
@@ -87,17 +89,18 @@ class RolController extends Controller
      * so a leaf granted without its parent would never show. Headers carry no
      * permiso, so pulling them in grants no extra ability.
      *
-     * @param  list<int|string>  $leafIds
+     * @param  list<int>  $leafIds
      * @return list<int>
      */
     private function grantSet(array $leafIds): array
     {
-        $leafIds = array_map('intval', $leafIds);
-
         $headerIds = Menu::query()
             ->whereIn('id_menu', $leafIds)
+            ->toBase()
             ->pluck('id_ref')
+            ->map(static fn (mixed $id): int => is_numeric($id) ? (int) $id : 0)
             ->filter(static fn (int $id): bool => $id !== 0)
+            ->values()
             ->all();
 
         return array_values(array_unique([...$leafIds, ...$headerIds]));

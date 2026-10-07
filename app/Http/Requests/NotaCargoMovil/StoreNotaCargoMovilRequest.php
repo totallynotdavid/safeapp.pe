@@ -2,11 +2,11 @@
 
 namespace App\Http\Requests\NotaCargoMovil;
 
+use App\Http\Requests\Solicitud;
 use App\Models\NcMovil;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreNotaCargoMovilRequest extends FormRequest
+class StoreNotaCargoMovilRequest extends Solicitud
 {
     public function rules(): array
     {
@@ -14,7 +14,7 @@ class StoreNotaCargoMovilRequest extends FormRequest
             'id_cliente' => [
                 'required',
                 Rule::exists('cliente_acceso', 'id_cliente')
-                    ->where('id_usuario', $this->user()?->id_usuario),
+                    ->where('id_usuario', $this->agente()->id_usuario),
             ],
             'zonal' => ['required', Rule::exists('tienda', 'id_tienda')],
             'q_lineas' => ['required', 'integer', 'min:1'],

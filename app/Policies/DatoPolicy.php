@@ -21,9 +21,12 @@ class DatoPolicy
             return Response::denyAsNotFound();
         }
 
+        $asignacion = $dato->asignacionActiva;
+
         $permitido =
             $user->can($permiso)
-            && $dato->asignacionActiva?->id_usuario === $user->id_usuario
+            && $asignacion !== null
+            && $asignacion->id_usuario === $user->id_usuario
             && Cliente::visiblePara($user)->whereKey($dato->id_cliente)->exists();
 
         return $permitido ? Response::allow() : Response::deny();

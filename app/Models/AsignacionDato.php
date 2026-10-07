@@ -57,16 +57,19 @@ class AsignacionDato extends Model
         ];
     }
 
+    /** @return BelongsTo<Dato, $this> */
     public function dato(): BelongsTo
     {
         return $this->belongsTo(Dato::class, 'id_dato', 'id_dato');
     }
 
+    /** @return BelongsTo<Usuario, $this> */
     public function agente(): BelongsTo
     {
         return $this->belongsTo(Usuario::class, 'id_usuario', 'id_usuario');
     }
 
+    /** @return BelongsTo<Tienda, $this> */
     public function tienda(): BelongsTo
     {
         return $this->belongsTo(Tienda::class, 'id_tienda', 'id_tienda');

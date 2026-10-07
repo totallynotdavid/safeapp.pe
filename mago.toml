@@ -10,29 +10,16 @@ includes = ["vendor"]
 preset = "laravel"
 
 [analyzer]
-# The baseline contains findings from request input, config(), and DB::table()
-# rows that still have mixed types. New code is held to the full check.
-# Regenerate the baseline only after fixing entries. Do not use it to admit
-# new findings.
-baseline = "analyzer-baseline.toml"
 # Unknown methods and properties are reported as warnings. The default level
 # would let them pass the gate.
 minimum-fail-level = "warning"
 ignore = [
-    # Eloquent forwards model scopes and static builder calls through __call at
-    # runtime. The analyzer cannot see them. A @method tag for each scope would
-    # only restate its signature. Each name is listed, so a mistyped method on a
-    # model or builder still fails.
-    { code = "non-documented-method", pattern = "call to `(?i:visiblePara|enPeriodo|seleccionables|ofrecibles|encola|insert|create|updateOrCreate|firstOrCreate|findOrFail)` on class `(Illuminate.Database.Eloquent.Builder|App.Models.[A-Za-z]+)`" },
     # DB::table() rows are stdClass, so their columns have no declaration. Only
     # the files that read such rows are listed.
     { code = "ambiguous-object-property-access", in = ["app/Cutover/", "app/Cockpit/MezclaDeLineas.php", "app/Http/Controllers/ProduccionController.php", "app/Support/BackfillDeAccesosClientes.php"] },
     # Laravel reads these arguments through func_get_args(). The methods accept
     # more arguments at runtime than their declared signatures show.
     { code = "too-many-arguments", pattern = "Eloquent.Builder::with`|Eloquent.Model::load`|Query.Builder::select`" },
-    # Auth::guard('web') exposes the Guard contract. The web guard also provides
-    # login and logout through StatefulGuard.
-    { code = "non-existent-method", pattern = "`(login|logout)` does not exist on type `Illuminate.Contracts.Auth.Guard`" },
     # Factory::create() may return a model or a collection because count()
     # changes the result. The analyzer cannot infer the single-model case in
     # tests. It also cannot prove that find() and fresh() are non-null there.
@@ -50,6 +37,8 @@ ignore = [
 
 [linter]
 integrations = ["laravel", "phpunit"]
+# Warnings fail the run, so "no warnings" is the standard, not a hope.
+minimum-fail-level = "warning"
 
 [linter.rules]
 # Laravel's own code omits declare(strict_types=1). Matching the framework

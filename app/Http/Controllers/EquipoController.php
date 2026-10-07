@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Usuario;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
 
 class EquipoController extends Controller
 {
@@ -14,9 +14,9 @@ class EquipoController extends Controller
         'asignacion.gestionar',
     ];
 
-    public function index(Request $request): View
+    public function index(#[CurrentUser] Usuario $agente): View
     {
-        $this->authorizeDirectory($request);
+        $this->authorizeDirectory($agente);
 
         $usuarios = Usuario::query()
             ->with(['rol', 'supervisor', 'asignacionActiva.tienda'])
@@ -26,9 +26,9 @@ class EquipoController extends Controller
         return view('equipo.index', ['usuarios' => $usuarios]);
     }
 
-    public function show(Request $request, Usuario $usuario): View
+    public function show(Usuario $usuario, #[CurrentUser] Usuario $agente): View
     {
-        $this->authorizeDirectory($request);
+        $this->authorizeDirectory($agente);
 
         return view('equipo.show', [
             'usuario' => $usuario->load([
@@ -40,14 +40,8 @@ class EquipoController extends Controller
         ]);
     }
 
-    private function authorizeDirectory(Request $request): void
+    private function authorizeDirectory(Usuario $agente): void
     {
-        abort_unless(
-            array_any(
-                self::PERMISSIONS,
-                fn (string $permission): bool => $request->user()->hasPermiso($permission),
-            ),
-            403,
-        );
+        abort_unless(array_any(self::PERMISSIONS, $agente->hasPermiso(...)), 403);
     }
 }

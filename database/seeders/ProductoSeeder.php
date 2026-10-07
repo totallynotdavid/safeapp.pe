@@ -83,7 +83,7 @@ class ProductoSeeder extends Seeder
 
     public function run(): void
     {
-        Producto::insert(array_map(static fn (array $fila): array => [
+        Producto::query()->insert(array_map(static fn (array $fila): array => [
             'tipo' => Producto::FIJA,
             'subtipo' => $fila[0],
             'descripcion' => $fila[1],

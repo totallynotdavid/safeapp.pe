@@ -28,6 +28,7 @@ class NotificacionUsuario extends Model
         'descripcion',
     ];
 
+    /** @return BelongsTo<Usuario, $this> */
     public function usuario(): BelongsTo
     {
         return $this->belongsTo(Usuario::class, 'id_usuario', 'id_usuario');

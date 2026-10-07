@@ -12,14 +12,14 @@ class AltaDeClientes
     // `origen` records provenance; `tipo_data` selects the queue.
     public const ORIGEN = 'INHOUSE';
 
-    /** @param  array<string, mixed>  $payload */
+    /** @param  array{ruc: string, razon_social: string, ...<string, mixed>}  $payload */
     public static function registrar(
         array $payload,
         string $tipoData,
         Usuario $agente,
         int $idTienda,
     ): Dato {
-        return DB::transaction(
+        return DB::connection()->transaction(
             static function () use ($payload, $tipoData, $agente, $idTienda): Dato {
                 $cliente = AccesoAClientes::resolverOcrear(
                     $agente,

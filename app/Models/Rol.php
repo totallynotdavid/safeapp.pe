@@ -28,11 +28,13 @@ class Rol extends Model
 
     protected $fillable = ['nombre_rol'];
 
+    /** @return HasMany<Usuario, $this> */
     public function usuarios(): HasMany
     {
         return $this->hasMany(Usuario::class, 'id_rol', 'id_rol');
     }
 
+    /** @return BelongsToMany<Menu, $this> */
     public function menus(): BelongsToMany
     {
         return $this->belongsToMany(Menu::class, 'accesoxrol', 'id_rol', 'id_menu');

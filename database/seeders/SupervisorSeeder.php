@@ -17,8 +17,8 @@ class SupervisorSeeder extends Seeder
             return;
         }
 
-        $supervisor = Supervisor::factory()->create(['nombre' => 'SUPERVISOR DEV']);
-        Supervisor::factory()->create(['nombre' => 'SUPERVISOR BACKUP']);
+        $supervisor = Supervisor::factory()->createOne(['nombre' => 'SUPERVISOR DEV']);
+        Supervisor::factory()->createOne(['nombre' => 'SUPERVISOR BACKUP']);
 
         Usuario::query()->where('id_supervisor', 0)->update(['id_supervisor' => $supervisor->id_supervisor]);
     }

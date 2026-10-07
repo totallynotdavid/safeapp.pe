@@ -15,7 +15,7 @@ class MenuFactory extends Factory
     public function definition(): array
     {
         return [
-            'descripcion' => mb_strtoupper(fake()->unique()->words(2, true)),
+            'descripcion' => mb_strtoupper(fake()->unique()->word().' '.fake()->word()),
             // One of the values Sidebar::ICONOS maps, so a factory-built row
             // renders like a seeded one.
             'icono' => 'fa fa-users',

@@ -38,6 +38,7 @@ class AsignacionTienda extends Model
         return ['estado' => 'integer'];
     }
 
+    /** @return BelongsTo<Tienda, $this> */
     public function tienda(): BelongsTo
     {
         return $this->belongsTo(Tienda::class, 'id_tienda', 'id_tienda');

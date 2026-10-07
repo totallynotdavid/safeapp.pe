@@ -29,7 +29,10 @@ final class TrasladoDePermisos implements Traslado
 
     public function ejecutar(): array
     {
-        $menus = Menu::query()->pluck('id_menu')->flip()->all();
+        $menus = [];
+        foreach (Menu::query()->get(['id_menu']) as $menu) {
+            $menus[$menu->id_menu] = true;
+        }
 
         return [
             ...$this->copiarGrantsDeUsuario($menus),
@@ -46,7 +49,7 @@ final class TrasladoDePermisos implements Traslado
      * lack the surviving global equivalent, so dropping them costs nobody
      * access.
      *
-     * @param  array<int, int>  $menus
+     * @param  array<int, true>  $menus  existing menu ids
      * @return array<string, int>
      */
     private function copiarGrantsDeUsuario(array $menus): array
@@ -83,7 +86,7 @@ final class TrasladoDePermisos implements Traslado
         ];
     }
 
-    /** @param  array<int, int>  $menus */
+    /** @param  array<int, true>  $menus  existing menu ids */
     private function copiarGrantsDeRol(array $menus): int
     {
         $roles = DB::table('rol')->pluck('id_rol')->flip()->all();
@@ -104,18 +107,22 @@ final class TrasladoDePermisos implements Traslado
 
     private function abrirPantallasNuevas(): int
     {
-        $administradores = DB::table('acceso')
-            ->join('menu', 'menu.id_menu', '=', 'acceso.id_menu')
-            ->where('menu.permiso', self::PERMISO_ADMINISTRADOR)
-            ->pluck('acceso.id_usuario');
+        $administradores = array_map(
+            intval(...),
+            DB::table('acceso')
+                ->join('menu', 'menu.id_menu', '=', 'acceso.id_menu')
+                ->where('menu.permiso', self::PERMISO_ADMINISTRADOR)
+                ->pluck('acceso.id_usuario')
+                ->all(),
+        );
 
-        $nuevos = Menu::query()->whereIn('permiso', self::PERMISOS_NUEVOS)->pluck('id_menu');
+        $nuevos = Menu::query()->whereIn('permiso', self::PERMISOS_NUEVOS)->get(['id_menu']);
 
         $grants = new Lote('acceso');
 
         foreach ($administradores as $idUsuario) {
-            foreach ($nuevos as $idMenu) {
-                $grants->agregar(['id_usuario' => (int) $idUsuario, 'id_menu' => (int) $idMenu]);
+            foreach ($nuevos as $menu) {
+                $grants->agregar(['id_usuario' => $idUsuario, 'id_menu' => $menu->id_menu]);
             }
         }
 

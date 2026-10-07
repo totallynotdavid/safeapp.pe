@@ -2,6 +2,8 @@
 
 namespace App\Cockpit;
 
+use Illuminate\Database\Eloquent\Model;
+
 /**
  * A customer's lines per carrier have two independent sources: what the campaign
  * file claimed at load, and what an agent confirmed on a call. Both are kept, and
@@ -17,10 +19,12 @@ final readonly class MezclaDeLineas
     /** Accepts any row with the q_<carrier> columns: `datos` or `llamada`. */
     public static function observada(object $fila): self
     {
+        // A model keeps its columns in attributes, not in object properties.
+        $columnas = $fila instanceof Model ? $fila->getAttributes() : get_object_vars($fila);
         $counts = [];
 
         foreach (Operadores::TODOS as $operador) {
-            $counts[$operador] = (int) $fila->{Operadores::columna($operador)};
+            $counts[$operador] = intval($columnas[Operadores::columna($operador)] ?? 0);
         }
 
         return new self($counts);

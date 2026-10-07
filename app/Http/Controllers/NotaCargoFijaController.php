@@ -12,6 +12,8 @@ use App\Models\Cliente;
 use App\Models\NcFija;
 use App\Models\Producto;
 use App\Models\Tienda;
+use App\Models\Usuario;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,13 +22,13 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class NotaCargoFijaController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, #[CurrentUser] Usuario $agente): View
     {
         $filtro = FiltroPeriodo::desde($request, NcFija::ESTADOS);
 
         return view('notas-cargo.fija.index', [
             'cargos' => $this
-                ->mias($request->user()->id_usuario, $filtro)
+                ->mias($agente->id_usuario, $filtro)
                 ->orderByDesc('fecha_ingreso')
                 ->get(),
             'estados' => NcFija::ESTADOS,
@@ -34,18 +36,18 @@ class NotaCargoFijaController extends Controller
         ]);
     }
 
-    public function exportar(Request $request): StreamedResponse
+    public function exportar(Request $request, #[CurrentUser] Usuario $agente): StreamedResponse
     {
         return ReporteNotaCargoFija::descargar(
             'mis-notas-cargo-fija',
             $this->mias(
-                $request->user()->id_usuario,
+                $agente->id_usuario,
                 FiltroPeriodo::desde($request, NcFija::ESTADOS),
             ),
         );
     }
 
-    public function create(Request $request): View
+    public function create(Request $request, #[CurrentUser] Usuario $agente): View
     {
         $ruc = $request->string('ruc')->trim()->toString();
 
@@ -53,7 +55,7 @@ class NotaCargoFijaController extends Controller
             'ruc' => $ruc === '' ? null : $ruc,
             'cliente' => $ruc === ''
                 ? null
-                : Cliente::visiblePara($request->user())
+                : Cliente::visiblePara($agente)
                     ->where('ruc', $ruc)
                     ->first(),
             'regiones' => Tienda::query()->orderBy('nombre')->get(),
@@ -63,25 +65,27 @@ class NotaCargoFijaController extends Controller
         ]);
     }
 
-    public function store(StoreNotaCargoFijaRequest $request): RedirectResponse
+    public function store(StoreNotaCargoFijaRequest $request, #[CurrentUser] Usuario $agente): RedirectResponse
     {
-        $producto = Producto::findOrFail($request->integer('id_producto'));
+        $producto = Producto::query()->findOrFail($request->integer('id_producto'));
 
         $cargo = new NcFija(
-            $request->safe()->except(['id_producto', 'cargo_fijo']),
+            $request->atributos(['id_producto', 'cargo_fijo']),
         );
 
         // Snapshot catalog values instead of trusting posted product data.
         $cargo->subtipo = $producto->subtipo;
         $cargo->descripcion = $producto->descripcion;
-        $cargo->cargo_fijo = $request->input('cargo_fijo') ?? $producto->cargo_fijo;
+        $cargo->cargo_fijo = $request->filled('cargo_fijo')
+            ? $request->string('cargo_fijo')->toString()
+            : $producto->cargo_fijo;
 
-        $cargo->id_usuario = $request->user()->id_usuario;
-        $cargo->id_supervisor = $request->user()->id_supervisor;
+        $cargo->id_usuario = $agente->id_usuario;
+        $cargo->id_supervisor = $agente->id_supervisor;
         $cargo->fecha_ingreso = now()->toDateString();
         $cargo->save();
 
-        AccesoAClientes::otorgar((int) $cargo->id_cliente, $request->user());
+        AccesoAClientes::otorgar((int) $cargo->id_cliente, $agente);
 
         return redirect()
             ->route('notas-cargo.fija.index')
@@ -110,7 +114,7 @@ class NotaCargoFijaController extends Controller
     ): RedirectResponse {
         Gate::authorize('update', $ncFija);
 
-        $ncFija->fill($request->validated())->save();
+        $ncFija->fill($request->atributos())->save();
 
         return redirect()
             ->route('notas-cargo.fija.index')

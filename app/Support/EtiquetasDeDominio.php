@@ -96,7 +96,9 @@ final class EtiquetasDeDominio
 
         $valor = trim($valor);
 
-        return self::ETIQUETAS[$dominio][$valor] ?? self::titulo($valor);
+        $etiqueta = $dominio === null ? null : self::ETIQUETAS[$dominio][$valor] ?? null;
+
+        return $etiqueta ?? self::titulo($valor);
     }
 
     /**
@@ -108,18 +110,15 @@ final class EtiquetasDeDominio
         $valores = is_array($valores) ? $valores : iterator_to_array($valores);
         $asociativo = ! array_is_list($valores);
 
-        return collect($valores)
-            ->map(static function ($etiqueta, $valor) use ($asociativo, $dominio): array {
-                $valor = (string) ($asociativo ? $valor : $etiqueta);
-                $etiqueta = (string) $etiqueta;
+        $opciones = [];
+        foreach ($valores as $clave => $etiqueta) {
+            $opciones[] = [
+                'value' => $asociativo ? (string) $clave : $etiqueta,
+                'label' => self::texto($etiqueta, $dominio) ?? '',
+            ];
+        }
 
-                return [
-                    'value' => $valor,
-                    'label' => self::texto($etiqueta, $dominio) ?? '',
-                ];
-            })
-            ->values()
-            ->all();
+        return $opciones;
     }
 
     private static function titulo(string $valor): string

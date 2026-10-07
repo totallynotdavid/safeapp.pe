@@ -2,8 +2,6 @@
 
 namespace App\Cockpit;
 
-use App\Models\Cliente;
-use App\Models\Dato;
 use App\Support\LectorCsv;
 use App\Support\LectorXlsx;
 use Illuminate\Support\Facades\DB;
@@ -91,7 +89,7 @@ final class ImportacionDeClientes
             $errores[] = "el RUC {$fila['ruc']} ya aparece en la línea {$lineaAnterior}.";
         }
 
-        return $errores;
+        return array_values($errores);
     }
 
     private static function cargar(
@@ -104,81 +102,15 @@ final class ImportacionDeClientes
         DB::transaction(
             static function () use ($ruta, $extension, &$nuevos, &$actualizados): void {
                 foreach (self::lotes($ruta, $extension) as $lote) {
-                    $campana = self::registrosDeCampana($lote);
-                    $repetidos = self::yaCargados($campana);
+                    $cargado = CargaDeLote::registrar($lote);
 
-                    $nuevos += count($campana) - $repetidos;
-                    $actualizados += $repetidos;
-
-                    // Excluding estado prevents a reload from resetting progress.
-                    Dato::query()->upsert(
-                        $campana,
-                        ['id_cliente', 'origen', 'tipo_data'],
-                        [
-                            'zonal',
-                            'nodo',
-                            ...array_map(
-                                Operadores::columna(...),
-                                Operadores::TODOS,
-                            ),
-                        ],
-                    );
+                    $nuevos += $cargado['nuevos'];
+                    $actualizados += $cargado['actualizados'];
                 }
             },
         );
 
         return ResultadoImportacion::cargada($nuevos, $actualizados);
-    }
-
-    /** @param  list<array<string, mixed>>  $campana */
-    private static function yaCargados(array $campana): int
-    {
-        $clave = static fn (array $registro): string => implode("\0", [
-            $registro['id_cliente'],
-            $registro['origen'],
-            $registro['tipo_data'],
-        ]);
-
-        $existentes = Dato::query()
-            ->whereIn('id_cliente', array_column($campana, 'id_cliente'))
-            ->get(['id_cliente', 'origen', 'tipo_data'])
-            ->map(
-                static fn (Dato $dato): string => $clave($dato->toArray()),
-            )
-            ->flip();
-
-        return count(array_filter(
-            $campana,
-            static fn (array $registro): bool => $existentes->has(
-                $clave($registro),
-            ),
-        ));
-    }
-
-    /**
-     * @param  list<array<string, string>>  $lote
-     * @return list<array<string, mixed>>
-     */
-    private static function registrosDeCampana(array $lote): array
-    {
-        // The import file is authoritative for razon_social.
-        Cliente::query()->upsert(
-            array_map(FormatoDeImportacion::valoresIdentidad(...), $lote),
-            ['ruc'],
-            ['razon_social'],
-        );
-
-        $ids = Cliente::query()
-            ->whereIn('ruc', array_column($lote, 'ruc'))
-            ->pluck('id_cliente', 'ruc');
-
-        return array_map(
-            static fn (array $fila): array => FormatoDeImportacion::valoresCampana(
-                $fila,
-                $ids[$fila['ruc']],
-            ),
-            $lote,
-        );
     }
 
     /** @return iterable<int, list<array<string, string>>> */

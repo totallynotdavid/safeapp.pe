@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Quiebre\UpdateQuiebreValidacionRequest;
 use App\Models\Quiebre;
+use App\Models\Usuario;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,20 +17,20 @@ use Illuminate\Support\Facades\Gate;
 // QuiebreRegistroController; this screen only reads and validates.
 class QuiebreValidacionController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, #[CurrentUser] Usuario $agente): View
     {
-        $tienda = $request->user()->tiendaAsignada();
-        $ano = (int) $request->integer('ano', now()->year);
-        $estado = $request->query('estado');
-        $filtroActivo = in_array($estado, Quiebre::ESTADOS, true);
+        $tienda = $agente->tiendaAsignada();
+        $ano = $request->integer('ano', now()->year);
+        $estado = $request->string('estado')->toString();
+        $estado = in_array($estado, Quiebre::ESTADOS, true) ? $estado : null;
 
         return view('quiebres.validacion.index', [
             'quiebres' => $tienda === null
                 ? new Collection
-                : $this->pendientes($tienda, $ano, $filtroActivo ? $estado : null),
+                : $this->pendientes($tienda, $ano, $estado),
             'sinAsignacion' => $tienda === null,
             'estados' => Quiebre::ESTADOS,
-            'estado' => $filtroActivo ? $estado : null,
+            'estado' => $estado,
             'ano' => $ano,
             'anos' => range(now()->year, now()->year - 5),
         ]);
@@ -44,16 +46,21 @@ class QuiebreValidacionController extends Controller
         ]);
     }
 
-    public function update(UpdateQuiebreValidacionRequest $request, Quiebre $quiebre): RedirectResponse
-    {
+    public function update(
+        UpdateQuiebreValidacionRequest $request,
+        Quiebre $quiebre,
+        #[CurrentUser]
+        Usuario $agente,
+    ): RedirectResponse {
         Gate::authorize('validar', $quiebre);
 
-        $data = $request->validated();
-        $quiebre->estado = $data['estado'];
-        $quiebre->caso_sf = $data['caso_sf'];
-        $quiebre->comentario_validador = $data['comentario_validador'];
+        $quiebre->estado = $request->string('estado')->toString();
+        $quiebre->caso_sf = $request->string('caso_sf')->toString();
+        $quiebre->comentario_validador = $request->filled('comentario_validador')
+            ? $request->string('comentario_validador')->toString()
+            : null;
         // Validator identity and date are server-assigned from session and clock.
-        $quiebre->id_validador = $request->user()->id_usuario;
+        $quiebre->id_validador = $agente->id_usuario;
         $quiebre->fecha_validacion = now()->toDateString();
         $quiebre->save();
 

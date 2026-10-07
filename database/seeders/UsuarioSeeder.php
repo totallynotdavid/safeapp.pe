@@ -23,7 +23,7 @@ class UsuarioSeeder extends Seeder
 
         $admin = Usuario::factory()
             ->clave(self::CLAVE)
-            ->create([
+            ->createOne([
                 'usuario' => self::USUARIO,
                 'id_rol' => 1,
                 'personal' => 'ADMINISTRADOR DEV',

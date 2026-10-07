@@ -13,14 +13,14 @@ class LiquidacionController extends Controller
 {
     public function index(Request $request): View
     {
-        $ano = (int) $request->integer('ano', now()->year);
-        $estado = $request->query('estado');
-        $filtroActivo = in_array($estado, NcMovil::ESTADOS_LIQUIDABLES, true);
+        $ano = $request->integer('ano', now()->year);
+        $estado = $request->string('estado')->toString();
+        $estado = in_array($estado, NcMovil::ESTADOS_LIQUIDABLES, true) ? $estado : null;
 
         return view('liquidaciones.index', [
-            'cargos' => $this->porLiquidar($ano, $filtroActivo ? $estado : null),
+            'cargos' => $this->porLiquidar($ano, $estado),
             'estados' => NcMovil::ESTADOS_LIQUIDABLES,
-            'estado' => $filtroActivo ? $estado : null,
+            'estado' => $estado,
             'ano' => $ano,
             'anos' => range(now()->year, now()->year - 5),
         ]);
@@ -45,7 +45,7 @@ class LiquidacionController extends Controller
         UpdateLiquidacionRequest $request,
         NcMovil $ncMovil,
     ): RedirectResponse {
-        $ncMovil->fill($request->validated())->save();
+        $ncMovil->fill($request->atributos())->save();
 
         return redirect()
             ->route('liquidaciones.index')

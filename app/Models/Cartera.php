@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $estado
  * @property string|null $DNI
  * @property-read Tienda|null $tienda
+ *
+ * @method static Builder<Cartera> seleccionables()
  */
 class Cartera extends Model
 {
@@ -43,6 +45,7 @@ class Cartera extends Model
             ->orderBy('propietario');
     }
 
+    /** @return BelongsTo<Tienda, $this> */
     public function tienda(): BelongsTo
     {
         return $this->belongsTo(Tienda::class, 'id_tienda', 'id_tienda');

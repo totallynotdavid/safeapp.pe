@@ -39,21 +39,25 @@ class Menu extends Model
     // the usual true/false-means-enabled reading.
     protected $fillable = ['descripcion', 'icono', 'estado', 'id_ref', 'permiso'];
 
+    /** @return BelongsTo<Menu, $this> */
     public function padre(): BelongsTo
     {
         return $this->belongsTo(Menu::class, 'id_ref', 'id_menu');
     }
 
+    /** @return HasMany<Menu, $this> */
     public function hijos(): HasMany
     {
         return $this->hasMany(Menu::class, 'id_ref', 'id_menu');
     }
 
+    /** @return BelongsToMany<Rol, $this> */
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Rol::class, 'accesoxrol', 'id_menu', 'id_rol');
     }
 
+    /** @return BelongsToMany<Usuario, $this> */
     public function usuarios(): BelongsToMany
     {
         return $this->belongsToMany(Usuario::class, 'acceso', 'id_menu', 'id_usuario');

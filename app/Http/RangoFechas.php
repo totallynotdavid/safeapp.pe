@@ -24,8 +24,8 @@ final class RangoFechas
 
     public static function desde(Request $request): self
     {
-        $hoy = now();
-        $desde = self::fecha($request->query('desde')) ?? $hoy->copy()->subDays(self::DIAS_POR_DEFECTO);
+        $hoy = Carbon::now();
+        $desde = self::fecha($request->query('desde')) ?? Carbon::now()->subDays(self::DIAS_POR_DEFECTO);
         $hasta = self::fecha($request->query('hasta')) ?? $hoy;
 
         return $desde->greaterThan($hasta) ? new self($hasta, $desde) : new self($desde, $hasta);

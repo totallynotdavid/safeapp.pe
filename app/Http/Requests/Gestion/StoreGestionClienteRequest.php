@@ -17,12 +17,14 @@ class StoreGestionClienteRequest extends FormRequest
         ];
     }
 
-    /** @return array<string, mixed> */
+    /** @return array{ruc: string, razon_social: string, zonal: string|null, ...<string, int|string|null>} */
     public function cliente(): array
     {
         return [
-            ...$this->safe()->except(array_map(Operadores::columna(...), Operadores::TODOS)),
             ...Operadores::conteos($this->input(...)),
+            'ruc' => $this->string('ruc')->toString(),
+            'razon_social' => $this->string('razon_social')->toString(),
+            'zonal' => $this->filled('zonal') ? $this->string('zonal')->toString() : null,
         ];
     }
 }

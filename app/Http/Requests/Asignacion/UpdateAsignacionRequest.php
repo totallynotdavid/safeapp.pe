@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests\Asignacion;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\Solicitud;
 use Illuminate\Validation\Rule;
 
-class UpdateAsignacionRequest extends FormRequest
+class UpdateAsignacionRequest extends Solicitud
 {
     public function authorize(): bool
     {
@@ -22,7 +22,7 @@ class UpdateAsignacionRequest extends FormRequest
         return [
             'tiendas' => ['nullable', 'array'],
             'tiendas.*' => ['integer', Rule::exists('tienda', 'id_tienda')],
-            'activa' => ['nullable', 'integer', 'required_with:tiendas', Rule::in($this->input('tiendas', []))],
+            'activa' => ['nullable', 'integer', 'required_with:tiendas', Rule::in($this->enteros('tiendas'))],
         ];
     }
 

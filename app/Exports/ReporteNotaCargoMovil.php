@@ -54,6 +54,7 @@ final class ReporteNotaCargoMovil
         'COMENTARIO LIQUIDADOR',
     ];
 
+    /** @param  Builder<NcMovil>  $consulta */
     public static function descargar(string $nombre, Builder $consulta): StreamedResponse
     {
         return Reporte::descargar(
@@ -68,6 +69,17 @@ final class ReporteNotaCargoMovil
     private static function fila(NcMovil $cargo): array
     {
         return [
+            ...self::seguimiento($cargo),
+            ...self::servicio($cargo),
+            ...self::contactoYValidacion($cargo),
+            ...self::backYLiquidacion($cargo),
+        ];
+    }
+
+    /** @return list<null|string|\DateTimeInterface> */
+    private static function seguimiento(NcMovil $cargo): array
+    {
+        return [
             $cargo->ejecutivo?->personal,
             $cargo->supervisor?->nombre,
             $cargo->fecha_ingreso,
@@ -75,6 +87,13 @@ final class ReporteNotaCargoMovil
             $cargo->fecha_actualizacion,
             $cargo->fecha_estimada,
             $cargo->fecha_liquidacion,
+        ];
+    }
+
+    /** @return list<null|float|int|string> */
+    private static function servicio(NcMovil $cargo): array
+    {
+        return [
             $cargo->cliente?->ruc,
             $cargo->cliente?->razon_social,
             $cargo->modalidad,
@@ -82,12 +101,19 @@ final class ReporteNotaCargoMovil
             $cargo->q_lineas,
             // Cast off the decimal:2 string so the column arrives as a number
             // and sums in the spreadsheet.
-            (float) $cargo->cargo_fijo,
+            floatval($cargo->cargo_fijo),
             $cargo->region?->nombre,
             $cargo->nodo,
             $cargo->etapa,
             $cargo->oportunidad,
             $cargo->nivel_negociacion,
+        ];
+    }
+
+    /** @return list<null|string> */
+    private static function contactoYValidacion(NcMovil $cargo): array
+    {
+        return [
             $cargo->contacto,
             $cargo->telefono1,
             $cargo->telefono2,
@@ -96,6 +122,13 @@ final class ReporteNotaCargoMovil
             $cargo->validacion,
             $cargo->validador?->personal,
             $cargo->comentario_validador,
+        ];
+    }
+
+    /** @return list<null|float|int|string> */
+    private static function backYLiquidacion(NcMovil $cargo): array
+    {
+        return [
             $cargo->cartera?->nombre,
             $cargo->casofwa,
             $cargo->ciclo,

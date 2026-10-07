@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests\NotaCargoFija;
 
+use App\Http\Requests\Solicitud;
 use App\Models\NcFija;
 use App\Models\Producto;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreNotaCargoFijaRequest extends FormRequest
+class StoreNotaCargoFijaRequest extends Solicitud
 {
     public function rules(): array
     {
@@ -15,7 +15,7 @@ class StoreNotaCargoFijaRequest extends FormRequest
             'id_cliente' => [
                 'required',
                 Rule::exists('cliente_acceso', 'id_cliente')
-                    ->where('id_usuario', $this->user()?->id_usuario),
+                    ->where('id_usuario', $this->agente()->id_usuario),
             ],
 
             'zonal' => [

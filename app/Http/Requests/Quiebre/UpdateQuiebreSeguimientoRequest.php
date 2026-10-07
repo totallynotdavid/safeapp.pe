@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests\Quiebre;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\Solicitud;
 
 // The ejecutivo amends the contact block and comentario of a case they already
 // registered. Ownership and the editable-state check are enforced by the policy
 // in the controller; this only shapes the editable fields.
-class UpdateQuiebreSeguimientoRequest extends FormRequest
+class UpdateQuiebreSeguimientoRequest extends Solicitud
 {
     public function rules(): array
     {

@@ -2,11 +2,11 @@
 
 namespace App\Http\Requests\Liquidacion;
 
+use App\Http\Requests\Solicitud;
 use App\Models\NcMovil;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateLiquidacionRequest extends FormRequest
+class UpdateLiquidacionRequest extends Solicitud
 {
     public function authorize(): bool
     {

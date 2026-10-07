@@ -3,7 +3,7 @@
     <div class="side-nav-section"
          role="group"
          aria-labelledby="{{ $titleId }}">
-        <div class="side-nav-section__header" @if ($section['hidden']) data-visually-hidden="true" @endif>
+        <div class="side-nav-section__header">
             <span class="side-nav-section__title-container">
                 <span id="{{ $titleId }}" class="side-nav-section__title">{{ $section['title'] }}</span>
             </span>

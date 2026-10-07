@@ -4,7 +4,9 @@ namespace App\Cutover;
 
 use App\Models\AsignacionDato;
 use App\Models\Dato;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use stdClass;
 
 final class TrasladoDeCampanas implements Traslado
 {
@@ -60,18 +62,21 @@ final class TrasladoDeCampanas implements Traslado
         DB::connection('legacy')
             ->table('datos')
             ->orderBy('id_cliente')
-            ->chunk(5_000, function (iterable $filas): void {
-                foreach ($filas as $fila) {
-                    $this->trasladar($fila);
-                }
+            ->chunk(
+                5_000,
+                /** @param Collection<int, stdClass> $filas */ function (Collection $filas): void {
+                    foreach ($filas as $fila) {
+                        $this->trasladar($fila);
+                    }
 
-                // Records before the holds that point at them. Both tables are
-                // narrow enough that 5,000 rows stay under the placeholder
-                // ceiling, so this boundary is the only place either is written
-                // and this order is the order they reach the database in.
-                $this->datos->vaciar();
-                $this->asignaciones->vaciar();
-            });
+                    // Records before the holds that point at them. Both tables are
+                    // narrow enough that 5,000 rows stay under the placeholder
+                    // ceiling, so this boundary is the only place either is written
+                    // and this order is the order they reach the database in.
+                    $this->datos->vaciar();
+                    $this->asignaciones->vaciar();
+                },
+            );
 
         return [
             'datos' => $this->datos->cerrar(),
@@ -186,15 +191,18 @@ final class TrasladoDeCampanas implements Traslado
             ->table($tabla)
             ->select('ruc')
             ->orderBy('id_cargo')
-            ->chunk(20_000, function (iterable $filas) use (&$clientes): void {
-                foreach ($filas as $fila) {
-                    $idCliente = $this->clientes->resolver($fila->ruc);
+            ->chunk(
+                20_000,
+                /** @param Collection<int, stdClass> $filas */ function (Collection $filas) use (&$clientes): void {
+                    foreach ($filas as $fila) {
+                        $idCliente = $this->clientes->resolver($fila->ruc);
 
-                    if ($idCliente !== null) {
-                        $clientes[$idCliente] = true;
+                        if ($idCliente !== null) {
+                            $clientes[$idCliente] = true;
+                        }
                     }
-                }
-            });
+                },
+            );
 
         return $clientes;
     }

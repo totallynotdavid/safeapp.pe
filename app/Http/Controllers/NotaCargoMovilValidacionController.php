@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\NotaCargoMovil\UpdateValidacionMovilRequest;
 use App\Models\NcMovil;
+use App\Models\Usuario;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -38,18 +40,24 @@ class NotaCargoMovilValidacionController extends Controller
         ]);
     }
 
-    public function update(UpdateValidacionMovilRequest $request, NcMovil $ncMovil): RedirectResponse
-    {
+    public function update(
+        UpdateValidacionMovilRequest $request,
+        NcMovil $ncMovil,
+        #[CurrentUser]
+        Usuario $agente,
+    ): RedirectResponse {
         // A case already ruled on is not re-ruled. Legacy loaded and overwrote
         // whatever id the form posted, so a second validador could silently
         // replace the first one's decision.
         abort_unless($ncMovil->esEditable(), 403);
 
-        $data = $request->validated();
-        $ncMovil->fill(['q_lineas' => $data['q_lineas'], 'cargo_fijo' => $data['cargo_fijo']]);
-        $ncMovil->validacion = $data['validacion'];
-        $ncMovil->comentario_validador = $data['comentario_validador'];
-        $ncMovil->id_validador = $request->user()->id_usuario;
+        $ncMovil->fill([
+            'q_lineas' => $request->integer('q_lineas'),
+            'cargo_fijo' => $request->string('cargo_fijo')->toString(),
+        ]);
+        $ncMovil->validacion = $request->string('validacion')->toString();
+        $ncMovil->comentario_validador = $request->string('comentario_validador')->toString();
+        $ncMovil->id_validador = $agente->id_usuario;
         $ncMovil->fecha_validacion = now()->toDateString();
         $ncMovil->save();
 

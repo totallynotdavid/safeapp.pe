@@ -3,8 +3,10 @@
 namespace App\View\Composers;
 
 use App\Models\Dato;
+use App\Models\Usuario;
 use App\Navigation\RutaDeGestion;
 use App\Navigation\Sidebar;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -12,15 +14,15 @@ class NavegacionPrincipal
 {
     public function __construct(
         private readonly Request $request,
+        #[CurrentUser]
+        private readonly ?Usuario $usuario,
     ) {}
 
     public function compose(View $view): void
     {
-        $usuario = $this->request->user();
-
         $view->with([
-            'sidebarSections' => $usuario ? Sidebar::forUser($usuario, $this->rutaResaltada()) : collect(),
-            'settingsUrl' => $usuario ? Sidebar::settingsUrlForUser($usuario) : null,
+            'sidebarSections' => $this->usuario ? Sidebar::forUser($this->usuario, $this->rutaResaltada()) : collect(),
+            'settingsUrl' => $this->usuario ? Sidebar::settingsUrlForUser($this->usuario) : null,
         ]);
     }
 

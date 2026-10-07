@@ -3,14 +3,16 @@
 namespace App\View\Composers;
 
 use App\Models\AsignacionTienda;
-use Illuminate\Http\Request;
+use App\Models\Usuario;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class SelectorDeTienda
 {
     public function __construct(
-        private readonly Request $request,
+        #[CurrentUser]
+        private readonly ?Usuario $usuario,
     ) {}
 
     public function compose(View $view): void
@@ -33,10 +35,8 @@ class SelectorDeTienda
     /** @return Collection<int, AsignacionTienda> */
     private function asignaciones(): Collection
     {
-        $usuario = $this->request->user();
-
-        return $usuario
-            ? $usuario->asignaciones()->with('tienda')->get()
-            : collect();
+        return $this->usuario
+            ? $this->usuario->asignaciones()->with('tienda')->get()
+            : new Collection;
     }
 }

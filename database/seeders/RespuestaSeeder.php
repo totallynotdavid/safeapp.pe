@@ -54,6 +54,6 @@ class RespuestaSeeder extends Seeder
             'volverllamar' => $r[5],
         ], self::CATALOGO);
 
-        Respuesta::insert($rows);
+        Respuesta::query()->insert($rows);
     }
 }

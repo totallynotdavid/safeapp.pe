@@ -184,13 +184,13 @@ class Sidebar
         ],
     ];
 
-    /** @return Collection<int, array{title: string, hidden: bool, items: Collection}> */
+    /** @return Collection<int, array{title: string, items: Collection<int, array{label: string, url: string, icon: string, active: bool}>}> */
     public static function forUser(Usuario $user, ?string $currentRoute = null): Collection
     {
         return self::resolve(self::OPERATIONAL, $user, $currentRoute);
     }
 
-    /** @return Collection<int, array{title: string, hidden: bool, items: Collection}> */
+    /** @return Collection<int, array{title: string, items: Collection<int, array{label: string, url: string, icon: string, active: bool}>}> */
     public static function settingsForUser(Usuario $user, ?string $currentRoute = null): Collection
     {
         return self::resolve(self::SETTINGS, $user, $currentRoute);
@@ -207,60 +207,73 @@ class Sidebar
      */
     public static function startUrlForUser(Usuario $user): ?string
     {
-        $firstOperationalItem = self::forUser($user)
-            ->flatMap(static fn (array $section): Collection => $section['items'])
-            ->first();
+        foreach (self::forUser($user) as $section) {
+            $primero = $section['items']->first();
 
-        return $firstOperationalItem['url'] ?? self::settingsUrlForUser($user);
+            if ($primero !== null) {
+                return $primero['url'];
+            }
+        }
+
+        return self::settingsUrlForUser($user);
     }
 
     /**
-     * @param  array<int, array{title: string, hidden?: bool, items: array<int, array<string, mixed>>}>  $schema
-     * @return Collection<int, array{title: string, hidden: bool, items: Collection}>
+     * @param  list<array{title: string, items: list<array{label: string, route: string, icon: string, permission?: string, permissions?: list<string>, active?: list<string>}>}>  $schema
+     * @return Collection<int, array{title: string, items: Collection<int, array{label: string, url: string, icon: string, active: bool}>}>
      */
     private static function resolve(array $schema, Usuario $user, ?string $currentRoute): Collection
     {
-        $grants = $user
-            ->menus
-            ->pluck('permiso')
-            ->filter()
-            ->flip();
+        $grants = [];
+        foreach ($user->menus as $menu) {
+            if ($menu->permiso === null || $menu->permiso === '') {
+                continue;
+            }
 
-        return collect($schema)
-            ->map(static function (array $section) use ($grants, $currentRoute): array {
-                $items = collect($section['items'])
-                    ->filter(static function (array $item) use ($grants): bool {
-                        if (array_key_exists('permissions', $item)) {
-                            return collect($item['permissions'])
-                                ->contains(
-                                    static fn (string $permission): bool => $grants->has($permission),
-                                );
-                        }
+            $grants[$menu->permiso] = true;
+        }
 
-                        return ($item['permission'] ?? null) === null || $grants->has($item['permission']);
-                    })
-                    ->map(static function (array $item) use ($currentRoute): array {
-                        $patterns = $item['active'] ?? [
-                            $item['route'],
-                            $item['route'].'.*',
-                        ];
+        $sections = [];
+        foreach ($schema as $section) {
+            $items = [];
+            foreach ($section['items'] as $item) {
+                if (! self::permitido($item, $grants)) {
+                    continue;
+                }
 
-                        return [
-                            'label' => $item['label'],
-                            'url' => route($item['route']),
-                            'icon' => $item['icon'],
-                            'active' => $currentRoute !== null && Str::is($patterns, $currentRoute),
-                        ];
-                    })
-                    ->values();
-
-                return [
-                    'title' => $section['title'],
-                    'hidden' => (bool) ($section['hidden'] ?? false),
-                    'items' => $items,
+                $items[] = [
+                    'label' => $item['label'],
+                    'url' => route($item['route']),
+                    'icon' => $item['icon'],
+                    'active' =>
+                        $currentRoute !== null
+                            && Str::is($item['active'] ?? [$item['route'], $item['route'].'.*'], $currentRoute),
                 ];
-            })
-            ->filter(static fn (array $section): bool => $section['items']->isNotEmpty())
-            ->values();
+            }
+
+            // A section with nothing the user may open is not shown.
+            if ($items !== []) {
+                $sections[] = ['title' => $section['title'], 'items' => new Collection($items)];
+            }
+        }
+
+        return new Collection($sections);
+    }
+
+    /**
+     * @param  array{permission?: string, permissions?: list<string>, ...<string, mixed>}  $item
+     * @param  array<string, true>  $grants
+     */
+    private static function permitido(array $item, array $grants): bool
+    {
+        $cualquiera = $item['permissions'] ?? null;
+
+        if ($cualquiera !== null) {
+            return array_any($cualquiera, static fn (string $permiso): bool => array_key_exists($permiso, $grants));
+        }
+
+        $requerido = $item['permission'] ?? null;
+
+        return $requerido === null || array_key_exists($requerido, $grants);
     }
 }

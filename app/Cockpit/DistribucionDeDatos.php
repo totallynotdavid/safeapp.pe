@@ -15,7 +15,9 @@ class DistribucionDeDatos
     /** @return Collection<int, object{origen: string, disponibles: int}> */
     public static function origenesDisponibles(string $tipoData): Collection
     {
+        /** @var Collection<int, object{origen: string, disponibles: int}> */
         return self::disponibles($tipoData)
+            ->toBase()
             ->selectRaw('origen, COUNT(*) as disponibles')
             ->groupBy('origen')
             ->orderByDesc('disponibles')
@@ -28,7 +30,7 @@ class DistribucionDeDatos
         string $origen,
         string $tipoData,
     ): int {
-        return DB::transaction(
+        return DB::connection()->transaction(
             static function () use ($idAgente, $idTienda, $origen, $tipoData): int {
                 // The lock has to be taken inside this transaction, or two
                 // concurrent requests draw the same records.
@@ -37,14 +39,16 @@ class DistribucionDeDatos
                     ->orderBy('id_dato')
                     ->limit(self::LOTE)
                     ->lockForUpdate()
-                    ->pluck('id_dato');
+                    ->pluck('id_dato')
+                    ->map(static fn (mixed $id): int => (int) $id)
+                    ->all();
 
-                if ($ids->isEmpty()) {
+                if ($ids === []) {
                     return 0;
                 }
 
                 return self::abrir(
-                    $ids->all(),
+                    array_values($ids),
                     $idAgente,
                     $idTienda,
                 );
@@ -106,6 +110,7 @@ class DistribucionDeDatos
         return count($idsDato);
     }
 
+    /** @return Builder<Dato> */
     private static function disponibles(string $tipoData): Builder
     {
         return Dato::query()

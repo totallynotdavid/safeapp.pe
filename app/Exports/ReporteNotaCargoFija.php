@@ -50,6 +50,7 @@ final class ReporteNotaCargoFija
         'COMENTARIO BACK',
     ];
 
+    /** @param  Builder<NcFija>  $consulta */
     public static function descargar(string $nombre, Builder $consulta): StreamedResponse
     {
         return Reporte::descargar(
@@ -64,12 +65,30 @@ final class ReporteNotaCargoFija
     private static function fila(NcFija $cargo): array
     {
         return [
+            ...self::seguimiento($cargo),
+            ...self::servicio($cargo),
+            ...self::contactoYValidacion($cargo),
+            ...self::back($cargo),
+        ];
+    }
+
+    /** @return list<null|string|\DateTimeInterface> */
+    private static function seguimiento(NcFija $cargo): array
+    {
+        return [
             $cargo->ejecutivo?->personal,
             $cargo->supervisor?->nombre,
             $cargo->fecha_ingreso,
             $cargo->fecha_validacion,
             $cargo->fecha_actualizacion,
             $cargo->fecha_liquidacion,
+        ];
+    }
+
+    /** @return list<null|float|string> */
+    private static function servicio(NcFija $cargo): array
+    {
+        return [
             $cargo->cliente?->ruc,
             $cargo->cliente?->razon_social,
             $cargo->modalidad,
@@ -77,12 +96,19 @@ final class ReporteNotaCargoFija
             $cargo->descripcion,
             // Cast off the decimal:2 string so the column arrives as a number
             // and sums in the spreadsheet.
-            (float) $cargo->cargo_fijo,
+            floatval($cargo->cargo_fijo),
             $cargo->tecnologia,
             $cargo->region?->nombre,
             $cargo->nodo,
             $cargo->direccion,
             $cargo->coordenadas,
+        ];
+    }
+
+    /** @return list<null|string> */
+    private static function contactoYValidacion(NcFija $cargo): array
+    {
+        return [
             $cargo->contacto,
             $cargo->telefono1,
             $cargo->telefono2,
@@ -91,6 +117,13 @@ final class ReporteNotaCargoFija
             $cargo->validacion,
             $cargo->validador?->personal,
             $cargo->comentario_validador,
+        ];
+    }
+
+    /** @return list<null|string> */
+    private static function back(NcFija $cargo): array
+    {
+        return [
             $cargo->peticion,
             $cargo->nasignado,
             $cargo->contrata,

@@ -46,13 +46,22 @@ class StoreGestionRequest extends FormRequest
      * The contact payload as Cliente::registrarGestion() expects it: line counts
      * always present so an omitted input reads as zero rather than null.
      *
-     * @return array<string, mixed>
+     * @return array{telefono: string, id_respuesta: int, nombre_contacto: string|null, correo: string|null, comentario: string|null, ...<string, int|string|null>}
      */
     public function contacto(): array
     {
         return [
-            ...$this->safe()->except(array_map(Operadores::columna(...), Operadores::TODOS)),
             ...Operadores::conteos($this->input(...)),
+            'telefono' => $this->string('telefono')->toString(),
+            'id_respuesta' => $this->integer('id_respuesta'),
+            'nombre_contacto' => $this->textoOpcional('nombre_contacto'),
+            'correo' => $this->textoOpcional('correo'),
+            'comentario' => $this->textoOpcional('comentario'),
         ];
+    }
+
+    private function textoOpcional(string $campo): ?string
+    {
+        return $this->filled($campo) ? $this->string($campo)->toString() : null;
     }
 }

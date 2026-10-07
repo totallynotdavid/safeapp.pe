@@ -22,8 +22,13 @@ class ImportacionController extends Controller
         /** @var UploadedFile $archivo */
         $archivo = $request->file('archivo');
 
+        $ruta = $archivo->getRealPath();
+        if ($ruta === false) {
+            abort(422);
+        }
+
         $resultado = ImportacionDeClientes::desdeArchivo(
-            $archivo->getRealPath(),
+            $ruta,
             $archivo->getClientOriginalExtension(),
         );
 

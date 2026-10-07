@@ -15,6 +15,8 @@ use Illuminate\Support\Collection;
  * @property string $descripcion
  * @property string $cargo_fijo
  * @property int $estado
+ *
+ * @method static Builder<Producto> ofrecibles(string $tipo)
  */
 // A sellable product in the catalog behind the nota de cargo fija form. See the
 // create_producto_table migration for why `tipo` survives.
@@ -39,12 +41,11 @@ class Producto extends Model
      * enough to hold the whole catalog, so it is one query and the price is
      * filled in from it rather than typed over.
      *
-     * @return Collection<string, Collection<int, Producto>>
+     * @return Collection<array-key, Collection<int, Producto>>
      */
     public static function catalogoFija(): Collection
     {
-        return self::query()
-            ->ofrecibles(self::FIJA)
+        return self::ofrecibles(self::FIJA)
             ->get()
             ->groupBy('subtipo');
     }

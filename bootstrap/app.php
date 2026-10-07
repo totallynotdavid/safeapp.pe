@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         then: static function (): void {
             Route::middleware(['web', 'auth'])->group(base_path('routes/cockpit.php'));
             Route::middleware(['web', 'auth'])->group(base_path('routes/notas-cargo.php'));
+            Route::middleware(['web', 'auth'])->group(base_path('routes/control-operativo.php'));
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {

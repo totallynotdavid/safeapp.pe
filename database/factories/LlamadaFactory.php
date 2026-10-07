@@ -41,15 +41,15 @@ class LlamadaFactory extends Factory
             'id_usuario' => Usuario::factory(),
             // Point at a seeded catalog row when one exists, otherwise stand up a
             // single disposition so the factory works without RespuestaSeeder.
-            'id_respuesta' => static fn (): int => (
+            'id_respuesta' => static fn (): int => intval(
                 Respuesta::query()->value('id_respuesta')
-                ?? Respuesta::create([
+                ?? Respuesta::query()->create([
                     'descripcion' => 'Desea Movil',
                     'tipo' => 'LLAMADA',
                     'contactabilidad' => true,
                     'negociacion' => true,
                     'volverllamar' => false,
-                ])->id_respuesta
+                ])->id_respuesta,
             ),
             'fecha' => fake()->dateTimeBetween('-3 months', 'now'),
             'id_cliente' => Cliente::factory(),

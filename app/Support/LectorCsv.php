@@ -53,7 +53,11 @@ final class LectorCsv
         rewind($manejador);
         $encabezados = fgetcsv($manejador, separator: $delimitador, escape: '');
 
-        return new self($manejador, $delimitador, self::normalizar($encabezados === false ? [] : $encabezados));
+        return new self(
+            $manejador,
+            $delimitador,
+            self::normalizar(self::celdas($encabezados === false ? [] : $encabezados)),
+        );
     }
 
     /**
@@ -70,19 +74,31 @@ final class LectorCsv
     {
         $linea = 1;
 
-        while (($campos = fgetcsv($this->manejador, separator: $this->delimitador, escape: '')) !== false) {
+        while (($leidos = fgetcsv($this->manejador, separator: $this->delimitador, escape: '')) !== false) {
             $linea++;
 
             // fgetcsv yields [null] for a blank line. Trailing blank lines are
             // normal in exported files and are not an operator's mistake.
-            if ($campos === [null] || $campos === []) {
+            if ($leidos === [null] || $leidos === []) {
                 continue;
             }
 
-            yield $linea => $this->asociar($campos);
+            yield $linea => $this->asociar(self::celdas($leidos));
         }
 
         fclose($this->manejador);
+    }
+
+    /**
+     * @param  array<array-key, mixed>  $campos
+     * @return list<?string>
+     */
+    private static function celdas(array $campos): array
+    {
+        return array_values(array_map(
+            static fn (mixed $campo): ?string => is_string($campo) ? $campo : null,
+            $campos,
+        ));
     }
 
     private static function delimitadorDe(string $encabezado): string
@@ -91,9 +107,11 @@ final class LectorCsv
 
         // The strict comparison keeps the first delimiter when counts tie.
         foreach (self::DELIMITADORES as $delimitador) {
-            if (substr_count($encabezado, $delimitador) > substr_count($encabezado, $elegido)) {
-                $elegido = $delimitador;
+            if (substr_count($encabezado, $delimitador) <= substr_count($encabezado, $elegido)) {
+                continue;
             }
+
+            $elegido = $delimitador;
         }
 
         return $elegido;
@@ -120,7 +138,7 @@ final class LectorCsv
         $fila = [];
 
         foreach ($this->encabezados as $indice => $nombre) {
-            $fila[$nombre] = trim((string) ($campos[$indice] ?? ''));
+            $fila[$nombre] = trim($campos[$indice] ?? '');
         }
 
         return $fila;

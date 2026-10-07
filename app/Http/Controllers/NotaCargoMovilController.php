@@ -12,6 +12,8 @@ use App\Models\Cartera;
 use App\Models\Cliente;
 use App\Models\NcMovil;
 use App\Models\Tienda;
+use App\Models\Usuario;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,34 +25,34 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 // permisos; this one never writes their columns.
 class NotaCargoMovilController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, #[CurrentUser] Usuario $agente): View
     {
         $filtro = FiltroPeriodo::desde($request, NcMovil::ESTADOS);
 
         return view('notas-cargo.movil.index', [
-            'cargos' => $this->mias($request->user()->id_usuario, $filtro)->orderByDesc('fecha_ingreso')->get(),
+            'cargos' => $this->mias($agente->id_usuario, $filtro)->orderByDesc('fecha_ingreso')->get(),
             'estados' => NcMovil::ESTADOS,
             'filtro' => $filtro,
         ]);
     }
 
-    public function exportar(Request $request): StreamedResponse
+    public function exportar(Request $request, #[CurrentUser] Usuario $agente): StreamedResponse
     {
         return ReporteNotaCargoMovil::descargar(
             'mis-notas-cargo-movil',
-            $this->mias($request->user()->id_usuario, FiltroPeriodo::desde($request, NcMovil::ESTADOS)),
+            $this->mias($agente->id_usuario, FiltroPeriodo::desde($request, NcMovil::ESTADOS)),
         );
     }
 
-    public function create(Request $request): View
+    public function create(Request $request, #[CurrentUser] Usuario $agente): View
     {
         $ruc = $request->string('ruc')->trim()->toString();
 
         return view('notas-cargo.movil.create', [
             'ruc' => $ruc === '' ? null : $ruc,
-            'cliente' => $ruc === '' ? null : Cliente::visiblePara($request->user())->where('ruc', $ruc)->first(),
+            'cliente' => $ruc === '' ? null : Cliente::visiblePara($agente)->where('ruc', $ruc)->first(),
             'regiones' => Tienda::query()->orderBy('nombre')->get(),
-            'carteras' => Cartera::query()->seleccionables()->get(),
+            'carteras' => Cartera::seleccionables()->get(),
             'modalidades' => NcMovil::MODALIDADES,
             'niveles' => NcMovil::NIVELES_NEGOCIACION,
             'tiposProducto' => NcMovil::TIPOS_PRODUCTO,
@@ -58,17 +60,17 @@ class NotaCargoMovilController extends Controller
         ]);
     }
 
-    public function store(StoreNotaCargoMovilRequest $request): RedirectResponse
+    public function store(StoreNotaCargoMovilRequest $request, #[CurrentUser] Usuario $agente): RedirectResponse
     {
-        $cargo = new NcMovil($request->safe()->except('id_cartera'));
+        $cargo = new NcMovil($request->atributos(['id_cartera']));
 
         // Owner, supervisor and date are server-assigned from session and clock.
-        $cargo->id_usuario = $request->user()->id_usuario;
-        $cargo->id_supervisor = $request->user()->id_supervisor;
+        $cargo->id_usuario = $agente->id_usuario;
+        $cargo->id_supervisor = $agente->id_supervisor;
         $cargo->fecha_ingreso = now()->toDateString();
-        $cargo->id_cartera = (int) $request->input('id_cartera', 0);
+        $cargo->id_cartera = $request->integer('id_cartera');
         $cargo->save();
-        AccesoAClientes::otorgar((int) $cargo->id_cliente, $request->user());
+        AccesoAClientes::otorgar((int) $cargo->id_cliente, $agente);
 
         return redirect()
             ->route('notas-cargo.movil.index')
@@ -90,7 +92,7 @@ class NotaCargoMovilController extends Controller
     {
         Gate::authorize('update', $ncMovil);
 
-        $ncMovil->fill($request->validated())->save();
+        $ncMovil->fill($request->atributos())->save();
 
         return redirect()
             ->route('notas-cargo.movil.index')

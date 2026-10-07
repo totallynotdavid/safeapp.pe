@@ -73,21 +73,25 @@ class Llamada extends Model
         ];
     }
 
+    /** @return BelongsTo<Usuario, $this> */
     public function agente(): BelongsTo
     {
         return $this->belongsTo(Usuario::class, 'id_usuario', 'id_usuario');
     }
 
+    /** @return BelongsTo<Respuesta, $this> */
     public function respuesta(): BelongsTo
     {
         return $this->belongsTo(Respuesta::class, 'id_respuesta', 'id_respuesta');
     }
 
+    /** @return BelongsTo<Cliente, $this> */
     public function cliente(): BelongsTo
     {
         return $this->belongsTo(Cliente::class, 'id_cliente', 'id_cliente');
     }
 
+    /** @return BelongsTo<Dato, $this> */
     public function dato(): BelongsTo
     {
         return $this->belongsTo(Dato::class, 'id_dato', 'id_dato');

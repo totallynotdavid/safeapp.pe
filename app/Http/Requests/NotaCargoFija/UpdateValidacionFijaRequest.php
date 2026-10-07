@@ -2,11 +2,11 @@
 
 namespace App\Http\Requests\NotaCargoFija;
 
+use App\Http\Requests\Solicitud;
 use App\Models\NcFija;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateValidacionFijaRequest extends FormRequest
+class UpdateValidacionFijaRequest extends Solicitud
 {
     public function rules(): array
     {

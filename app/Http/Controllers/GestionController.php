@@ -10,8 +10,11 @@ use App\Http\Requests\Gestion\StoreGestionClienteRequest;
 use App\Http\Requests\Gestion\StoreGestionRequest;
 use App\Models\Dato;
 use App\Models\Respuesta;
+use App\Models\Usuario;
 use App\Navigation\RutaDeGestion;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -25,23 +28,19 @@ class GestionController extends Controller
         'FIJA' => 'gestion.fija',
     ];
 
-    public function index(Request $request, string $tipo): View
+    public function index(Request $request, #[CurrentUser] Usuario $agente, string $tipo): View
     {
-        $agente = $request->user();
         $busqueda = $request->string('buscar')->trim()->limit(100)->toString();
 
-        $datos = Dato::query()
-            ->enCola($agente->id_usuario, $agente->tiendaAsignada(), $tipo)
+        $datos = Dato::enCola($agente->id_usuario, $agente->tiendaAsignada(), $tipo)
             ->with('cliente')
             ->join('cliente', 'cliente.id_cliente', '=', 'datos.id_cliente')
-            ->when($busqueda !== '', static function ($query) use ($busqueda): void {
+            ->when($busqueda !== '', static function (Builder $query) use ($busqueda): Builder {
                 $escaped = addcslashes($busqueda, '%_\\');
 
-                $query->where(static function ($clientes) use ($escaped): void {
-                    $clientes
-                        ->where('cliente.ruc', 'like', "%{$escaped}%")
-                        ->orWhere('cliente.razon_social', 'like', "%{$escaped}%");
-                });
+                return $query->where(static fn (Builder $clientes): Builder => $clientes
+                    ->where('cliente.ruc', 'like', "%{$escaped}%")
+                    ->orWhere('cliente.razon_social', 'like', "%{$escaped}%"));
             })
             ->orderBy('cliente.razon_social')
             ->select('datos.*')
@@ -58,9 +57,9 @@ class GestionController extends Controller
         ]);
     }
 
-    public function create(Request $request, string $tipo): View
+    public function create(#[CurrentUser] Usuario $agente, string $tipo): View
     {
-        $this->autorizarTipo($request, $tipo);
+        $this->autorizarTipo($agente, $tipo);
 
         return view('gestion.create', [
             'tipo' => $tipo,
@@ -69,11 +68,14 @@ class GestionController extends Controller
         ]);
     }
 
-    public function storeCliente(StoreGestionClienteRequest $request, string $tipo): RedirectResponse
-    {
-        $this->autorizarTipo($request, $tipo);
+    public function storeCliente(
+        StoreGestionClienteRequest $request,
+        #[CurrentUser]
+        Usuario $agente,
+        string $tipo,
+    ): RedirectResponse {
+        $this->autorizarTipo($agente, $tipo);
 
-        $agente = $request->user();
         $idTienda = $agente->tiendaAsignada();
 
         if ($idTienda === null) {
@@ -91,7 +93,7 @@ class GestionController extends Controller
             ->with('status', 'Cliente registrado. Registre la gestión.');
     }
 
-    public function show(Request $request, Dato $dato): View
+    public function show(#[CurrentUser] Usuario $agente, Dato $dato): View
     {
         Gate::authorize('view', $dato);
 
@@ -100,7 +102,7 @@ class GestionController extends Controller
         // History belongs to the customer, not the campaign record.
         $historial = $cliente
             ->llamadas()
-            ->where('id_usuario', $request->user()->id_usuario)
+            ->where('id_usuario', $agente->id_usuario)
             ->with(['agente', 'respuesta'])
             ->orderByDesc('fecha')
             ->get();
@@ -111,28 +113,31 @@ class GestionController extends Controller
             'respuestas' => Respuesta::query()->orderBy('descripcion')->get()->groupBy('tipo'),
             'rutaBase' => RutaDeGestion::index($dato->tipo_data),
             'historial' => $historial,
-            'telefonos' => $cliente->telefonosConocidosPara($request->user()),
+            'telefonos' => $cliente->telefonosConocidosPara($agente),
             // Fall back to the imported record when there is no prior contact.
             'mezcla' => MezclaDeLineas::observada($historial->first() ?? $dato),
         ]);
     }
 
-    public function store(StoreGestionRequest $request, Dato $dato): RedirectResponse
+    public function store(StoreGestionRequest $request, #[CurrentUser] Usuario $agente, Dato $dato): RedirectResponse
     {
         Gate::authorize('view', $dato);
 
-        $dato->registrarGestion($request->user()->id_usuario, $request->contacto());
+        $dato->registrarGestion($agente->id_usuario, $request->contacto());
 
         return redirect()
             ->route(RutaDeGestion::index($dato->tipo_data))
             ->with('status', 'Gestión registrada.');
     }
 
-    private function autorizarTipo(Request $request, string $tipo): void
+    private function autorizarTipo(Usuario $agente, string $tipo): void
     {
         $permiso = self::PERMISOS[$tipo] ?? null;
 
-        abort_if($permiso === null, 404);
-        abort_unless($request->user()->can($permiso), 403);
+        if ($permiso === null) {
+            abort(404);
+        }
+
+        abort_unless($agente->can($permiso), 403);
     }
 }

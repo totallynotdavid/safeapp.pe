@@ -8,6 +8,8 @@ use App\Http\Requests\NotaCargoFija\UpdateBackFijaRequest;
 use App\Models\Builders\NcFijaBuilder;
 use App\Models\NcFija;
 use App\Models\Tienda;
+use App\Models\Usuario;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -52,22 +54,25 @@ class NotaCargoFijaBackController extends Controller
         ]);
     }
 
-    public function update(UpdateBackFijaRequest $request, NcFija $ncFija): RedirectResponse
-    {
+    public function update(
+        UpdateBackFijaRequest $request,
+        NcFija $ncFija,
+        #[CurrentUser]
+        Usuario $agente,
+    ): RedirectResponse {
         // Only a validated case has anything to fulfil, and the queue only lists
         // those. Legacy trusted the posted id, so a rejected case could be moved
         // through the lifecycle anyway.
         abort_unless($ncFija->esValidado(), 403);
 
-        $data = $request->validated();
-        $ncFija->fill($request->safe()->except(['estado', 'fecha_liquidacion']));
-        $ncFija->estado = $data['estado'];
-        $ncFija->fecha_liquidacion = $data['fecha_liquidacion'] ?? null;
+        $ncFija->fill($request->atributos(['estado', 'fecha_liquidacion']));
+        $ncFija->estado = $request->string('estado')->toString();
+        $ncFija->fecha_liquidacion = $request->date('fecha_liquidacion');
         // Stamped rather than posted, which makes it exactly "when the back
         // office last acted" and is what every queue windows a cancelled case
         // by. Legacy stamped it server-side here too.
         $ncFija->fecha_actualizacion = now()->toDateString();
-        $ncFija->id_back = $request->user()->id_usuario;
+        $ncFija->id_back = $agente->id_usuario;
         $ncFija->save();
 
         return redirect()

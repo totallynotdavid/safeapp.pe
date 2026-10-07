@@ -27,6 +27,7 @@ final class ReporteContacto
         'COMENTARIO',
     ];
 
+    /** @param  Builder<Llamada>  $consulta */
     public static function descargar(string $nombre, Builder $consulta): StreamedResponse
     {
         return Reporte::descargar(
@@ -64,7 +65,7 @@ final class ReporteContacto
             $contacto->correo,
             $contacto->comentario,
             ...array_map(
-                static fn (string $operador): int => (int) $contacto->{Operadores::columna($operador)},
+                static fn (string $operador): int => intval($contacto->getAttribute(Operadores::columna($operador))),
                 Operadores::TODOS,
             ),
         ];

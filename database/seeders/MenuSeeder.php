@@ -56,6 +56,6 @@ class MenuSeeder extends Seeder
             'permiso' => $row[4],
         ], $rows);
 
-        Menu::insert($menus);
+        Menu::query()->insert($menus);
     }
 }

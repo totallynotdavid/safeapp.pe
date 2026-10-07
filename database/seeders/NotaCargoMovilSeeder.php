@@ -33,7 +33,7 @@ class NotaCargoMovilSeeder extends Seeder
             ->limit(count(NcMovil::ESTADOS_LIQUIDABLES) + 3)
             ->pluck('id_cliente');
         $caso = ['id_usuario' => $admin->id_usuario, 'zonal' => $idTienda];
-        $cartera = Cartera::query()->seleccionables()->firstOrFail();
+        $cartera = Cartera::seleccionables()->firstOrFail();
         $supervisor = Supervisor::query()->firstOrFail();
 
         foreach (NcMovil::ESTADOS_LIQUIDABLES as $indice => $estado) {

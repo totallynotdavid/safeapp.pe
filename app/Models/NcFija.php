@@ -52,6 +52,8 @@ use Illuminate\Support\Carbon;
  * @property-read Usuario|null $validador
  * @property-read Tienda|null $region
  * @property-read Supervisor|null $supervisor
+ *
+ * @method static NcFijaBuilder<NcFija> query()
  */
 // Registro, validación and back office own separate parts of the row.
 class NcFija extends Model
@@ -125,28 +127,39 @@ class NcFija extends Model
         'ncfe',
     ];
 
+    /** @return BelongsTo<Cliente, $this> */
     public function cliente(): BelongsTo
     {
         return $this->belongsTo(Cliente::class, 'id_cliente', 'id_cliente');
     }
 
+    /** @return BelongsTo<Usuario, $this> */
     public function ejecutivo(): BelongsTo
     {
         return $this->belongsTo(Usuario::class, 'id_usuario', 'id_usuario');
     }
 
+    /** @return BelongsTo<Usuario, $this> */
     public function validador(): BelongsTo
     {
         return $this->belongsTo(Usuario::class, 'id_validador', 'id_usuario');
     }
 
-    // Region of the case, not the ejecutivo's current tienda.
+    /**
+     * Region of the case, not the ejecutivo's current tienda.
+     *
+     * @return BelongsTo<Tienda, $this>
+     */
     public function region(): BelongsTo
     {
         return $this->belongsTo(Tienda::class, 'zonal', 'id_tienda');
     }
 
-    // Supervisor recorded when the case was registered.
+    /**
+     * Supervisor recorded when the case was registered.
+     *
+     * @return BelongsTo<Supervisor, $this>
+     */
     public function supervisor(): BelongsTo
     {
         return $this->belongsTo(Supervisor::class, 'id_supervisor', 'id_supervisor');

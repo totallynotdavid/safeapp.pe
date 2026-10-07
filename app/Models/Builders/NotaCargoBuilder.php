@@ -30,7 +30,7 @@ use Illuminate\Support\Collection;
  */
 abstract class NotaCargoBuilder extends Builder
 {
-    public function enPeriodo(int $ano, int $mes, ?string $estado): self
+    public function enPeriodo(int $ano, int $mes, ?string $estado): static
     {
         $cierres = $this->columnasDeCierre();
 
@@ -66,6 +66,7 @@ abstract class NotaCargoBuilder extends Builder
      */
     public function totalPorEstado(): Collection
     {
+        /** @var Collection<int, object{id_usuario: int, estado: string, total: float}> */
         return $this
             ->toBase()
             ->selectRaw('id_usuario, estado, SUM(cargo_fijo) as total')
@@ -90,12 +91,12 @@ abstract class NotaCargoBuilder extends Builder
     /**
      * @param  list<string>  $estados
      */
-    protected function enCurso(array $estados, int $ano): self
+    protected function enCurso(array $estados, int $ano): static
     {
         return $this->whereIn('estado', $estados)->whereYear('fecha_ingreso', '<=', $ano);
     }
 
-    protected function cerradoEn(string $estado, string $columna, int $ano, int $mes): self
+    protected function cerradoEn(string $estado, string $columna, int $ano, int $mes): static
     {
         return $this->where('estado', $estado)->whereYear($columna, $ano)->whereMonth($columna, $mes);
     }

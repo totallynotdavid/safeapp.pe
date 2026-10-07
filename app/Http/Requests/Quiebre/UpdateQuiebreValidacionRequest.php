@@ -2,11 +2,11 @@
 
 namespace App\Http\Requests\Quiebre;
 
+use App\Http\Requests\Solicitud;
 use App\Models\Quiebre;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateQuiebreValidacionRequest extends FormRequest
+class UpdateQuiebreValidacionRequest extends Solicitud
 {
     // Route middleware (`can:quiebre.validar`) and the QuiebrePolicy authorize
     // access; this request only shapes the input.

@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Support\Facades\DB;
 
 /**
  * One customer on one campaign list: the unit of work behind GESTION MOVIL and
@@ -36,6 +35,8 @@ use Illuminate\Support\Facades\DB;
  * @property-read AsignacionDato|null $asignacionActiva
  * @property-read EloquentCollection<int, AsignacionDato> $asignaciones
  * @property-read EloquentCollection<int, Llamada> $llamadas
+ *
+ * @method static Builder<Dato> enCola(int $idAgente, ?int $idTienda, string $tipoData)
  */
 class Dato extends Model
 {
@@ -81,16 +82,17 @@ class Dato extends Model
      * them and a failure leaves a logged call on a record that never leaves the
      * queue.
      *
-     * @param  array<string, mixed>  $contacto  validated payload from StoreGestionRequest
+     * @param  array{id_respuesta: int, ...<string, int|string|null>}  $contacto  validated payload from StoreGestionRequest
      */
     public function registrarGestion(int $idAgente, array $contacto): Llamada
     {
-        return DB::transaction(function () use ($idAgente, $contacto): Llamada {
+        return $this->getConnection()->transaction(function () use ($idAgente, $contacto): Llamada {
             // $fillable guards the agent-supplied half. The rest is server
             // state. The channel comes from the chosen respuesta, never from the
             // request, so a VISITA outcome cannot be filed against a LLAMADA.
-            $llamada = $this->llamadas()->make($contacto);
+            $llamada = new Llamada($contacto);
             $llamada->forceFill([
+                'id_dato' => $this->id_dato,
                 'id_cliente' => $this->id_cliente,
                 'id_usuario' => $idAgente,
                 'razon_social' => $this->cliente->razon_social,
@@ -112,6 +114,9 @@ class Dato extends Model
      * The agent's outstanding queue for one segment, scoped to their active
      * tienda. A record assigned under a tienda the agent no longer holds is
      * intentionally invisible here.
+     *
+     * @param  Builder<Dato>  $query
+     * @return Builder<Dato>
      */
     public function scopeEnCola(Builder $query, int $idAgente, ?int $idTienda, string $tipoData): Builder
     {
@@ -126,6 +131,7 @@ class Dato extends Model
             );
     }
 
+    /** @return BelongsTo<Cliente, $this> */
     public function cliente(): BelongsTo
     {
         return $this->belongsTo(Cliente::class, 'id_cliente', 'id_cliente');
@@ -135,6 +141,8 @@ class Dato extends Model
      * The agent currently holding this record, if any. At most one row can
      * match: the unique index on (id_dato, activa) makes that a constraint
      * rather than an expectation.
+     *
+     * @return HasOne<AsignacionDato, $this>
      */
     public function asignacionActiva(): HasOne
     {
@@ -143,11 +151,13 @@ class Dato extends Model
             ->where('activa', AsignacionDato::ACTIVA);
     }
 
+    /** @return HasMany<AsignacionDato, $this> */
     public function asignaciones(): HasMany
     {
         return $this->hasMany(AsignacionDato::class, 'id_dato', 'id_dato');
     }
 
+    /** @return HasMany<Llamada, $this> */
     public function llamadas(): HasMany
     {
         return $this->hasMany(Llamada::class, 'id_dato', 'id_dato');

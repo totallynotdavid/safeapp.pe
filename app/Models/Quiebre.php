@@ -141,21 +141,25 @@ class Quiebre extends Model
         return $fechaActivacion !== null && $fechaActivacion->diffInDays(now()) >= self::DIAS_PARA_TICKET;
     }
 
+    /** @return BelongsTo<Cliente, $this> */
     public function cliente(): BelongsTo
     {
         return $this->belongsTo(Cliente::class, 'id_cliente', 'id_cliente');
     }
 
+    /** @return BelongsTo<Usuario, $this> */
     public function ejecutivo(): BelongsTo
     {
         return $this->belongsTo(Usuario::class, 'id_usuario', 'id_usuario');
     }
 
+    /** @return BelongsTo<Usuario, $this> */
     public function validador(): BelongsTo
     {
         return $this->belongsTo(Usuario::class, 'id_validador', 'id_usuario');
     }
 
+    /** @return BelongsTo<Tienda, $this> */
     public function tienda(): BelongsTo
     {
         return $this->belongsTo(Tienda::class, 'zonal_telefonica', 'id_tienda');

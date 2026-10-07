@@ -56,6 +56,8 @@ use Illuminate\Support\Carbon;
  * @property-read Tienda|null $region
  * @property-read Cartera|null $cartera
  * @property-read Supervisor|null $supervisor
+ *
+ * @method static NcMovilBuilder<NcMovil> query()
  */
 // A nota de cargo móvil. The whole lifecycle lives on this one row and each
 // stage owns a disjoint set of columns: registro (the ejecutivo) writes the
@@ -198,16 +200,19 @@ class NcMovil extends Model
         'comentario_liquidador',
     ];
 
+    /** @return BelongsTo<Cliente, $this> */
     public function cliente(): BelongsTo
     {
         return $this->belongsTo(Cliente::class, 'id_cliente', 'id_cliente');
     }
 
+    /** @return BelongsTo<Usuario, $this> */
     public function ejecutivo(): BelongsTo
     {
         return $this->belongsTo(Usuario::class, 'id_usuario', 'id_usuario');
     }
 
+    /** @return BelongsTo<Usuario, $this> */
     public function validador(): BelongsTo
     {
         return $this->belongsTo(Usuario::class, 'id_validador', 'id_usuario');
@@ -217,21 +222,31 @@ class NcMovil extends Model
      * The región the case is for, not the ejecutivo's own tienda. The two differ
      * in 1,390 of the 2,006 production rows, so naming this `tienda` would
      * assert something the data denies. Tienda is the región catalog.
+     *
+     * @return BelongsTo<Tienda, $this>
      */
     public function region(): BelongsTo
     {
         return $this->belongsTo(Tienda::class, 'zonal', 'id_tienda');
     }
 
-    // The carrier account executive the case is attributed to. Optional:
-    // id_cartera stays 0 until the registro or back screen picks one.
+    /**
+     * The carrier account executive the case is attributed to. Optional:
+     * id_cartera stays 0 until the registro or back screen picks one.
+     *
+     * @return BelongsTo<Cartera, $this>
+     */
     public function cartera(): BelongsTo
     {
         return $this->belongsTo(Cartera::class, 'id_cartera', 'id_cartera');
     }
 
-    // The supervisor on record when the ejecutivo registered the case, which is
-    // not necessarily the one that user reports to today.
+    /**
+     * The supervisor on record when the ejecutivo registered the case, which is
+     * not necessarily the one that user reports to today.
+     *
+     * @return BelongsTo<Supervisor, $this>
+     */
     public function supervisor(): BelongsTo
     {
         return $this->belongsTo(Supervisor::class, 'id_supervisor', 'id_supervisor');

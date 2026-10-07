@@ -2,14 +2,14 @@
 
 namespace App\Http\Requests\NotaCargoMovil;
 
+use App\Http\Requests\Solicitud;
 use App\Models\NcMovil;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 // The back office moves a validated case through the lifecycle and records what
 // fulfilment produced. `estado` belongs to this stage alone: registro sets it to
 // PENDIENTE once and never touches it again, and liquidación leaves it alone.
-class UpdateBackMovilRequest extends FormRequest
+class UpdateBackMovilRequest extends Solicitud
 {
     public function rules(): array
     {

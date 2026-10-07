@@ -76,22 +76,26 @@ class ProduccionController extends Controller
      */
     private function porEjecutivo(NotaCargoBuilder $consulta, FiltroPeriodo $filtro): Collection
     {
-        $totales = $consulta
-            ->enPeriodo($filtro->ano, $filtro->mes, null)
-            ->totalPorEstado()
-            ->groupBy('id_usuario')
-            ->map(static fn (Collection $delEjecutivo): Collection => $delEjecutivo
-                ->mapWithKeys(static fn (object $fila): array => [$fila->estado => (float) $fila->total]));
+        /** @var array<int, array<string, float>> $totales */
+        $totales = [];
+        foreach ($consulta->enPeriodo($filtro->ano, $filtro->mes, null)->totalPorEstado() as $fila) {
+            $totales[$fila->id_usuario][$fila->estado] = $fila->total;
+        }
 
-        $nombres = Usuario::query()
-            ->whereIn('id_usuario', $totales->keys())
-            ->pluck('personal', 'id_usuario');
+        $nombres = [];
+        foreach (Usuario::query()->whereIn('id_usuario', array_keys($totales))->get([
+            'id_usuario',
+            'personal',
+        ]) as $ejecutivo) {
+            $nombres[$ejecutivo->id_usuario] = $ejecutivo->personal;
+        }
 
-        return $totales
-            ->map(static fn (Collection $porEstado, int $id): array => [
-                'personal' => $nombres[$id] ?? '',
-                'totales' => $porEstado,
-            ])
+        $filas = [];
+        foreach ($totales as $id => $porEstado) {
+            $filas[] = ['personal' => $nombres[$id] ?? '', 'totales' => new Collection($porEstado)];
+        }
+
+        return (new Collection($filas))
             ->sortBy('personal')
             ->values();
     }

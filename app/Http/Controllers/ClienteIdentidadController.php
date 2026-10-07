@@ -5,13 +5,19 @@ namespace App\Http\Controllers;
 use App\Cockpit\AccesoAClientes;
 use App\Cockpit\ClienteNoDisponible;
 use App\Http\Requests\Cliente\StoreClienteIdentidadRequest;
+use App\Models\Usuario;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\RedirectResponse;
 
 // Customer identity is created only as part of a case flow.
 class ClienteIdentidadController extends Controller
 {
-    public function store(StoreClienteIdentidadRequest $request, string $origen): RedirectResponse
-    {
+    public function store(
+        StoreClienteIdentidadRequest $request,
+        string $origen,
+        #[CurrentUser]
+        Usuario $agente,
+    ): RedirectResponse {
         $rutas = [
             'movil' => 'notas-cargo.movil.create',
             'fija' => 'notas-cargo.fija.create',
@@ -23,7 +29,7 @@ class ClienteIdentidadController extends Controller
 
         try {
             AccesoAClientes::resolverOcrear(
-                $request->user(),
+                $agente,
                 $ruc,
                 $request->string('razon_social')->trim()->toString(),
             );

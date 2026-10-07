@@ -2,7 +2,9 @@
 
 namespace App\Support;
 
+use DateTimeInterface;
 use Generator;
+use OpenSpout\Common\Entity\Cell;
 use OpenSpout\Reader\XLSX\Reader;
 use RuntimeException;
 
@@ -79,17 +81,27 @@ final class LectorXlsx
     }
 
     /**
-     * @param iterable<\OpenSpout\Common\Entity\Cell> $celdas
+     * @param array<int, Cell> $celdas
      * @return list<string>
      */
-    private static function valores(iterable $celdas): array
+    private static function valores(array $celdas): array
     {
-        return array_map(
-            static fn ($celda): string => trim(
-                (string) ($celda->getValue() ?? ''),
-            ),
-            [...$celdas],
-        );
+        return array_values(array_map(
+            static fn (Cell $celda): string => self::texto($celda->getValue()),
+            $celdas,
+        ));
+    }
+
+    // A date-formatted cell arrives as a DateTimeInterface, which has no string
+    // form; the import reads dates as Y-m-d.
+    private static function texto(mixed $valor): string
+    {
+        return trim(match (true) {
+            is_string($valor) => $valor,
+            is_scalar($valor) => (string) $valor,
+            $valor instanceof DateTimeInterface => $valor->format('Y-m-d'),
+            default => '',
+        });
     }
 
     /**

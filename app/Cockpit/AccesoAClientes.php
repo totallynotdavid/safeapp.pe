@@ -31,7 +31,7 @@ final class AccesoAClientes
         string $ruc,
         string $razonSocial,
     ): Cliente {
-        return DB::transaction(
+        return DB::connection()->transaction(
             static function () use ($usuario, $ruc, $razonSocial): Cliente {
                 $cliente = Cliente::query()
                     ->where('ruc', $ruc)

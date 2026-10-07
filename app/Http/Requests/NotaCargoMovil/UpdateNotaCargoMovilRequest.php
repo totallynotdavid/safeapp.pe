@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\NotaCargoMovil;
 
+use App\Http\Requests\Solicitud;
 use App\Models\NcMovil;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 // The ejecutivo amends their own case while it is still awaiting validación.
@@ -11,7 +11,7 @@ use Illuminate\Validation\Rule;
 // are what the case is, and changing them would make it a different case, so
 // they are fixed at registration. Whether the case may be amended at all is a
 // policy question, not a validation one, and lives in NcMovilPolicy.
-class UpdateNotaCargoMovilRequest extends FormRequest
+class UpdateNotaCargoMovilRequest extends Solicitud
 {
     public function rules(): array
     {

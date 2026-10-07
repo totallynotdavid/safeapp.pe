@@ -2,11 +2,11 @@
 
 namespace App\Http\Requests\Rol;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\Solicitud;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
-class UpdateRolRequest extends FormRequest
+class UpdateRolRequest extends Solicitud
 {
     // Access is gated by `can:roles.manage` on the route.
     public function authorize(): bool

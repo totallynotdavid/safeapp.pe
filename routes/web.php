@@ -3,15 +3,11 @@
 use App\Http\Controllers\AccountSettingsController;
 use App\Http\Controllers\AsignacionController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\ClienteIdentidadController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\EquipoController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImportacionController;
-use App\Http\Controllers\LiquidacionController;
 use App\Http\Controllers\PersonalController;
-use App\Http\Controllers\QuiebreRegistroController;
-use App\Http\Controllers\QuiebreValidacionController;
 use App\Http\Controllers\RolController;
 use App\Http\Controllers\TiendaActivaController;
 use App\Http\Controllers\UsuarioController;
@@ -19,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
-    Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+    Route::post('/login', [AuthenticatedSessionController::class, 'store'])->middleware('throttle:5,1');
 });
 
 Route::middleware('auth')->group(function () {
@@ -78,29 +74,6 @@ Route::middleware('auth')->group(function () {
         Route::delete('/configuracion/roles/{rol}', [RolController::class, 'destroy'])->name('roles.destroy');
     });
 
-    Route::middleware('can:quiebre.registrar')->group(function () {
-        Route::get('/quiebres/registro', [QuiebreRegistroController::class, 'index'])->name('quiebres.registro.index');
-        Route::get('/quiebres/registro/crear', [QuiebreRegistroController::class, 'create'])->name(
-            'quiebres.registro.create',
-        );
-        Route::post('/quiebres/registro', [QuiebreRegistroController::class, 'store'])->name('quiebres.registro.store');
-        Route::post('/quiebres/registro/cliente', [ClienteIdentidadController::class, 'store'])
-            ->defaults('origen', 'quiebre')
-            ->name('quiebres.registro.cliente.store');
-        Route::get('/quiebres/registro/{quiebre}/editar', [QuiebreRegistroController::class, 'edit'])->name(
-            'quiebres.registro.edit',
-        );
-        Route::put('/quiebres/registro/{quiebre}', [QuiebreRegistroController::class, 'update'])->name(
-            'quiebres.registro.update',
-        );
-    });
-
-    Route::middleware('can:liquidacion.gestionar')->group(function () {
-        Route::get('/liquidaciones', [LiquidacionController::class, 'index'])->name('liquidaciones.index');
-        Route::get('/liquidaciones/{ncMovil}', [LiquidacionController::class, 'edit'])->name('liquidaciones.edit');
-        Route::put('/liquidaciones/{ncMovil}', [LiquidacionController::class, 'update'])->name('liquidaciones.update');
-    });
-
     Route::middleware('can:personal.gestionar')->group(function () {
         Route::get('/configuracion/equipo/personal', [PersonalController::class, 'index'])->name('personal.index');
         Route::get('/configuracion/equipo/{usuario}/personal', [PersonalController::class, 'edit'])->name(
@@ -145,16 +118,4 @@ Route::middleware('auth')->group(function () {
     // Keep the person hub after its named subflows so a static path such as
     // /configuracion/equipo/nuevo is never mistaken for a Usuario binding.
     Route::get('/configuracion/equipo/{usuario}', [EquipoController::class, 'show'])->name('equipo.show');
-
-    Route::middleware('can:quiebre.validar')->group(function () {
-        Route::get('/quiebres/validacion', [QuiebreValidacionController::class, 'index'])->name(
-            'quiebres.validacion.index',
-        );
-        Route::get('/quiebres/validacion/{quiebre}', [QuiebreValidacionController::class, 'edit'])->name(
-            'quiebres.validacion.edit',
-        );
-        Route::put('/quiebres/validacion/{quiebre}', [QuiebreValidacionController::class, 'update'])->name(
-            'quiebres.validacion.update',
-        );
-    });
 });

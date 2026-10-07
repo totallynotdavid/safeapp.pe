@@ -17,6 +17,8 @@ use Illuminate\Support\Collection;
  * @property-read EloquentCollection<int, Dato> $datos
  * @property-read EloquentCollection<int, Llamada> $llamadas
  * @property-read EloquentCollection<int, AccesoCliente> $accesos
+ *
+ * @method static Builder<Cliente> visiblePara(Usuario $usuario)
  */
 class Cliente extends Model
 {
@@ -36,7 +38,10 @@ class Cliente extends Model
         return self::query()->where('ruc', $ruc)->first();
     }
 
-    /** @return Builder<self> */
+    /**
+     * @param  Builder<Cliente>  $query
+     * @return Builder<Cliente>
+     */
     public function scopeVisiblePara(Builder $query, Usuario $usuario): Builder
     {
         return $query->whereHas(
@@ -67,22 +72,24 @@ class Cliente extends Model
     /** @return Collection<int, object{telefono: string, veces: int, ultimo_contacto: string}> */
     public function telefonosConocidos(): Collection
     {
-        return $this
-            ->llamadas()
-            ->selectRaw('telefono, COUNT(*) as veces, MAX(fecha) as ultimo_contacto')
-            ->whereNotNull('telefono')
-            ->where('telefono', '<>', '')
-            ->groupBy('telefono')
-            ->orderByDesc('ultimo_contacto')
-            ->get();
+        return $this->resumenDeTelefonos($this->llamadas());
     }
 
     /** @return Collection<int, object{telefono: string, veces: int, ultimo_contacto: string}> */
     public function telefonosConocidosPara(Usuario $usuario): Collection
     {
-        return $this
-            ->llamadas()
-            ->where('id_usuario', $usuario->id_usuario)
+        return $this->resumenDeTelefonos($this->llamadas()->where('id_usuario', $usuario->id_usuario));
+    }
+
+    /**
+     * @param  HasMany<Llamada, $this>  $llamadas
+     * @return Collection<int, object{telefono: string, veces: int, ultimo_contacto: string}>
+     */
+    private function resumenDeTelefonos(HasMany $llamadas): Collection
+    {
+        /** @var Collection<int, object{telefono: string, veces: int, ultimo_contacto: string}> */
+        return $llamadas
+            ->toBase()
             ->selectRaw('telefono, COUNT(*) as veces, MAX(fecha) as ultimo_contacto')
             ->whereNotNull('telefono')
             ->where('telefono', '<>', '')
@@ -91,16 +98,19 @@ class Cliente extends Model
             ->get();
     }
 
+    /** @return HasMany<Dato, $this> */
     public function datos(): HasMany
     {
         return $this->hasMany(Dato::class, 'id_cliente', 'id_cliente');
     }
 
+    /** @return HasMany<Llamada, $this> */
     public function llamadas(): HasMany
     {
         return $this->hasMany(Llamada::class, 'id_cliente', 'id_cliente');
     }
 
+    /** @return HasMany<AccesoCliente, $this> */
     public function accesos(): HasMany
     {
         return $this->hasMany(AccesoCliente::class, 'id_cliente', 'id_cliente');

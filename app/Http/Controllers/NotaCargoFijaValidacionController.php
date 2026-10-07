@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\NotaCargoFija\UpdateValidacionFijaRequest;
 use App\Models\NcFija;
+use App\Models\Usuario;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -37,17 +39,20 @@ class NotaCargoFijaValidacionController extends Controller
         ]);
     }
 
-    public function update(UpdateValidacionFijaRequest $request, NcFija $ncFija): RedirectResponse
-    {
+    public function update(
+        UpdateValidacionFijaRequest $request,
+        NcFija $ncFija,
+        #[CurrentUser]
+        Usuario $agente,
+    ): RedirectResponse {
         // A case already ruled on is not re-ruled. Legacy loaded and overwrote
         // whatever id the form posted, so a second validador could silently
         // replace the first one's decision.
         abort_unless($ncFija->esEditable(), 403);
 
-        $data = $request->validated();
-        $ncFija->validacion = $data['validacion'];
-        $ncFija->comentario_validador = $data['comentario_validador'];
-        $ncFija->id_validador = $request->user()->id_usuario;
+        $ncFija->validacion = $request->string('validacion')->toString();
+        $ncFija->comentario_validador = $request->string('comentario_validador')->toString();
+        $ncFija->id_validador = $agente->id_usuario;
         $ncFija->fecha_validacion = now()->toDateString();
         $ncFija->save();
 
