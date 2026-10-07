@@ -84,6 +84,6 @@ abstract class CutoverTestCase extends TestCase
 
     protected function transformar(): void
     {
-        $this->artisan('cutover:transform')->assertSuccessful();
+        $this->comando('cutover:transform')->assertSuccessful();
     }
 }

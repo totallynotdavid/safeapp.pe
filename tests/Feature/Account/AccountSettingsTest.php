@@ -69,7 +69,7 @@ class AccountSettingsTest extends TestCase
 
     public function test_password_change_requires_the_current_password_and_does_not_mutate_on_failure(): void
     {
-        $usuario = Usuario::factory()->clave('correcta')->create();
+        $usuario = Usuario::factory()->clave('correcta')->createOne();
         $original = $usuario->clave;
 
         $this
@@ -101,7 +101,7 @@ class AccountSettingsTest extends TestCase
             ->assertRedirect(route('configuracion.seguridad'))
             ->assertSessionHas('status', 'Contraseña actualizada.');
 
-        $this->assertTrue(password_verify('nueva-clave', $usuario->fresh()->clave));
+        $this->assertTrue(password_verify('nueva-clave', (string) $usuario->fresh()?->clave));
         $this->assertDatabaseHas('notificacion_usuario', [
             'id_usuario' => $usuario->id_usuario,
             'categoria' => 'seguridad',
@@ -135,11 +135,11 @@ class AccountSettingsTest extends TestCase
 
     public function test_email_verification_accepts_only_its_owner_and_a_valid_signed_link(): void
     {
-        $usuario = Usuario::factory()->create(['correo' => 'persona@example.test']);
-        $otro = Usuario::factory()->create();
+        $usuario = Usuario::factory()->createOne(['correo' => 'persona@example.test']);
+        $otro = Usuario::factory()->createOne();
         $url = URL::temporarySignedRoute('configuracion.correo.verificar', now()->addMinute(), [
             'usuario' => $usuario,
-            'hash' => sha1($usuario->correo),
+            'hash' => sha1((string) $usuario->correo),
         ]);
 
         $this->actingAs($otro)->get($url)->assertForbidden();

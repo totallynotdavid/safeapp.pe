@@ -27,6 +27,7 @@
         <server name="DB_DATABASE" value=":memory:" force="true"/>
         <server name="DB_URL" value="" force="true"/>
         <env name="APP_ENV" value="testing" force="true"/>
+        <env name="APP_KEY" value="base64:EtH0ufHnSEz0zonSn0GEQp7pcM0rkurEbbkoUXSIwMg="/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>

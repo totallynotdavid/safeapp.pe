@@ -20,10 +20,12 @@ class CampanaTrasladadaTest extends CutoverTestCase
 
         $dato = Dato::query()->with('asignacionActiva')->sole();
         $this->assertSame(Dato::ESTADO_GESTIONADO, $dato->estado);
-        $this->assertSame(42, $dato->asignacionActiva?->id_usuario);
-        $this->assertSame(4, $dato->asignacionActiva?->id_tienda);
-        $this->assertSame('2026-06-01', $dato->asignacionActiva?->fecha_asignacion->toDateString());
-        $this->assertNull($dato->asignacionActiva?->fecha_liberacion);
+        $asignacion = $dato->asignacionActiva;
+        $this->assertNotNull($asignacion);
+        $this->assertSame(42, $asignacion->id_usuario);
+        $this->assertSame(4, $asignacion->id_tienda);
+        $this->assertSame('2026-06-01', $asignacion->fecha_asignacion->toDateString());
+        $this->assertNull($asignacion->fecha_liberacion);
     }
 
     public function test_an_unheld_record_arrives_with_no_hold_at_all(): void
@@ -116,6 +118,7 @@ class CampanaTrasladadaTest extends CutoverTestCase
     {
         return Dato::query()
             ->whereHas('cliente', static fn ($q) => $q->where('ruc', $ruc))
-            ->value('tipo_data');
+            ->first()
+            ?->tipo_data;
     }
 }

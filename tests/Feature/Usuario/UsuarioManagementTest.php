@@ -16,7 +16,7 @@ class UsuarioManagementTest extends TestCase
     private function manager(): Usuario
     {
         $menu = Menu::factory()->create(['permiso' => 'usuarios.manage']);
-        $manager = Usuario::factory()->create();
+        $manager = Usuario::factory()->createOne();
         $manager->menus()->attach($menu);
 
         return $manager;
@@ -57,9 +57,9 @@ class UsuarioManagementTest extends TestCase
     public function test_creating_a_user_copies_the_roles_acceso_template(): void
     {
         $rol = Rol::factory()->create();
-        $granted = Menu::factory()->count(3)->create();
+        $granted = Menu::factory()->count(3)->create()->all();
         DB::table('accesoxrol')->insert(
-            $granted->map(static fn (Menu $m): array => ['id_rol' => $rol->id_rol, 'id_menu' => $m->id_menu])->all(),
+            array_map(static fn (Menu $m): array => ['id_rol' => $rol->id_rol, 'id_menu' => $m->id_menu], $granted),
         );
 
         $response = $this->actingAs($this->manager())->post(route('usuarios.store'), [
@@ -75,7 +75,7 @@ class UsuarioManagementTest extends TestCase
         $this->assertSame('JUAN PEREZ', $creado->personal, 'personal is upper-cased like the legacy insert');
         $this->assertTrue($creado->estado);
         $this->assertEqualsCanonicalizing(
-            $granted->pluck('id_menu')->all(),
+            array_map(static fn (Menu $m): int => $m->id_menu, $granted),
             $creado->menus()->pluck('menu.id_menu')->all(),
         );
     }
@@ -93,6 +93,7 @@ class UsuarioManagementTest extends TestCase
         ]);
 
         $creado = Usuario::query()->where('usuario', 'nuevo')->firstOrFail();
+        $this->assertNotNull($creado->clave);
         $this->assertNotSame('secreto1', $creado->clave);
         $this->assertTrue(password_verify('secreto1', $creado->clave));
     }
@@ -113,7 +114,7 @@ class UsuarioManagementTest extends TestCase
 
     public function test_a_blank_password_on_edit_keeps_the_current_hash(): void
     {
-        $target = Usuario::factory()->clave('original')->create();
+        $target = Usuario::factory()->clave('original')->createOne();
         $hashAntes = $target->clave;
 
         $this->actingAs($this->manager())->put(route('usuarios.update', $target), [
@@ -128,7 +129,7 @@ class UsuarioManagementTest extends TestCase
 
     public function test_a_new_password_on_edit_replaces_the_hash(): void
     {
-        $target = Usuario::factory()->clave('original')->create();
+        $target = Usuario::factory()->clave('original')->createOne();
 
         $this->actingAs($this->manager())->put(route('usuarios.update', $target), [
             'personal' => $target->personal,
@@ -136,6 +137,7 @@ class UsuarioManagementTest extends TestCase
         ]);
 
         $target->refresh();
+        $this->assertNotNull($target->clave);
         $this->assertTrue(password_verify('reemplazo1', $target->clave));
     }
 

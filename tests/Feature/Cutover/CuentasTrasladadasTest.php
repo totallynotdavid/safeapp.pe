@@ -24,6 +24,29 @@ class CuentasTrasladadasTest extends CutoverTestCase
         $this->assertSame('EJECUTIVO COMERCIAL', Usuario::query()->sole()->rol?->nombre_rol);
     }
 
+    public function test_no_legacy_password_hash_arrives(): void
+    {
+        $md5 = md5('secreto');
+        $this->usuarioLegado(1);
+        $this->filaLegado('usuario', [
+            'id_usuario' => 2,
+            'usuario' => 'viejo',
+            'clave' => $md5,
+            'id_rol' => 1,
+            'personal' => 'PERSONA 2',
+            'estado' => 1,
+            'sexo' => 'M',
+            'id_supervisor' => 0,
+            'fecha_nacimiento' => '0000-00-00',
+        ]);
+
+        $this->transformar();
+
+        $this->assertSame(2, Usuario::query()->count());
+        $this->assertSame(0, Usuario::query()->whereNotNull('clave')->count());
+        $this->assertDatabaseMissing('usuario', ['clave' => $md5]);
+    }
+
     public function test_the_role_for_a_retired_module_does_not_arrive(): void
     {
         // BACK OFFICE AVANZADO holds no users and no grants in production. It

@@ -84,6 +84,7 @@ class ClienteRecuperadoTest extends CutoverTestCase
 
         for ($vuelta = 0; $vuelta < 4; $vuelta++) {
             $mangled = mb_convert_encoding($mangled, 'UTF-8', 'ISO-8859-1');
+            $this->assertIsString($mangled);
         }
 
         $this->assertStringContainsString('Ã', $mangled);

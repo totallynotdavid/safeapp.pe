@@ -5,9 +5,19 @@ namespace Tests\Feature\Cutover;
 use App\Models\Cliente;
 use App\Models\Dato;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class TransformCommandTest extends CutoverTestCase
 {
+    /**
+     * migrate:fresh vacuums SQLite, which it cannot do inside the transaction
+     * RefreshDatabase wraps each test in.
+     */
+    private function salirDeLaTransaccion(): void
+    {
+        DB::rollBack();
+    }
+
     /**
      * Rerunnable by refusing, not by merging. A second run over a populated
      * database would double every table, and an upsert path that only ever runs
@@ -20,12 +30,25 @@ class TransformCommandTest extends CutoverTestCase
         $this->transformar();
 
         $this
-            ->artisan('cutover:transform')
-            ->expectsOutputToContain('migrate:fresh')
+            ->comando('cutover:transform')
+            ->expectsOutputToContain('--fresh')
             ->assertFailed();
 
         $this->assertSame(1, Cliente::query()->count());
         $this->assertSame(1, Dato::query()->count());
+    }
+
+    public function test_fresh_rebuilds_the_destination_so_a_rerun_needs_no_other_step(): void
+    {
+        $this->datoLegado();
+        $this->transformar();
+        $this->salirDeLaTransaccion();
+        DB::connection('legacy')->table('datos')->delete();
+        $this->datoLegado(['ruc' => '20999999999', 'razon_social' => 'CLIENTE DOS SAC']);
+
+        $this->comando('cutover:transform', ['--fresh' => true])->assertSuccessful();
+
+        $this->assertSame(['20999999999'], Cliente::query()->pluck('ruc')->all());
     }
 
     /**
@@ -39,9 +62,19 @@ class TransformCommandTest extends CutoverTestCase
         DB::statement('CREATE VIEW reporteusu_excel AS SELECT id_usuario FROM usuario');
 
         $this
-            ->artisan('cutover:transform')
-            ->expectsOutputToContain('--drop-views')
+            ->comando('cutover:transform')
+            ->expectsOutputToContain('--fresh')
             ->assertFailed();
+    }
+
+    public function test_fresh_drops_the_legacy_views_the_destination_still_holds(): void
+    {
+        DB::statement('CREATE VIEW reporteusu_excel AS SELECT id_usuario FROM usuario');
+        $this->salirDeLaTransaccion();
+
+        $this->comando('cutover:transform', ['--fresh' => true])->assertSuccessful();
+
+        $this->assertSame([], Schema::getViews());
     }
 
     public function test_an_empty_export_still_leaves_the_catalogs_the_app_owns(): void
