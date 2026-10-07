@@ -1,4 +1,16 @@
 [tools]
-php = "8.5.10"
 bun = "1.4.2"
 mago = "1.49.0"
+
+# A prebuilt static PHP, so no compiler or -dev libraries are needed. The
+# "common" build carries every extension the app and its tests use.
+[tools."http:php"]
+version = "8.5.8"
+url = "https://dl.static-php.dev/static-php-cli/common/php-{{version}}-cli-linux-x86_64.tar.gz"
+checksum = "sha256:517a18e0f0874de35669fe134eb3c52508e128a6d1da5bf890760cb800ada410"
+
+[tools."http:composer"]
+version = "2.10.3"
+url = "https://getcomposer.org/download/{{version}}/composer.phar"
+checksum = "sha256:7a2d379d5b8ffdaa028580ef26494c36d2feef4b178d3dd1473a4dbc5e17c8d6"
+bin = "composer"
