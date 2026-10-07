@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := help
 
 .PHONY: help setup dev fmt fmt-check lint analyze test \
-	db-up db-down db-dump db-reset db-legacy db-status
+	db-up db-down db-dump db-reset db-legacy db-status cutover
 
 MISE := $(shell command -v mise >/dev/null 2>&1 && echo 'mise exec --')
 DB := ./scripts/db.sh
@@ -11,11 +11,19 @@ help: ## Show this help
 	@grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
 
 # .env has to exist before db-up: scripts/db.sh reads the DB name and
-# credentials from it to create the database and its account.
-setup: ## Install the Laravel app's deps, prepare .env, build a fresh dev DB
+# credentials from it to create the database and its account. A new .env gets a
+# random database password and an application key. An existing one is left
+# alone, so rerunning setup keeps the key and the password the database was
+# created with.
+setup: ## Install the toolchain and deps, create .env, build assets and a fresh dev DB
+	@if command -v mise >/dev/null 2>&1; then mise install; fi
 	$(MISE) composer install
-	@[ -f .env ] || cp .env.example .env
-	$(MISE) php artisan key:generate --ansi
+	$(MISE) bun install --frozen-lockfile
+	$(MISE) bun run build
+	@if [ ! -f .env ]; then \
+		sed "s|^DB_PASSWORD=.*|DB_PASSWORD=$$(openssl rand -hex 16)|" .env.example > .env; \
+		$(MISE) php artisan key:generate --ansi; \
+	fi
 	$(MAKE) db-up
 	$(MISE) php artisan migrate --seed --ansi
 
@@ -51,6 +59,9 @@ db-reset: db-up ## Wipe the dev DB and rebuild it from migrations + seeders
 
 db-legacy: db-up ## Restore a production export into the cutover source DB (FILE=path)
 	$(DB) restore-legacy $(FILE)
+
+cutover: db-legacy ## Run the production cutover: restore FILE=path, rebuild the schema, transform
+	$(MISE) php artisan cutover:transform --fresh --ansi
 
 db-status: ## Show whether the local MariaDB instance is running
 	$(DB) status
