@@ -10,7 +10,7 @@ comment that begins with `=` is never stored as a formula.
 
 `ReporteNotaCargoMovil` and `ReporteNotaCargoFija` declare the columns of each
 producto. `ReporteContacto` serves both call-log reports, Histórico for an
-agent's own contacts and Seguimiento for a supervisor's team. They differ only in
-who is in scope. `RangoFechas` in [`app/Http/`](../app/Http/) parses the date
+agent's own contacts and Seguimiento for a supervisor's team. They differ only
+in who is in scope. `RangoFechas` in [`app/Http/`](../app/Http/) parses the date
 range for those reports and falls back to the last seven days when the input is
 missing, unparseable, or inverted.
