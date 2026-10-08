@@ -50,8 +50,8 @@ because the permiso depends on the bound `Dato`. `GestionController` calls
 [`app/Cutover/`](../app/Cutover/) and the `cutover:transform` command in
 [`app/Console/Commands/`](../app/Console/Commands/) move a pre-rewrite export
 into this schema. Each `Traslado` class handles one module, because the steps
-are not one to one. The legacy `datos` table becomes two tables, for example. The
-[cutover runbook](cutover.md) describes how to run it.
+are not one to one. The legacy `datos` table becomes two tables, for example.
+The [cutover runbook](cutover.md) describes how to run it.
 
 ## Detail by concern
 
@@ -65,5 +65,3 @@ are not one to one. The legacy `datos` table becomes two tables, for example. Th
   windowing of its queues.
 - [Reports](reports.md): the spreadsheet exports.
 - [Schema](schema.md): the tables and the models behind them.
-- [Development](development.md): the checks CI runs and how the tests are laid
-  out.
