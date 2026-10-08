@@ -4,6 +4,7 @@ namespace Tests\Feature\Cutover;
 
 use App\Models\Cliente;
 use App\Models\Dato;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -75,6 +76,100 @@ class TransformCommandTest extends CutoverTestCase
         $this->comando('cutover:transform', ['--fresh' => true])->assertSuccessful();
 
         $this->assertSame([], Schema::getViews());
+    }
+
+    /**
+     * What production runs: no destructive command, so the guard in
+     * AppServiceProvider can stay on. Switched on here because it is decided at
+     * boot, before the test can set the environment.
+     */
+    private function enProduccion(): void
+    {
+        $this->app['env'] = 'production';
+        DB::prohibitDestructiveCommands();
+        $this->beforeApplicationDestroyed(static fn () => DB::prohibitDestructiveCommands(false));
+    }
+
+    public function test_production_transforms_a_migrated_empty_database_without_a_destructive_command(): void
+    {
+        $this->enProduccion();
+        $this->datoLegado();
+
+        $this->comando('cutover:transform')->assertSuccessful();
+
+        $this->assertSame(['20123456789'], Cliente::query()->pluck('ruc')->all());
+    }
+
+    public function test_production_run_twice_keeps_one_copy_and_says_it_changed_nothing(): void
+    {
+        $this->enProduccion();
+        $this->datoLegado();
+        $this->comando('cutover:transform')->assertSuccessful();
+
+        $this
+            ->comando('cutover:transform')
+            ->expectsOutputToContain('nothing was changed')
+            ->doesntExpectOutputToContain('--fresh to rebuild')
+            ->assertFailed();
+
+        $this->assertSame(1, Cliente::query()->count());
+        $this->assertDatabaseCount('menu', 27);
+    }
+
+    public function test_production_refuses_fresh_before_touching_anything(): void
+    {
+        $this->enProduccion();
+        $this->datoLegado();
+        $this->transformar();
+
+        $this
+            ->comando('cutover:transform', ['--fresh' => true])
+            ->expectsOutputToContain('Production is never rebuilt')
+            ->assertFailed();
+
+        $this->assertSame(1, Cliente::query()->count());
+    }
+
+    public function test_production_never_suggests_a_destructive_step_for_leftover_views(): void
+    {
+        $this->enProduccion();
+        DB::statement('CREATE VIEW reporteusu_excel AS SELECT id_usuario FROM usuario');
+
+        $this
+            ->comando('cutover:transform')
+            ->expectsOutputToContain('Production never drops them')
+            ->doesntExpectOutputToContain('--fresh')
+            ->assertFailed();
+    }
+
+    public function test_it_refuses_a_schema_with_pending_migrations(): void
+    {
+        DB::table('migrations')->orderByDesc('id')->limit(1)->delete();
+
+        $this
+            ->comando('cutover:transform')
+            ->expectsOutputToContain('migrate --force')
+            ->assertFailed();
+
+        $this->assertDatabaseCount('menu', 0);
+    }
+
+    public function test_a_failed_transfer_leaves_the_destination_empty_so_it_can_be_run_again(): void
+    {
+        $this->datoLegado();
+        Schema::connection('legacy')->drop('quiebre');
+
+        // The last step reads quiebre, after every other table was written.
+        $fallo = null;
+        try {
+            $this->comando('cutover:transform')->run();
+        } catch (QueryException $e) {
+            $fallo = $e;
+        }
+
+        $this->assertInstanceOf(QueryException::class, $fallo);
+        $this->assertDatabaseCount('cliente', 0);
+        $this->assertDatabaseCount('menu', 0);
     }
 
     public function test_an_empty_export_still_leaves_the_catalogs_the_app_owns(): void
