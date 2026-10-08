@@ -21,20 +21,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # ext-zip is named explicitly because every spreadsheet export fails at
-      # runtime without it. The versions here duplicate mise.toml. Nothing
-      # checks that the two agree.
-      - name: Install PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.5.10"
-          extensions: zip
-          coverage: none
-
-      - name: Install Mago
-        uses: nhedger/setup-mago@v2
-        with:
-          version: "1.49.0"
+      # mise.toml is the only place a tool version is written. The same
+      # prebuilt PHP, Composer, Mago and Bun that `make setup` installs run
+      # here, and tests/Unit/ToolchainPinsTest.php rejects a workflow that pins
+      # a version of its own.
+      - uses: jdx/mise-action@v5
 
       - uses: actions/cache@v6
         with:
@@ -65,9 +56,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: "1.4.2"
+      - uses: jdx/mise-action@v5
 
       # --frozen-lockfile is bun's npm ci: it fails rather than resolving when
       # bun.lock and package.json disagree.
