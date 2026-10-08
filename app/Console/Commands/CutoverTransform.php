@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Cutover\Destino;
 use App\Cutover\MapaDeClientes;
 use App\Cutover\Traslado;
 use App\Cutover\TrasladoDeAverias;
@@ -16,54 +17,44 @@ use App\Support\BackfillDeAccesosClientes;
 use Database\Seeders\MenuSeeder;
 use Database\Seeders\RespuestaSeeder;
 use Illuminate\Console\Command;
+use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 /**
  * Only transfers data; the migrations own the destination schema.
- *
- * The destination must be empty. `--fresh` rebuilds it first with
- * `migrate:fresh --drop-views`, which is what a rerun needs.
+ * The destination must be migrated and empty. The transfer is one transaction,
+ * so a run leaves it empty or full and a rerun refuses. Production never drops
+ * anything, so `--fresh` is for rehearsals outside it.
  */
 class CutoverTransform extends Command
 {
     protected $signature = 'cutover:transform
-        {--fresh : Drop every table and view in the destination and migrate it again first}';
+        {--fresh : Drop every table and view in the destination and migrate it again first (never in production)}';
 
     protected $description = 'Load a restored legacy export into the current schema';
-
-    private const TABLAS_DESTINO = [
-        'cliente',
-        'cliente_acceso',
-        'datos',
-        'asignacion_datos',
-        'llamada',
-        'nc_fija',
-        'nc_movil',
-        'quiebre',
-        'rol',
-        'usuario',
-        'acceso',
-        'accesoxrol',
-        'tienda',
-        'asignacion_tienda',
-        'supervisor',
-        'cartera',
-        'producto',
-        'menu',
-        'respuesta',
-    ];
 
     public function handle(): int
     {
         if ($this->option('fresh')) {
-            // Production refuses this (AppServiceProvider), which is the point.
+            if ($this->laravel->environment('production')) {
+                $this->components->error(
+                    'Production is never rebuilt, so --fresh is refused and nothing was changed. '
+                    .'Point DB_DATABASE at an empty database, run `php artisan migrate --force`, '
+                    .'then run this command without --fresh.',
+                );
+
+                return self::FAILURE;
+            }
+
             if ($this->call('migrate:fresh', ['--drop-views' => true]) !== self::SUCCESS) {
                 return self::FAILURE;
             }
         }
 
-        if (! $this->destinoVacio() || ! $this->destinoSinVistas()) {
+        $rechazo = $this->destino()->rechazo();
+        if ($rechazo !== null) {
+            $this->components->error($rechazo);
+
             return self::FAILURE;
         }
 
@@ -78,24 +69,10 @@ class CutoverTransform extends Command
             'Destino: '.DB::connection()->getDatabaseName(),
         );
 
-        // These seeders preserve the legacy identifiers used by copied rows.
-        $this->call('db:seed', [
-            '--class' => MenuSeeder::class,
-            '--no-interaction' => true,
-        ]);
-        $this->call('db:seed', [
-            '--class' => RespuestaSeeder::class,
-            '--no-interaction' => true,
-        ]);
-
-        $clientes = new MapaDeClientes;
-        $resumen = $clientes->construir();
-
-        foreach ($this->pasos($clientes) as $paso) {
-            $resumen = [...$resumen, ...$paso->ejecutar()];
-        }
-
-        BackfillDeAccesosClientes::ejecutar();
+        $resumen = [];
+        DB::transaction(function () use (&$resumen): void {
+            $resumen = $this->trasladar();
+        });
 
         $this->newLine();
         $this->table(
@@ -117,6 +94,32 @@ class CutoverTransform extends Command
         return self::SUCCESS;
     }
 
+    /** @return array<string, int> */
+    private function trasladar(): array
+    {
+        // These seeders preserve the legacy identifiers used by copied rows.
+        // Production db:seed asks for confirmation unless --force is present.
+        $this->call('db:seed', [
+            '--class' => MenuSeeder::class,
+            '--force' => true,
+        ]);
+        $this->call('db:seed', [
+            '--class' => RespuestaSeeder::class,
+            '--force' => true,
+        ]);
+
+        $clientes = new MapaDeClientes;
+        $resumen = $clientes->construir();
+
+        foreach ($this->pasos($clientes) as $paso) {
+            $resumen = [...$resumen, ...$paso->ejecutar()];
+        }
+
+        BackfillDeAccesosClientes::ejecutar();
+
+        return $resumen;
+    }
+
     /** @return list<Traslado> */
     private function pasos(MapaDeClientes $clientes): array
     {
@@ -134,48 +137,12 @@ class CutoverTransform extends Command
         ];
     }
 
-    private function destinoVacio(): bool
+    private function destino(): Destino
     {
-        foreach (self::TABLAS_DESTINO as $tabla) {
-            if (! DB::table($tabla)->exists()) {
-                continue;
-            }
-
-            $this->components->error(
-                "`{$tabla}` already has rows. Run again with --fresh to rebuild the destination first.",
-            );
-
-            return false;
-        }
-
-        return true;
-    }
-
-    private function destinoSinVistas(): bool
-    {
-        $esquema = Schema::getCurrentSchemaName();
-
-        $vistas = [];
-        foreach (DB::connection()->getSchemaBuilder()->getViews() as $vista) {
-            if ($vista['schema'] !== $esquema) {
-                continue;
-            }
-
-            $vistas[] = $vista['name'];
-        }
-
-        if ($vistas === []) {
-            return true;
-        }
-
-        // Legacy views reference columns removed by the current schema and can
-        // make the entire database dump fail.
-        $this->components->error(
-            'Views left over from the legacy schema: '
-            .implode(', ', $vistas)
-            .'. Run again with --fresh, which removes them.',
+        return new Destino(
+            $this->laravel->make(Migrator::class),
+            $this->laravel->databasePath('migrations'),
+            app()->isProduction(),
         );
-
-        return false;
     }
 }

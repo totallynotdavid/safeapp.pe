@@ -60,7 +60,7 @@ db-reset: db-up ## Wipe the dev DB and rebuild it from migrations + seeders
 db-legacy: db-up ## Restore a production export into the cutover source DB (FILE=path)
 	$(DB) restore-legacy $(FILE)
 
-cutover: db-legacy ## Run the production cutover: restore FILE=path, rebuild the schema, transform
+cutover: db-legacy ## Rehearse the cutover on the dev DB: restore FILE=path, rebuild the schema, transform
 	$(MISE) php artisan cutover:transform --fresh --ansi
 
 db-status: ## Show whether the local MariaDB instance is running
