@@ -1,19 +1,19 @@
 # Access control
 
-Access control has four parts.
+Access control has five parts.
 
 **Permisos.** A user's grants are the `menu` rows linked to them through the
 `acceso` table. `Usuario::hasPermiso` checks a `menu.permiso` string. The
-`Gate::before` hook in `AppServiceProvider` grants an ability when the user holds
-that permiso and otherwise returns `null`, so a model policy can still decide.
-Creating a user copies the role's grants from `accesoxrol` into `acceso`. The
-user's grants can diverge from the role afterward.
+`Gate::before` hook in `AppServiceProvider` grants an ability when the user
+holds that permiso and otherwise returns `null`, so a model policy can still
+decide. Creating a user copies the role's grants from `accesoxrol` into
+`acceso`. The user's grants can diverge from the role afterward.
 
 **Sidebar.** [`Navigation\Sidebar`](../app/Navigation/Sidebar.php) owns the
-structure and presentation of the navigation. It shows an item only when the user
-holds its permiso. The menu tables store grants and nothing else. After login,
-`Sidebar::startUrlForUser` sends the user to the first screen they may see, or to
-Configuración when they have no operational access.
+structure and presentation of the navigation. It shows an item only when the
+user holds its permiso. The menu tables store grants and nothing else. After
+login, `Sidebar::startUrlForUser` sends the user to the first screen they may
+see, or to Configuración when they have no operational access.
 
 **Policies.** A route permiso admits a user to a screen. The classes in
 [`app/Policies/`](../app/Policies/) decide whether that user may touch a
@@ -37,6 +37,10 @@ and resolves a RUC for a user. A RUC that exists but is not visible to the user
 raises `ClienteNoDisponible`, whose message does not say why. That keeps one
 executive's history from leaking to another.
 
-Passwords go through `LegacyPasswordHasher`. `usuario.clave` holds both unsalted
-MD5 from the earlier system and `password_hash` output. A successful MD5 match
-upgrades the stored value in place.
+**Passwords.** The `Usuario` model hashes `usuario.clave` through the `hashed`
+cast, and the login uses the framework's `Auth::attempt`. A `null` `clave` means
+the account has no password and never matches. The cutover leaves every migrated
+account that way. An operator with the `usuarios.manage` permiso sets a password
+on the Usuarios screen, or anyone with shell access runs
+`php artisan usuario:restablecer-clave <usuario>`, which prints a new random
+password once.
