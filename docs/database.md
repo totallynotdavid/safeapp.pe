@@ -23,7 +23,11 @@ make db-reset
 test suite uses an in-memory SQLite database and does not use the local MariaDB
 data.
 
+`make db-dump` writes a snapshot of the development database to `dev-dump.sql`.
+Pass `FILE=path` to choose another file.
+
 [Installation](installation.md) runs `make setup`, which starts the server and
-builds the development database the first time. [Production data
-cutover](cutover.md) uses `make db-legacy` to restore a production export into a
-separate database.
+builds the development database the first time.
+[Production data cutover](cutover.md) uses `make db-legacy` to restore a
+production export into a separate local database, and `make cutover` to rehearse
+the import. Both are for development only.
