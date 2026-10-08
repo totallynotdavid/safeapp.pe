@@ -36,7 +36,7 @@ final class PlantillaDeImportacion
         return response()->streamDownload(
             static function (): void {
                 $writer = new Writer;
-                $bold = (new Style)->withFontBold(true);
+                $bold = new Style()->withFontBold(true);
 
                 $writer->openToFile('php://output');
                 $writer->addRow(

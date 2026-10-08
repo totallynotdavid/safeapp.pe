@@ -95,7 +95,7 @@ class ProduccionController extends Controller
             $filas[] = ['personal' => $nombres[$id] ?? '', 'totales' => new Collection($porEstado)];
         }
 
-        return (new Collection($filas))
+        return new Collection($filas)
             ->sortBy('personal')
             ->values();
     }

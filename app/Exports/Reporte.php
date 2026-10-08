@@ -28,7 +28,7 @@ final class Reporte
 
     private function __construct()
     {
-        $this->fecha = (new Style)->withFormat('dd/mm/yyyy');
+        $this->fecha = new Style()->withFormat('dd/mm/yyyy');
     }
 
     /**
@@ -71,7 +71,7 @@ final class Reporte
         // OpenSpout 5 dropped the row-level default style, so the header's bold
         // is carried by its cells. StringCell for the same reason celda() uses
         // it: a title is text, never a formula.
-        $negrita = (new Style)->withFontBold(true);
+        $negrita = new Style()->withFontBold(true);
         $writer->addRow(new Row(array_map(
             static fn (string $titulo): Cell => new StringCell($titulo, $negrita),
             $encabezados,

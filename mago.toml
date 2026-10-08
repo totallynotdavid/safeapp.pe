@@ -1,6 +1,6 @@
-#:schema https://mago.carthage.software/1.43.0/schema.json
+#:schema https://mago.carthage.software/1.49.0/schema.json
 
-php-version = "8.2"
+php-version = "8.4"
 
 [source]
 paths = ["app", "config", "database", "routes", "tests"]
