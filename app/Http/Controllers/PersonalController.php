@@ -10,17 +10,6 @@ use Illuminate\Support\Str;
 
 class PersonalController extends Controller
 {
-    public function index(): View
-    {
-        $usuarios = Usuario::query()
-            ->where('estado', 1)
-            ->with(['rol', 'supervisor'])
-            ->orderBy('personal')
-            ->get();
-
-        return view('personal.index', ['usuarios' => $usuarios]);
-    }
-
     public function edit(Usuario $usuario): View
     {
         return view('personal.edit', ['usuario' => $usuario]);

@@ -10,17 +10,6 @@ use Illuminate\Http\RedirectResponse;
 
 class AsignacionController extends Controller
 {
-    public function index(): View
-    {
-        $usuarios = Usuario::query()
-            ->where('estado', 1)
-            ->with('asignacionActiva.tienda')
-            ->orderBy('personal')
-            ->get();
-
-        return view('asignacion.index', ['usuarios' => $usuarios]);
-    }
-
     public function edit(Usuario $usuario): View
     {
         return view('asignacion.edit', [

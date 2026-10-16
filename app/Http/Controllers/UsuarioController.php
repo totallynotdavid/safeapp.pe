@@ -14,16 +14,6 @@ use Illuminate\Support\Str;
 
 class UsuarioController extends Controller
 {
-    public function index(): View
-    {
-        $usuarios = Usuario::query()
-            ->with('rol')
-            ->orderBy('usuario')
-            ->get();
-
-        return view('usuarios.index', ['usuarios' => $usuarios]);
-    }
-
     public function create(): View
     {
         $roles = Rol::query()
@@ -88,7 +78,7 @@ class UsuarioController extends Controller
             ->with('status', 'Usuario actualizado.');
     }
 
-    // Users are disabled instead of deleted because legacy tables reference id_usuario.
+    // Users are disabled instead of deleted because other tables reference id_usuario.
     public function toggleEstado(Usuario $usuario): RedirectResponse
     {
         Gate::authorize('disable', $usuario);

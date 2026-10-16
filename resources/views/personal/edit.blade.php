@@ -57,7 +57,7 @@
 
                                         <div class="stack" data-direction="horizontal" data-gap="2" data-h-align="start" data-v-align="center">
                                             <x-ui.button type="submit" variant="primary">Guardar</x-ui.button>
-                                            <x-ui.button href="{{ route('personal.index') }}" variant="secondary">Cancelar</x-ui.button>
+                                            <x-ui.button href="{{ route('equipo.show', $usuario) }}" variant="secondary">Cancelar</x-ui.button>
                                         </div>
                                     </x-ui.form-layout>
                                 </form>

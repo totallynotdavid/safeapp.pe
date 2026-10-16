@@ -53,7 +53,6 @@ Route::middleware('auth')->group(function () {
     Route::put('/tienda-activa', [TiendaActivaController::class, 'update'])->name('tienda-activa.update');
 
     Route::middleware('can:usuarios.manage')->group(function () {
-        Route::get('/configuracion/equipo/usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
         Route::get('/configuracion/equipo/nuevo', [UsuarioController::class, 'create'])->name('usuarios.create');
         Route::post('/configuracion/equipo', [UsuarioController::class, 'store'])->name('usuarios.store');
         Route::get('/configuracion/equipo/{usuario}/cuenta', [UsuarioController::class, 'edit'])->name('usuarios.edit');
@@ -75,7 +74,6 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::middleware('can:personal.gestionar')->group(function () {
-        Route::get('/configuracion/equipo/personal', [PersonalController::class, 'index'])->name('personal.index');
         Route::get('/configuracion/equipo/{usuario}/personal', [PersonalController::class, 'edit'])->name(
             'personal.edit',
         );
@@ -85,7 +83,6 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::middleware('can:asignacion.gestionar')->group(function () {
-        Route::get('/configuracion/equipo/tiendas', [AsignacionController::class, 'index'])->name('asignacion.index');
         Route::get('/configuracion/equipo/{usuario}/tiendas', [AsignacionController::class, 'edit'])->name(
             'asignacion.edit',
         );

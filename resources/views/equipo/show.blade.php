@@ -9,7 +9,18 @@
                 <x-ui.stack direction="vertical" gap="4">
                     <x-ui.stack direction="horizontal" h-align="between" v-align="center">
                         <x-ui.heading level="2">Cuenta</x-ui.heading>
-                        <x-ui.button href="{{ route('usuarios.edit', $usuario) }}" variant="secondary" size="sm">Editar cuenta</x-ui.button>
+                        <x-ui.stack direction="horizontal" gap="2" v-align="center">
+                            <x-ui.button href="{{ route('usuarios.edit', $usuario) }}" variant="secondary" size="sm">Editar cuenta</x-ui.button>
+                            @can('disable', $usuario)
+                                <form method="POST" action="{{ route('usuarios.estado', $usuario) }}">
+                                    @csrf
+                                    @method('PATCH')
+                                    <x-ui.button type="submit" :variant="$usuario->estado ? 'destructive' : 'secondary'" size="sm">
+                                        {{ $usuario->estado ? 'Inhabilitar' : 'Habilitar' }}
+                                    </x-ui.button>
+                                </form>
+                            @endcan
+                        </x-ui.stack>
                     </x-ui.stack>
                     <x-ui.metadata-list columns="multi">
                         <x-ui.metadata-list-item label="Usuario" :value="$usuario->usuario" />

@@ -96,7 +96,7 @@
                     </x-ui.button>
 
                     <x-ui.button
-                        href="{{ route('asignacion.index') }}"
+                        href="{{ route('equipo.show', $usuario) }}"
                         variant="secondary"
                     >
                         Cancelar
