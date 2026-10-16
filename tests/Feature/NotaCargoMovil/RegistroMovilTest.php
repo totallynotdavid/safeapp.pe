@@ -3,6 +3,7 @@
 namespace Tests\Feature\NotaCargoMovil;
 
 use App\Cockpit\AccesoAClientes;
+use App\Models\Cliente;
 use App\Models\NcMovil;
 use App\Models\Usuario;
 
@@ -69,8 +70,6 @@ class RegistroMovilTest extends NotaCargoMovilTestCase
             $this->payload($cliente) + ['razon_social' => 'NOMBRE FALSO', 'ruc' => '20000000000'],
         );
 
-        // Legacy copied both onto the row and let the form edit them. The columns
-        // are gone, so the case can only ever show the client's own name.
         $atributos = NcMovil::query()->sole()->getAttributes();
         $this->assertArrayNotHasKey('razon_social', $atributos);
         $this->assertArrayNotHasKey('ruc', $atributos);
@@ -86,12 +85,24 @@ class RegistroMovilTest extends NotaCargoMovilTestCase
             ->assertSessionHasErrors('id_cliente');
     }
 
+    public function test_a_case_cannot_be_filed_against_a_client_held_by_another_executive(): void
+    {
+        $ejecutivo = $this->usuarioCon(self::PERMISO);
+        $cliente = Cliente::factory()->create();
+        AccesoAClientes::otorgar($cliente, Usuario::factory()->create());
+
+        $this
+            ->actingAs($ejecutivo)
+            ->post(route('notas-cargo.movil.store'), $this->payload($cliente))
+            ->assertSessionHasErrors('id_cliente');
+
+        $this->assertDatabaseCount('nc_movil', 0);
+    }
+
     public function test_the_probability_scale_does_not_offer_an_estado(): void
     {
-        // Legacy's "probabilidad de cierre" dropdown offered CAIDA alongside the
-        // four percentages. CAIDA is a lifecycle estado owned by the back office,
-        // no row carries it in that column, and accepting it here would let
-        // registro write a state it does not own.
+        // CAIDA is a lifecycle estado owned by the back office, so registro
+        // must not accept it.
         $cliente = $this->cliente();
 
         $this
@@ -102,8 +113,6 @@ class RegistroMovilTest extends NotaCargoMovilTestCase
 
     public function test_the_second_phone_is_optional(): void
     {
-        // Legacy required it on a form with no second number to give, so agents
-        // typed "0": it is set in 175 of 2,006 rows and mostly holds placeholders.
         $cliente = $this->cliente();
         $ejecutivo = $this->usuarioCon(self::PERMISO);
         AccesoAClientes::otorgar($cliente, $ejecutivo);

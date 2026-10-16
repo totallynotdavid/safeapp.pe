@@ -7,34 +7,32 @@ use App\Models\NcFija;
 class TecnologiaNormalizadaTest extends CutoverTestCase
 {
     /**
-     * Three technologies were spelled 28 ways because legacy made this a
-     * free-text input. The screen offers a select now, so a value it does not
-     * offer would be unreachable from the form that has to edit it.
+     * The screen offers a select of three technologies, so a value outside them
+     * would be unreachable from the form that has to edit it. Spellings of one
+     * collapse onto it. Anything else is left unset.
      */
     public function test_the_technology_spellings_collapse_onto_the_three_that_exist(): void
     {
-        foreach (['FFTH', 'FIBRA OPTICA', 'FTTTHH', 'HCF', 'GPON'] as $indice => $escrito) {
+        $esperadas = [
+            'FFTH' => 'FTTH',
+            'FIBRA OPTICA' => 'FTTH',
+            'FTTTHH' => 'FTTH',
+            'HCF' => 'HFC',
+            'GPON' => 'GPON',
+            '-12.071959726349125, -77.07335301123503' => null,
+            'HFC/GPON' => null,
+        ];
+
+        foreach (array_keys($esperadas) as $indice => $escrito) {
             $this->casoFijaLegado($indice + 1, $escrito);
         }
 
         $this->transformar();
 
         $this->assertSame(
-            ['FTTH', 'FTTH', 'FTTH', 'HFC', 'GPON'],
+            array_values($esperadas),
             NcFija::query()->orderBy('id_cargo')->pluck('tecnologia')->all(),
         );
-    }
-
-    public function test_a_technology_field_holding_something_else_is_left_unset(): void
-    {
-        // Three rows hold GPS coordinates, pasted into the wrong field, and one
-        // names two technologies at once.
-        $this->casoFijaLegado(1, '-12.071959726349125, -77.07335301123503');
-        $this->casoFijaLegado(2, 'HFC/GPON');
-
-        $this->transformar();
-
-        $this->assertSame([null, null], NcFija::query()->orderBy('id_cargo')->pluck('tecnologia')->all());
     }
 
     private function casoFijaLegado(int $id, string $tecnologia): void

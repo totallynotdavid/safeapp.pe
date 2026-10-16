@@ -30,8 +30,7 @@ class ProduccionTest extends TestCase
 
     public function test_it_offers_a_column_for_every_estado_each_producto_actually_uses(): void
     {
-        // Legacy's fija table listed the avanzado vocabulary, so COMPLETADO and
-        // CANCELADO, 4,780 of the 5,970 production rows, had nowhere to appear.
+        // The fija table lists the fija estados, COMPLETADO and CANCELADO included.
         $respuesta = $this
             ->actingAs($this->usuarioCon(self::PERMISO))
             ->get(route('produccion.index'))
@@ -44,8 +43,7 @@ class ProduccionTest extends TestCase
 
     public function test_a_completed_fija_case_is_counted_for_its_ejecutivo(): void
     {
-        // The case legacy could not show at all: it summed fija on
-        // estado='LIQUIDADO', which nc_fija has never contained.
+        // Fija totals sum on the estados nc_fija has, not on LIQUIDADO.
         $ejecutivo = Usuario::factory()->create(['personal' => 'ROSA QUISPE']);
         NcFija::factory()
             ->liquidadaEsteMes()

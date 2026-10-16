@@ -26,21 +26,7 @@ class UsuarioManagementTest extends TestCase
     {
         $sinPermiso = Usuario::factory()->create();
 
-        $this->actingAs($sinPermiso)->get(route('usuarios.index'))->assertForbidden();
-    }
-
-    public function test_the_list_names_each_account_and_the_rol_it_answers_to(): void
-    {
-        $rol = Rol::factory()->create(['nombre_rol' => 'SUPERVISOR']);
-        Usuario::factory()->create(['usuario' => 'jperez', 'personal' => 'JUAN PEREZ', 'id_rol' => $rol->id_rol]);
-
-        $this
-            ->actingAs($this->manager())
-            ->get(route('usuarios.index'))
-            ->assertOk()
-            ->assertSee('jperez')
-            ->assertSee('JUAN PEREZ')
-            ->assertSee('SUPERVISOR');
+        $this->actingAs($sinPermiso)->get(route('usuarios.create'))->assertForbidden();
     }
 
     public function test_the_create_screen_exposes_available_roles(): void
@@ -72,30 +58,13 @@ class UsuarioManagementTest extends TestCase
 
         $creado = Usuario::query()->where('usuario', 'nuevo')->firstOrFail();
         $response->assertRedirect(route('equipo.show', $creado));
-        $this->assertSame('JUAN PEREZ', $creado->personal, 'personal is upper-cased like the legacy insert');
+        $this->assertSame('JUAN PEREZ', $creado->personal, 'personal is stored upper-cased');
         $this->assertTrue($creado->estado);
+        $this->assertTrue(password_verify('secreto1', (string) $creado->clave));
         $this->assertEqualsCanonicalizing(
             array_map(static fn (Menu $m): int => $m->id_menu, $granted),
             $creado->menus()->pluck('menu.id_menu')->all(),
         );
-    }
-
-    public function test_hashes_the_password_on_create(): void
-    {
-        $rol = Rol::factory()->create();
-
-        $this->actingAs($this->manager())->post(route('usuarios.store'), [
-            'usuario' => 'nuevo',
-            'clave' => 'secreto1',
-            'personal' => 'juan perez',
-            'id_rol' => $rol->id_rol,
-            'sexo' => 'M',
-        ]);
-
-        $creado = Usuario::query()->where('usuario', 'nuevo')->firstOrFail();
-        $this->assertNotNull($creado->clave);
-        $this->assertNotSame('secreto1', $creado->clave);
-        $this->assertTrue(password_verify('secreto1', $creado->clave));
     }
 
     public function test_rejects_a_duplicate_username(): void

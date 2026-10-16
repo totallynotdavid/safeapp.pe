@@ -7,14 +7,10 @@ use App\Models\Tienda;
 
 class GestionColaTest extends GestionTestCase
 {
-    public function test_the_movil_permiso_gates_the_queue(): void
-    {
-        $this->actingAs($this->agente())->get(route('gestion.movil'))->assertForbidden();
-        $this->actingAs($this->agente('gestion.movil'))->get(route('gestion.movil'))->assertOk();
-    }
-
     public function test_each_data_segment_is_gated_by_its_own_permiso(): void
     {
+        $this->actingAs($this->agente())->get(route('gestion.movil'))->assertForbidden();
+
         $soloMovil = $this->agente('gestion.movil');
 
         $this->actingAs($soloMovil)->get(route('gestion.movil'))->assertOk();

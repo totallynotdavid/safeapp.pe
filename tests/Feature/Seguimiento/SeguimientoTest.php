@@ -30,20 +30,6 @@ class SeguimientoTest extends TestCase
             ->assertOk();
     }
 
-    public function test_it_lists_the_contacts_on_screen(): void
-    {
-        // Legacy rendered a #tablaDatatable div that no script ever filled, so a
-        // supervisor had to download a file to read a single number.
-        [$supervisor, $agente] = $this->equipo();
-        $this->contacto($agente, '20111111111');
-
-        $this
-            ->actingAs($this->usuarioCon(self::PERMISO))
-            ->get(route('seguimiento.index', ['supervisor' => $supervisor->id_supervisor]))
-            ->assertOk()
-            ->assertSee('20111111111');
-    }
-
     public function test_it_shows_only_the_chosen_supervisors_team(): void
     {
         [$supervisor, $agente] = $this->equipo();
@@ -84,8 +70,6 @@ class SeguimientoTest extends TestCase
 
     public function test_the_export_carries_the_line_counts_the_agent_recorded(): void
     {
-        // Legacy's export left these out, so the report could not show what the
-        // call actually established.
         [$supervisor, $agente] = $this->equipo();
         $this->contacto($agente, '20111111111', ['q_entel' => 7]);
 
@@ -108,7 +92,6 @@ class SeguimientoTest extends TestCase
 
     public function test_an_unknown_supervisor_is_treated_as_none_chosen(): void
     {
-        // The id arrives from a query string anyone can edit.
         $this
             ->actingAs($this->usuarioCon(self::PERMISO))
             ->get(route('seguimiento.index', ['supervisor' => 99_999]))

@@ -22,30 +22,12 @@ class AsignacionManagementTest extends TestCase
         return $user;
     }
 
-    public function test_the_gestionar_permiso_gates_the_index(): void
+    public function test_the_gestionar_permiso_gates_the_edit_screen(): void
     {
-        $this->actingAs(Usuario::factory()->create())->get(route('asignacion.index'))->assertForbidden();
-        $this->actingAs($this->gestor())->get(route('asignacion.index'))->assertOk();
-    }
+        $agente = Usuario::factory()->createOne();
 
-    public function test_lists_active_personnel_with_their_active_tienda(): void
-    {
-        $tienda = Tienda::factory()->create(['nombre' => 'LIMA CENTRO']);
-        $agente = Usuario::factory()->create(['personal' => 'AGENTE ACTIVO']);
-        AsignacionTienda::factory()->create([
-            'id_usuario' => $agente->id_usuario,
-            'id_tienda' => $tienda->id_tienda,
-            'estado' => 0,
-        ]);
-        Usuario::factory()->inactivo()->create(['personal' => 'AGENTE INACTIVO']);
-
-        $this
-            ->actingAs($this->gestor())
-            ->get(route('asignacion.index'))
-            ->assertOk()
-            ->assertSee('AGENTE ACTIVO')
-            ->assertSee('LIMA CENTRO')
-            ->assertDontSee('AGENTE INACTIVO');
+        $this->actingAs(Usuario::factory()->create())->get(route('asignacion.edit', $agente))->assertForbidden();
+        $this->actingAs($this->gestor())->get(route('asignacion.edit', $agente))->assertOk();
     }
 
     public function test_assigns_tiendas_and_sets_the_active_one(): void

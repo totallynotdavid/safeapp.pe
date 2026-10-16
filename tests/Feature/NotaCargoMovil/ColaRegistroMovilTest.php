@@ -26,8 +26,7 @@ class ColaRegistroMovilTest extends NotaCargoMovilTestCase
 
     public function test_a_rejected_case_leaves_the_queue(): void
     {
-        // The ejecutivo cannot act on it, and legacy excluded RECHAZADO from
-        // every branch of the list.
+        // The ejecutivo cannot act on a rejected case, so no branch lists it.
         $ejecutivo = $this->usuarioCon(self::PERMISO);
 
         NcMovil::factory()->registrada()->deRuc('20111111111')->create(['id_usuario' => $ejecutivo->id_usuario]);
@@ -73,7 +72,7 @@ class ColaRegistroMovilTest extends NotaCargoMovilTestCase
 
     public function test_another_ejecutivo_cannot_open_a_case(): void
     {
-        // Legacy scoped only the list; the detail endpoint trusted the posted id.
+        // The detail endpoint is scoped like the list, not trusted on the id.
         $cargo = $this->casoPendiente($this->usuarioCon(self::PERMISO));
 
         $this
@@ -105,8 +104,7 @@ class ColaRegistroMovilTest extends NotaCargoMovilTestCase
 
     public function test_a_validated_case_is_frozen(): void
     {
-        // The validador ruled on these figures. Legacy showed the form anyway and
-        // enforced this in JavaScript, so a posted form still went through.
+        // The validador ruled on these figures, so a posted form is refused too.
         $ejecutivo = $this->usuarioCon(self::PERMISO);
         $cargo = NcMovil::factory()->deRuc(self::RUC)->create(['id_usuario' => $ejecutivo->id_usuario]);
 

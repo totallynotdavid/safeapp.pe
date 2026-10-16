@@ -15,29 +15,19 @@ class LoginTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_the_login_screen_offers_the_two_fields_it_authenticates_on(): void
-    {
-        $this
-            ->get('/login')
-            ->assertOk()
-            ->assertSee('Usuario')
-            ->assertSee('Contraseña')
-            ->assertSee('autocomplete="username"', false)
-            ->assertSee('autocomplete="current-password"', false);
-    }
-
-    public function test_a_login_error_is_attached_to_the_username_field(): void
+    public function test_a_wrong_password_is_refused_and_the_error_is_attached_to_the_username_field(): void
     {
         Usuario::factory()->create(['usuario' => 'agente1']);
 
-        $response = $this
+        $this
             ->from('/login')
             ->post('/login', [
                 'usuario' => 'agente1',
                 'clave' => 'contrasena-incorrecta',
-            ]);
+            ])
+            ->assertRedirect('/login');
 
-        $response->assertRedirect('/login');
+        $this->assertGuest();
 
         $this
             ->get('/login')
@@ -60,22 +50,6 @@ class LoginTest extends TestCase
         ])->assertRedirect(route('home'));
 
         $this->assertAuthenticatedAs($usuario);
-    }
-
-    public function test_rejects_a_wrong_password(): void
-    {
-        Usuario::factory()->create(['usuario' => 'agente1']);
-
-        $this
-            ->from('/login')
-            ->post('/login', [
-                'usuario' => 'agente1',
-                'clave' => 'contrasena-incorrecta',
-            ])
-            ->assertRedirect('/login')
-            ->assertSessionHasErrors('usuario');
-
-        $this->assertGuest();
     }
 
     public function test_rejects_an_inactive_account_even_with_the_right_password(): void

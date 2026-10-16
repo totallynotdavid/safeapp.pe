@@ -21,22 +21,11 @@ class TiendaActivaTest extends TestCase
             ->assertRedirect(route('home'));
 
         $this->assertSame($arequipa->id_tienda, $operador->fresh()->tiendaAsignada());
-    }
-
-    public function test_switching_leaves_exactly_one_active_assignment(): void
-    {
-        [$operador, $lima, $arequipa] = $this->conDosTiendas();
-
-        $this->actingAs($operador)->put(route('tienda-activa.update'), ['id_tienda' => $arequipa->id_tienda]);
-
         $this->assertSame(1, $operador->asignaciones()->where('estado', 0)->count());
     }
 
     public function test_a_tienda_they_were_never_assigned_is_refused(): void
     {
-        // Legacy ran two blind UPDATEs with no membership check, so posting any
-        // id_tienda deactivated the real assignment and activated nothing,
-        // leaving the operator with an empty queue and no way back.
         [$operador, $lima] = $this->conDosTiendas();
         $ajena = Tienda::factory()->create();
 

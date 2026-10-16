@@ -29,8 +29,7 @@ class ColaLiquidacionTest extends LiquidacionTestCase
     public function test_a_validated_case_that_fell_through_is_not_settleable(): void
     {
         $this->enCola('20111111111');
-        // CAIDA passes validación but is a quarter of production, so leaving it
-        // in the queue would put fallen cases in front of the liquidador.
+        // CAIDA passes validación, so only the estado keeps it out of the queue.
         NcMovil::factory()->caida()->deRuc('20999999999')->create(['fecha_actualizacion' => now()]);
 
         $this
@@ -56,9 +55,8 @@ class ColaLiquidacionTest extends LiquidacionTestCase
 
     public function test_the_estado_filter_offers_only_settleable_states(): void
     {
-        // The settlement outcome vocabulary is not the estado vocabulary. Legacy
-        // offered DEUDA and friends as estado filter values, which no row could
-        // ever match.
+        // The settlement outcome vocabulary is not the estado vocabulary, so
+        // DEUDA and friends are not offered as estado filter values.
         $response = $this->actingAs($this->liquidador())->get(route('liquidaciones.index'))->assertOk();
 
         foreach (NcMovil::OBSERVACIONES as $observacion) {

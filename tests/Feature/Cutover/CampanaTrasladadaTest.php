@@ -93,25 +93,14 @@ class CampanaTrasladadaTest extends CutoverTestCase
 
     public function test_a_hand_registered_client_with_no_case_falls_to_the_common_segment(): void
     {
-        // 884 of them opened no case at all. All 2,677 are already worked, so
-        // the segment is a historical label, but it still has to be one that
-        // exists.
         $this->datoLegado(['origen' => 'INHOUSE', 'tipo_data' => 'CONVERGENTE']);
 
         $this->transformar();
 
-        $this->assertSame('MOVIL', Dato::query()->sole()->tipo_data);
-    }
-
-    public function test_provenance_survives_the_reclassification(): void
-    {
-        $this->datoLegado(['origen' => 'INHOUSE', 'tipo_data' => 'CONVERGENTE']);
-
-        $this->transformar();
-
-        // The fact the row was hand-registered is not lost, it moves to the
-        // column that always recorded it correctly.
-        $this->assertSame('INHOUSE', Dato::query()->sole()->origen);
+        $dato = Dato::query()->sole();
+        $this->assertSame('MOVIL', $dato->tipo_data);
+        // The hand-registered provenance stays in origen.
+        $this->assertSame('INHOUSE', $dato->origen);
     }
 
     private function segmentoDe(string $ruc): ?string

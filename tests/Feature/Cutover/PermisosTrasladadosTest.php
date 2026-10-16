@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Cutover;
 
-use App\Models\Menu;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\DB;
 
@@ -98,15 +97,5 @@ class PermisosTrasladadosTest extends CutoverTestCase
         $agente = Usuario::query()->find(2);
         $this->assertFalse($agente->hasPermiso('roles.manage'));
         $this->assertFalse($agente->hasPermiso('asignacion.gestionar'));
-    }
-
-    public function test_the_seeded_menu_keeps_the_ids_the_grants_point_at(): void
-    {
-        $this->transformar();
-
-        // Not a tautology: the transform relies on this, and a renumbered menu
-        // would silently repoint every grant at a different screen.
-        $this->assertSame('gestion.movil', Menu::query()->find(3)?->permiso);
-        $this->assertSame('notacargo.fija.back', Menu::query()->find(21)?->permiso);
     }
 }

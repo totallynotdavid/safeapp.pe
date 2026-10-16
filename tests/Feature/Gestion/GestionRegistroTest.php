@@ -46,8 +46,8 @@ class GestionRegistroTest extends GestionTestCase
     public function test_the_line_mix_an_agent_confirms_is_recorded_on_the_call(): void
     {
         // The file's counts and the agent's are two observations, not one
-        // mutable field. Legacy wrote the agent's back over the campaign row,
-        // so the next load of that campaign silently erased it.
+        // mutable field: the next load of the campaign must not erase the
+        // agent's.
         $agente = $this->agente('gestion.movil');
         $dato = $this->datoDe($agente, 'MOVIL', ['q_movistar' => 1, 'q_entel' => 1]);
 

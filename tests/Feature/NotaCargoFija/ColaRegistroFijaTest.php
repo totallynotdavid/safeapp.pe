@@ -41,10 +41,8 @@ class ColaRegistroFijaTest extends NotaCargoFijaTestCase
 
     public function test_an_open_case_filed_in_an_earlier_year_is_still_on_the_queue(): void
     {
-        // Legacy bounded in-flight cases with year(fecha_ingreso) = the chosen
-        // year rather than <=, so an agent looking at the current year could not
-        // see the still-open cases they filed in an earlier one: 1,044 of the
-        // 5,970 production rows are in that state.
+        // In-flight cases are bounded by fecha_ingreso <= the chosen year, so an
+        // agent sees the still-open cases they filed in an earlier one.
         $ejecutivo = $this->usuarioCon(self::PERMISO);
 
         NcFija::factory()
@@ -86,7 +84,7 @@ class ColaRegistroFijaTest extends NotaCargoFijaTestCase
 
     public function test_another_ejecutivo_cannot_open_a_case(): void
     {
-        // Legacy scoped only the list; the detail endpoint trusted the posted id.
+        // The detail endpoint is scoped like the list, not trusted on the id.
         $cargo = $this->casoPendiente($this->usuarioCon(self::PERMISO));
 
         $this
@@ -116,8 +114,7 @@ class ColaRegistroFijaTest extends NotaCargoFijaTestCase
 
     public function test_a_validated_case_is_frozen(): void
     {
-        // The validador ruled on this case. Legacy showed the form anyway and
-        // enforced this in JavaScript, so a posted form still went through.
+        // The validador ruled on this case, so a posted form is refused too.
         $ejecutivo = $this->usuarioCon(self::PERMISO);
         $cargo = NcFija::factory()->deRuc(self::RUC)->create(['id_usuario' => $ejecutivo->id_usuario]);
 

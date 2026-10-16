@@ -8,9 +8,7 @@ use ZipArchive;
 
 /**
  * Reads a streamed .xlsx download back. An xlsx is a zip, so opening one is
- * also the check that the download is the format it claims: legacy's exports
- * were HTML tables under a spreadsheet content type and would fail to open
- * here.
+ * also the check that the download is the format it claims.
  *
  * @require-extends TestCase
  */

@@ -60,9 +60,6 @@ class BackMovilTest extends NotaCargoMovilTestCase
 
     public function test_it_corrects_the_region_in_place(): void
     {
-        // Legacy wrote the correction to a second column (zonal_telefonica) and
-        // left the original standing, so the two disagreed on 46 of the 1,202
-        // cases where both were set, and different screens read different ones.
         $destino = Tienda::factory()->create();
         $cargo = NcMovil::factory()->deRuc(self::RUC)->createOne(['zonal' => Tienda::factory()]);
 
@@ -83,7 +80,7 @@ class BackMovilTest extends NotaCargoMovilTestCase
 
     public function test_an_unvalidated_case_cannot_be_moved_through_the_lifecycle(): void
     {
-        // Legacy trusted the posted id, so a rejected case could be activated.
+        // The posted id is not trusted: a rejected case cannot be activated.
         $cargo = NcMovil::factory()->rechazada()->deRuc(self::RUC)->create(['estado' => 'PENDIENTE']);
 
         $this

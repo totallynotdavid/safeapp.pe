@@ -7,9 +7,8 @@ use App\Models\Dato;
 use App\Models\Quiebre;
 use App\Models\Tienda;
 
-// How a quiebre gets the client it belongs to. Legacy let the ejecutivo type the
-// RUC and the razón social into the case, so the same RUC could carry different
-// names across quiebres and a case could name a client that does not exist.
+// How a quiebre gets the client it belongs to: it references an existing
+// client, never free-typed RUC and razón social.
 class QuiebreClienteTest extends QuiebreTestCase
 {
     public function test_the_form_appears_only_once_a_ruc_resolves_to_a_client(): void

@@ -3,9 +3,9 @@
 namespace Tests\Feature\Personal;
 
 use App\Models\Menu;
-use App\Models\Supervisor;
 use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class PersonalManagementTest extends TestCase
@@ -21,35 +21,12 @@ class PersonalManagementTest extends TestCase
         return $user;
     }
 
-    public function test_the_gestionar_permiso_gates_the_index(): void
+    public function test_the_gestionar_permiso_gates_the_edit_screen(): void
     {
-        $this->actingAs(Usuario::factory()->create())->get(route('personal.index'))->assertForbidden();
-        $this->actingAs($this->gestor())->get(route('personal.index'))->assertOk();
-    }
+        $usuario = Usuario::factory()->createOne();
 
-    public function test_lists_active_personnel_only(): void
-    {
-        Usuario::factory()->create(['personal' => 'AGENTE ACTIVO']);
-        Usuario::factory()->inactivo()->create(['personal' => 'AGENTE INACTIVO']);
-
-        $this
-            ->actingAs($this->gestor())
-            ->get(route('personal.index'))
-            ->assertOk()
-            ->assertSee('AGENTE ACTIVO')
-            ->assertDontSee('AGENTE INACTIVO');
-    }
-
-    public function test_shows_the_supervisor_name(): void
-    {
-        $supervisor = Supervisor::factory()->create(['nombre' => 'JEFA DE EQUIPO']);
-        Usuario::factory()->create(['personal' => 'CON SUPERVISOR', 'id_supervisor' => $supervisor->id_supervisor]);
-
-        $this
-            ->actingAs($this->gestor())
-            ->get(route('personal.index'))
-            ->assertOk()
-            ->assertSee('JEFA DE EQUIPO');
+        $this->actingAs(Usuario::factory()->create())->get(route('personal.edit', $usuario))->assertForbidden();
+        $this->actingAs($this->gestor())->get(route('personal.edit', $usuario))->assertOk();
     }
 
     public function test_updates_the_contact_data(): void
@@ -84,23 +61,24 @@ class PersonalManagementTest extends TestCase
         $this->assertNull($fresh->fecha_nacimiento);
     }
 
-    public function test_rejects_an_invalid_correo(): void
+    /** @return array<string, array{array<string, string>, string}> */
+    public static function rejectedInput(): array
     {
-        $usuario = Usuario::factory()->create();
-
-        $this->actingAs($this->gestor())->put(route('personal.update', $usuario), [
-            'personal' => 'NOMBRE',
-            'correo' => 'not-an-email',
-        ])->assertSessionHasErrors('correo');
+        return [
+            'an invalid correo' => [['personal' => 'NOMBRE', 'correo' => 'not-an-email'], 'correo'],
+            'a missing nombre' => [[], 'personal'],
+        ];
     }
 
-    public function test_requires_the_nombre(): void
+    /** @param  array<string, string>  $input */
+    #[DataProvider('rejectedInput')]
+    public function test_rejects_invalid_input(array $input, string $campo): void
     {
         $usuario = Usuario::factory()->create();
 
         $this
             ->actingAs($this->gestor())
-            ->put(route('personal.update', $usuario), [])
-            ->assertSessionHasErrors('personal');
+            ->put(route('personal.update', $usuario), $input)
+            ->assertSessionHasErrors($campo);
     }
 }

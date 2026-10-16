@@ -41,11 +41,8 @@ class ImportacionCargaTest extends TestCase
     }
 
     /**
-     * The legacy screen copied id_usuario and estado straight out of the
-     * staging table, so a load could unassign a record an agent was mid-way
-     * through, or mark a worked one as pending. Neither column is on `datos`
-     * any more, so a load has nothing to reach: this asserts the property the
-     * schema now gives for free rather than a rule the importer remembers.
+     * A load cannot unassign a record an agent is working or mark a worked one
+     * as pending: neither column is reachable from `datos` by the importer.
      */
     public function test_a_load_cannot_disturb_the_agent_working_a_record(): void
     {
@@ -88,10 +85,6 @@ class ImportacionCargaTest extends TestCase
         $this->assertSame(7, $dato->cliente->llamadas()->sole()->q_movistar);
     }
 
-    /**
-     * Legacy kept one row per RUC, so a new list silently replaced whatever the
-     * previous one was still working.
-     */
     public function test_a_second_campaign_adds_a_record_rather_than_replacing_one(): void
     {
         Dato::factory()->create(['ruc' => '20123456789', 'origen' => 'CAMPAÑA JULIO']);

@@ -49,15 +49,12 @@ class RegistroFijaTest extends NotaCargoFijaTestCase
         $this->assertSame(NcFija::VALIDACION_PENDIENTE, $cargo->validacion);
         $this->assertSame($ejecutivo->id_usuario, $cargo->id_usuario);
         $this->assertSame(now()->toDateString(), $cargo->fecha_ingreso->toDateString());
-        // Legacy hardcoded this on insert; the column default carries it now.
         $this->assertSame('SINNODO', $cargo->nodo);
     }
 
     public function test_the_product_and_its_price_come_from_the_catalog(): void
     {
-        // Legacy posted subtipo, descripción and the price as three independent
-        // fields, so a case could name a product the catalog never had: 335 of
-        // the 5,970 rows do.
+        // subtipo, descripción and price are not posted as independent fields.
         $ejecutivo = $this->usuarioCon(self::PERMISO);
 
         $this
@@ -105,8 +102,6 @@ class RegistroFijaTest extends NotaCargoFijaTestCase
 
     public function test_a_case_cannot_be_filed_against_a_client_that_does_not_exist(): void
     {
-        // Legacy took ruc and razon_social as free text, so a case could name a
-        // client nothing else in the system knew about.
         $this
             ->actingAs($this->usuarioCon(self::PERMISO))
             ->post(route('notas-cargo.fija.store'), $this->payload($this->cliente(), $this->producto(), [
@@ -119,8 +114,6 @@ class RegistroFijaTest extends NotaCargoFijaTestCase
 
     public function test_the_technology_is_a_choice_and_not_free_text(): void
     {
-        // The legacy input collected 27 spellings of three values, three of them
-        // GPS coordinates pasted into the wrong box.
         $this
             ->actingAs($this->usuarioCon(self::PERMISO))
             ->post(route('notas-cargo.fija.store'), $this->payload($this->cliente(), $this->producto(), [
@@ -131,7 +124,6 @@ class RegistroFijaTest extends NotaCargoFijaTestCase
 
     public function test_the_second_phone_is_optional(): void
     {
-        // Legacy marked it required on a form with no second number to give.
         $this
             ->actingAs($this->usuarioCon(self::PERMISO))
             ->post(route('notas-cargo.fija.store'), $this->payload($this->cliente(), $this->producto()))

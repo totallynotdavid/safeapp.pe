@@ -35,9 +35,8 @@ class ValidacionFijaTest extends NotaCargoFijaTestCase
 
     public function test_the_queue_is_not_scoped_to_the_validators_own_region(): void
     {
-        // Legacy shipped a second copy of this screen filtered on the case's
-        // región, which is not the reviewer's store: a Lima validador saw none
-        // of the Piura cases. Nobody held that copy exclusively.
+        // The queue is global: a case in a far región still shows to a
+        // validador whose store is elsewhere.
         $lejos = Tienda::factory()->create();
         NcFija::factory()->registrada()->deRuc('20111111111')->create(['zonal' => $lejos->id_tienda]);
 
@@ -82,8 +81,7 @@ class ValidacionFijaTest extends NotaCargoFijaTestCase
 
     public function test_a_decided_case_cannot_be_ruled_on_again(): void
     {
-        // Legacy loaded and overwrote whatever id the form posted, so a second
-        // validador could silently replace the first one's decision.
+        // A second validador cannot silently replace the first one's decision.
         $cargo = NcFija::factory()->deRuc(self::RUC)->create(['comentario_validador' => 'VALIDACION OK']);
 
         $this

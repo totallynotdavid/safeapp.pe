@@ -34,10 +34,8 @@ class ValidacionMovilTest extends NotaCargoMovilTestCase
 
     public function test_the_queue_is_not_scoped_to_the_validators_own_region(): void
     {
-        // Legacy shipped this screen twice, and the filtered copy matched the
-        // case's región against the reviewer's own store. Those are different
-        // things: they differ in 1,390 of the 2,006 production rows, so the
-        // filtered screen hid most of the queue. Nobody used it.
+        // The case's región and the reviewer's own store are different things,
+        // so the queue is not filtered by the reviewer's store.
         $validador = $this->usuarioCon(self::PERMISO);
         $ejecutivo = Usuario::factory()->create();
 
@@ -67,8 +65,7 @@ class ValidacionMovilTest extends NotaCargoMovilTestCase
         $fresh = $cargo->fresh();
         $this->assertSame(NcMovil::VALIDACION_PROCEDE, $fresh->validacion);
         $this->assertSame(7, $fresh->q_lineas);
-        // Identity and date come from the session and the clock; legacy trusted a
-        // hidden field for the validator id.
+        // Identity and date come from the session and the clock.
         $this->assertSame($validador->id_usuario, $fresh->id_validador);
         $this->assertSame(now()->toDateString(), $fresh->fecha_validacion->toDateString());
     }
@@ -94,8 +91,7 @@ class ValidacionMovilTest extends NotaCargoMovilTestCase
 
     public function test_a_decided_case_cannot_be_ruled_on_again(): void
     {
-        // Legacy loaded and overwrote whatever id the form posted, so a second
-        // validador could silently replace the first one's decision.
+        // A second validador cannot silently replace the first one's decision.
         $cargo = NcMovil::factory()->deRuc(self::RUC)->create(['comentario_validador' => 'PRIMERA DECISION']);
 
         $this

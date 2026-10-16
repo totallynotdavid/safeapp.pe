@@ -7,6 +7,7 @@ use App\Models\Menu;
 use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class ImportacionFormatoTest extends TestCase
@@ -32,8 +33,7 @@ class ImportacionFormatoTest extends TestCase
 
     public function test_it_loads_a_semicolon_file_that_excel_wrote(): void
     {
-        // Excel on a Spanish locale writes semicolons and prefixes a BOM. Both
-        // were present in the files the legacy upload left behind.
+        // Excel on a Spanish locale writes semicolons and prefixes a BOM.
         $this
             ->actingAs($this->cargador())
             ->post(route('clientes.importar.store'), [
@@ -65,65 +65,40 @@ class ImportacionFormatoTest extends TestCase
         $this->assertSame('FIJA', Cliente::porRuc('20123456789')?->datos()->value('tipo_data'));
     }
 
-    public function test_one_bad_row_rejects_the_whole_file(): void
+    /**
+     * One bad row rejects the whole file, because a partial load leaves an
+     * operator unable to say what is missing.
+     *
+     * @return array<string, array{string}>
+     */
+    public static function refusedFiles(): array
     {
-        // Partial loads are the thing that leaves an operator unable to say what
-        // is missing. Rejecting is safe because the load is idempotent.
-        $this
-            ->actingAs($this->cargador())
-            ->post(route('clientes.importar.store'), [
-                'archivo' => $this->csv(
-                    self::ENCABEZADO
+        return [
+            'one bad row among good ones' => [
+                self::ENCABEZADO
                     ."\n20123456789;ACME SAC;MOVIL;CAMPAÑA JULIO;LIMA;;0;0;0;0"
                     ."\n123;OTRA SAC;MOVIL;CAMPAÑA JULIO;LIMA;;0;0;0;0",
-                ),
-            ])
+            ],
+            // tipo_data decides which queue works the client, and no screen
+            // covers CONVERGENTE.
+            'a segment with no queue' => ["ruc;tipo_data;origen\n20123456789;CONVERGENTE;CAMPAÑA JULIO"],
+            // The pool picker groups by origen and skips nulls.
+            'a client without an origen' => ["ruc;tipo_data;origen\n20123456789;MOVIL;"],
+            // The unique index does not catch this: the upsert would keep the
+            // last copy and report success.
+            'a ruc repeated inside the file' => [
+                "ruc;tipo_data;origen\n20123456789;MOVIL;CAMPAÑA JULIO\n20123456789;FIJA;CAMPAÑA JULIO",
+            ],
+        ];
+    }
+
+    #[DataProvider('refusedFiles')]
+    public function test_a_file_with_an_invalid_row_loads_nothing(string $contenido): void
+    {
+        $this
+            ->actingAs($this->cargador())
+            ->post(route('clientes.importar.store'), ['archivo' => $this->csv($contenido)])
             ->assertRedirect()
-            ->assertSessionHas('errores');
-
-        $this->assertSame(0, Cliente::query()->count());
-    }
-
-    public function test_a_segment_with_no_queue_is_refused(): void
-    {
-        // tipo_data decides which queue works the client. Legacy let the import
-        // write anything, which is how 2,677 CONVERGENTE clients became
-        // unreachable: no screen has ever covered that segment.
-        $this
-            ->actingAs($this->cargador())
-            ->post(route('clientes.importar.store'), [
-                'archivo' => $this->csv("ruc;tipo_data;origen\n20123456789;CONVERGENTE;CAMPAÑA JULIO"),
-            ])
-            ->assertSessionHas('errores');
-
-        $this->assertSame(0, Cliente::query()->count());
-    }
-
-    public function test_a_client_without_an_origen_is_refused(): void
-    {
-        // The pool picker groups by origen and skips nulls, so a client loaded
-        // without one could never be drawn by any agent.
-        $this
-            ->actingAs($this->cargador())
-            ->post(route('clientes.importar.store'), [
-                'archivo' => $this->csv("ruc;tipo_data;origen\n20123456789;MOVIL;"),
-            ])
-            ->assertSessionHas('errores');
-
-        $this->assertSame(0, Cliente::query()->count());
-    }
-
-    public function test_a_ruc_repeated_inside_one_file_is_refused(): void
-    {
-        // The unique index does not catch this: the upsert would keep whichever
-        // copy came last and report success.
-        $this
-            ->actingAs($this->cargador())
-            ->post(route('clientes.importar.store'), [
-                'archivo' => $this->csv(
-                    "ruc;tipo_data;origen\n20123456789;MOVIL;CAMPAÑA JULIO\n20123456789;FIJA;CAMPAÑA JULIO",
-                ),
-            ])
             ->assertSessionHas('errores');
 
         $this->assertSame(0, Cliente::query()->count());

@@ -13,9 +13,6 @@ class ExportacionFijaTest extends ExportacionTestCase
 {
     public function test_the_export_is_a_real_workbook_not_an_html_table(): void
     {
-        // Legacy served every one of these as an HTML <table> under a
-        // Content-Type: application/xls header, so Excel opened it by sniffing
-        // the markup and warned that the contents did not match the extension.
         NcFija::factory()->liquidadaEsteMes()->deRuc(self::RUC)->create();
 
         $respuesta = $this->exportarBackFija();
@@ -33,7 +30,6 @@ class ExportacionFijaTest extends ExportacionTestCase
 
     public function test_the_filename_carries_the_date_so_two_pulls_do_not_collide(): void
     {
-        // Ten different legacy reports all downloaded as reporteseguimientoFT.xls.
         NcFija::factory()->liquidadaEsteMes()->deRuc(self::RUC)->create();
 
         $this->exportarBackFija()->assertDownload(
@@ -76,9 +72,8 @@ class ExportacionFijaTest extends ExportacionTestCase
 
     public function test_the_export_carries_the_same_filter_as_the_screen(): void
     {
-        // The contract that legacy broke: its endpoints re-ran their own copy of
-        // the screen's SQL. Here a case outside the requested month must be
-        // absent from the download exactly as it is absent from the list.
+        // A case outside the requested month is absent from the download
+        // exactly as it is absent from the list.
         NcFija::factory()->liquidadaEsteMes()->deRuc(self::RUC)->create();
         NcFija::factory()
             ->deRuc(self::RUC_AJENO)
@@ -104,7 +99,7 @@ class ExportacionFijaTest extends ExportacionTestCase
     public function test_the_screens_permiso_gates_the_export(): void
     {
         // The export is a view of the queue, so it answers to the queue's permiso
-        // and needs none of its own. Legacy's exports checked only for a session.
+        // and needs none of its own.
         $this
             ->actingAs(Usuario::factory()->create())
             ->get(route('notas-cargo.fija.back.exportar'))
@@ -113,8 +108,7 @@ class ExportacionFijaTest extends ExportacionTestCase
 
     public function test_an_ejecutivo_exports_only_their_own_cases(): void
     {
-        // Legacy's registro export took the user id from a hidden form field, so
-        // editing it dumped another ejecutivo's queue.
+        // The export scopes to the session user, never to a posted id.
         $ejecutivo = $this->usuarioCon('notacargo.fija.registrar');
         $otro = $this->usuarioCon('notacargo.fija.registrar');
 

@@ -8,8 +8,7 @@ use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-// The screen has no tienda scoping (legacy passed one and never filtered on it),
-// so the fixture places no one in a tienda.
+// The screen has no tienda scoping, so the fixture places no one in a tienda.
 abstract class LiquidacionTestCase extends TestCase
 {
     use RefreshDatabase;
