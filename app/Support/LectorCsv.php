@@ -6,9 +6,6 @@ use Generator;
 use RuntimeException;
 
 /**
- * Reads a CSV as a stream of header-keyed rows, tolerating what Excel actually
- * produces.
- *
  * Two Excel quirks are handled here rather than in every caller:
  *
  * - Excel on a Spanish locale writes semicolon-separated files, English writes
@@ -16,8 +13,6 @@ use RuntimeException;
  *   character appears more often in the header line.
  * - Excel prefixes a UTF-8 BOM, which would otherwise become part of the first
  *   header name and make that column silently unfindable.
- *
- * Rows are yielded one at a time so a large file never has to be held whole.
  */
 final class LectorCsv
 {
@@ -61,12 +56,9 @@ final class LectorCsv
     }
 
     /**
-     * Header-keyed rows, keyed by their 1-based line number in the file so a
-     * caller can point an operator at the line to fix.
-     *
-     * A row with the wrong number of fields is yielded as-is rather than
-     * skipped: deciding what to do about it belongs to whoever knows what the
-     * columns mean.
+     * Keyed by 1-based line number, so a caller can point an operator at the
+     * line to fix. A row with the wrong number of fields is yielded as-is: the
+     * caller decides what it means.
      *
      * @return Generator<int, array<string, string>>
      */

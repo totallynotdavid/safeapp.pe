@@ -15,17 +15,11 @@ class UpdateBackFijaRequest extends Solicitud
     {
         return [
             'estado' => ['required', Rule::in(NcFija::ESTADOS)],
-            // The month a settled case counts in, so a COMPLETADO case without
-            // one falls out of every queue that windows by month. Seven of the
-            // 3,481 legacy COMPLETADO rows are in exactly that hole, invisible
-            // to the screen that closed them. Requiring it here is what keeps
-            // the hole from being dug again.
+            // The month a settled case counts in: a COMPLETADO case without one
+            // falls out of every queue that windows by month.
             'fecha_liquidacion' => ['required_if:estado,'.NcFija::ESTADO_COMPLETADO, 'nullable', 'date'],
             'comentario_back' => ['required', 'string'],
-            // Back may correct the región the ejecutivo chose. Legacy wrote the
-            // correction to a second column (zonal_telefonica) instead, leaving
-            // two región columns that disagreed in 1,835 of the 4,478 rows where
-            // both were set; there is one column now and this writes it.
+            // Back may correct the región the ejecutivo chose.
             'zonal' => ['required', Rule::exists('tienda', 'id_tienda')],
             'nodo' => ['required', Rule::in(NcFija::NODOS)],
             'peticion' => ['nullable', 'string', 'max:100'],

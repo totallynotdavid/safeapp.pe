@@ -5,20 +5,14 @@ namespace App\Cutover;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Row-at-a-time inserts would make the contact log alone 276,006 round trips.
- *
- * Timing is the caller's: it flushes at the end of each source chunk, in
- * dependency order, because one step writes `datos` and `asignacion_datos`
- * together and a hold cannot be inserted before the record it points at. A
- * buffer that chose its own timing put those two out of order and the foreign
- * key caught it.
- *
- * The one thing decided here is the ceiling, because it is a limit of the
- * database rather than a choice: a prepared statement takes 65,535 placeholders,
- * so a wide table runs out of room at far fewer rows than a narrow one.
+ * The caller flushes at the end of each source chunk, in dependency order: a
+ * hold cannot be inserted before the record it points at. Only the ceiling is
+ * decided here, because it is a database limit.
  */
 final class Lote
 {
+    // A prepared statement takes 65,535 placeholders, so a wide table fits
+    // fewer rows than a narrow one.
     private const MAX_PLACEHOLDERS = 65_535;
 
     /** @var list<array<string, mixed>> */

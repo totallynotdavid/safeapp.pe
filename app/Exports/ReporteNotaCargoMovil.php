@@ -6,14 +6,7 @@ use App\Models\NcMovil;
 use Illuminate\Database\Eloquent\Builder;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-/**
- * Shared by all four móvil screens, registro through liquidación, so every
- * export carries the settlement columns: any screen can show a case that is
- * already settled.
- *
- * Unlike fija, móvil keeps the cartera column: `id_cartera` is set on 576 of the
- * 2,006 production rows, so EJECUTIVO TDP is a real value here.
- */
+/** Every móvil screen shares this export, so it always carries the settlement columns. */
 final class ReporteNotaCargoMovil
 {
     private const ENCABEZADOS = [

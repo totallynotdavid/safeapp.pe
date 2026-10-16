@@ -69,9 +69,8 @@ class QuiebreValidacionController extends Controller
 
     /**
      * Open quiebres in a tienda for a year. A specific estado narrows the queue;
-     * without one, every open state shows. Legacy filtered the default view on
-     * fecha_registro but the per-estado view on fecha_inicio; this uses
-     * fecha_registro throughout, matching the date the list actually displays.
+     * without one, every open state shows. The window is fecha_registro, the
+     * date the list displays.
      *
      * @return Collection<int, Quiebre>
      */

@@ -13,9 +13,7 @@ use Illuminate\Support\Facades\Schema;
 //   propietario the executive's full name, which is what the screens display
 //   DNI         their national id, carried so the back-office form can show it
 //
-// Small and hand-maintained: 22 rows in production, with no screen that edits
-// them. The column name DNI keeps its legacy casing so the cutover copy stays a
-// straight column-for-column move.
+// Hand-maintained: no screen edits it.
 return new class extends Migration {
     public function up(): void
     {

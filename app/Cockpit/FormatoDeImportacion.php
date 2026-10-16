@@ -4,19 +4,10 @@ namespace App\Cockpit;
 
 use App\Models\Dato;
 
-/**
- * The contract an import file is built against. The screen renders its template
- * from here, so the instructions cannot drift from what the upload enforces.
- *
- * A load reaches identity and campaign columns only; ownership and progress live
- * on tables it never writes.
- */
 final class FormatoDeImportacion
 {
     /**
-     * The order is the template's column order. The file format did not change
-     * with the identity/campaign split: an existing spreadsheet still loads, into
-     * two tables instead of one.
+     * The order is the template's column order.
      *
      * @return list<string>
      */
@@ -26,8 +17,6 @@ final class FormatoDeImportacion
     }
 
     /**
-     * Header columns that must be present. Every other column may be absent.
-     *
      * @return list<string>
      */
     public static function obligatorias(): array
@@ -41,12 +30,9 @@ final class FormatoDeImportacion
         return [
             'ruc' => 'required|digits:11',
             'razon_social' => 'nullable|string|max:250',
-            // Decides which queue works the record, so only a segment that has a
-            // screen is loadable.
             'tipo_data' => 'required|in:'.implode(',', Dato::TIPOS_DATA),
-            // Required because the pool groups by origen: a record loaded
-            // without one can never be drawn by any agent. Production carries 17
-            // distinct values, the longest 25 characters.
+            // Required because the pool groups by origen: a record loaded without
+            // one can never be drawn by any agent.
             'origen' => 'required|string|max:100',
             'zonal' => 'nullable|string|max:100',
             'nodo' => 'nullable|string',
@@ -55,9 +41,6 @@ final class FormatoDeImportacion
     }
 
     /**
-     * Permanent facts about the customer, shared by every campaign that delivers
-     * them.
-     *
      * @return list<string>
      */
     public static function identidad(): array
@@ -66,9 +49,6 @@ final class FormatoDeImportacion
     }
 
     /**
-     * Facts true of one load, not of the customer. The carrier counts are derived
-     * so a change to the carrier catalog reaches the template automatically.
-     *
      * @return list<string>
      */
     public static function campana(): array

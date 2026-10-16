@@ -18,8 +18,6 @@ use Illuminate\Support\Collection;
  *
  * @method static Builder<Producto> ofrecibles(string $tipo)
  */
-// A sellable product in the catalog behind the nota de cargo fija form. See the
-// create_producto_table migration for why `tipo` survives.
 class Producto extends Model
 {
     /** @use HasFactory<ProductoFactory> */
@@ -36,10 +34,8 @@ class Producto extends Model
     protected $fillable = ['tipo', 'subtipo', 'descripcion', 'cargo_fijo', 'estado'];
 
     /**
-     * The fija catalog as the registro form needs it: subtipo, then the
-     * descripciones under it, then the charge for the pair. The form is small
-     * enough to hold the whole catalog, so it is one query and the price is
-     * filled in from it rather than typed over.
+     * Grouped by subtipo. The registro form holds the whole catalog and fills
+     * the charge from it.
      *
      * @return Collection<array-key, Collection<int, Producto>>
      */

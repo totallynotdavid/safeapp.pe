@@ -6,11 +6,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use stdClass;
 
-/**
- * Four legacy columns are not carried: `tipo`, `ejecutivo_telefonica`,
- * `tipo_etapa`, and `zonal_telefonica`, which is folded into `zonal` the same
- * way fija's is. `ejecutivo_tdp` is not dropped, it becomes `id_cartera`.
- */
 final class TrasladoDeNotasMovil implements Traslado
 {
     public function __construct(
@@ -55,16 +50,10 @@ final class TrasladoDeNotasMovil implements Traslado
                             'telefono1' => Saneamiento::texto($fila->telefono1, 50),
                             'telefono2' => Saneamiento::texto($fila->telefono2, 50),
                             'comentario_ejecutivo' => Saneamiento::texto($fila->comentario_ejecutivo),
-                            // Back's correction wins, as in fija: zonal_telefonica
-                            // is set in none of the 329 cases back never touched.
+                            // Back's correction wins.
                             'zonal' =>
                                 Saneamiento::idEnTexto($fila->zonal_telefonica) ?? Saneamiento::idEnTexto($fila->zonal),
-                            // Two columns held the same attribution and different
-                            // screens joined cartera through different ones. The
-                            // populated one wins: ejecutivo_tdp carries 576 rows to
-                            // id_cartera's 3, and every value in it resolves to a
-                            // real cartera. The two rows where both are set disagree
-                            // (65 vs 85, 87 vs 34), so one has to lose.
+                            // Both columns held the attribution. ejecutivo_tdp wins.
                             'id_cartera' => Saneamiento::idEnTexto($fila->ejecutivo_tdp) ?? (int) $fila->id_cartera,
                             'oportunidad' => Saneamiento::texto($fila->oportunidad, 100),
                             'nivel_negociacion' => Saneamiento::texto($fila->nivel_negociacion, 10),

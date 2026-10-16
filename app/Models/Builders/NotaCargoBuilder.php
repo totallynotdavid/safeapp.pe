@@ -6,24 +6,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 /**
- * How a nota de cargo queue is windowed to a period, which every screen over
- * every producto does the same way.
- *
- * The rule has two halves. A case still in flight is bounded by year alone, so
- * it stays on the queue however old it is. A case that closed shows in the month
- * it closed, dated by whichever column records that closing: móvil dates
- * ACTIVADO by fecha_actualizacion, fija dates COMPLETADO by fecha_liquidacion.
- * With no estado chosen the list is the union, which legacy spelled out as a SQL
- * UNION per screen.
- *
- * Legacy re-derived this per screen and got it wrong in two places. The móvil
- * and fija registro queues bounded in-flight cases with `year(fecha) = $ano`
- * rather than `<=`, so an agent looking at the current year could not see the
- * still-open cases they filed in an earlier one: 1,044 of the 5,970 fija rows.
- * The fija back and registro screens also disagreed about which column dates a
- * CANCELADO case, so the same case fell in two different months depending on who
- * was looking. One owner here, one answer.
- *
  * @template TModel of \Illuminate\Database\Eloquent\Model
  *
  * @extends Builder<TModel>
@@ -55,12 +37,8 @@ abstract class NotaCargoBuilder extends Builder
     }
 
     /**
-     * How much each ejecutivo has in each estado, over whatever window is
-     * already applied. It lives on the builder because both productos aggregate
-     * identically and the numbers must come from the window the queues use.
-     *
-     * Returns ids rather than names: resolving an ejecutivo is the caller's job,
-     * and joining `usuario` here would collide with its own `estado` column.
+     * Returns ids rather than names: joining `usuario` here would collide with
+     * its own `estado` column.
      *
      * @return Collection<int, object{id_usuario: int, estado: string, total: float}>
      */

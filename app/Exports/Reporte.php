@@ -13,17 +13,10 @@ use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Writer\XLSX\Writer;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-/**
- * An export is handed the same builder the screen filters with, never its own
- * query. Legacy's exports each re-ran a copy of the screen's SQL, so an export
- * and its screen drifted apart.
- */
 final class Reporte
 {
     private const POR_LOTE = 500;
 
-    // OpenSpout 5 made Style readonly, so one instance is shared by every date
-    // cell.
     private readonly Style $fecha;
 
     private function __construct()
@@ -68,9 +61,8 @@ final class Reporte
     {
         $writer = new Writer;
         $writer->openToFile('php://output');
-        // OpenSpout 5 dropped the row-level default style, so the header's bold
-        // is carried by its cells. StringCell for the same reason celda() uses
-        // it: a title is text, never a formula.
+        // StringCell for the same reason celda() uses it: a title is text,
+        // never a formula.
         $negrita = new Style()->withFontBold(true);
         $writer->addRow(new Row(array_map(
             static fn (string $titulo): Cell => new StringCell($titulo, $negrita),
@@ -102,9 +94,7 @@ final class Reporte
         }
 
         // Cell::fromValue promotes any string starting with '=' to a live
-        // formula. These columns carry free text an agent typed, so a comment
-        // beginning with '=' would land as a formula instead of what was
-        // written. A data export has no business holding formulas.
+        // formula, and these columns carry free text an agent typed.
         if (is_string($valor) && $valor !== '') {
             return new StringCell($valor, null);
         }

@@ -6,15 +6,6 @@ use App\Models\NcFija;
 use Illuminate\Database\Eloquent\Builder;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-/**
- * Shared by all three fija screens.
- *
- * Six of legacy's columns are gone because the port dropped the columns behind
- * them: TIPO was always 'FIJA', Q_LINEAS always 1, and CARTERA/DNI/EJECUTIVO
- * TELEFONICA all resolved through `id_cartera`, which is 0 in every one of the
- * 5,970 production rows, so those three exported an empty string every time.
- * ZONAL TELEFONICA and the región it duplicated collapsed into one column.
- */
 final class ReporteNotaCargoFija
 {
     private const ENCABEZADOS = [

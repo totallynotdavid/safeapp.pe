@@ -59,11 +59,6 @@ use Illuminate\Support\Carbon;
  *
  * @method static NcMovilBuilder<NcMovil> query()
  */
-// A nota de cargo móvil. The whole lifecycle lives on this one row and each
-// stage owns a disjoint set of columns: registro (the ejecutivo) writes the
-// case, validación writes the decision, back writes `estado` and the fulfilment
-// fields, liquidación writes the settlement. No stage writes another's columns,
-// which is why the three screens assign explicitly instead of sharing $fillable.
 class NcMovil extends Model
 {
     /** @use HasFactory<NcMovilFactory> */
@@ -71,11 +66,6 @@ class NcMovil extends Model
 
     use Validable;
 
-    /**
-     * The lifecycle, owned by the back office. Every one of the 8 estados
-     * present in the 2,006 production rows is in here; BOLSA and SALIDAANTICIPADA
-     * are offered by the legacy screen and have never been recorded.
-     */
     public const ESTADOS = [
         'PENDIENTE',
         'PROCESANDO',
@@ -89,11 +79,7 @@ class NcMovil extends Model
         'ADR',
     ];
 
-    /**
-     * Estados that mean the case is still moving. These are dated by
-     * fecha_ingreso with no month bound, so an in-flight case never falls off
-     * the queue just because it is old. See NotaCargoBuilder.
-     */
+    /** Dated by fecha_ingreso with no month bound, so an in-flight case never ages out of the queue. */
     public const ESTADOS_EN_CURSO = [
         'INGRESADO',
         'PROCESANDO',
@@ -105,15 +91,8 @@ class NcMovil extends Model
     ];
 
     /**
-     * Estados a validated case can still be settled from.
-     *
-     * Legacy's list was an if/else chain over its own filter dropdown, and only
-     * the last branch matched real data: this set (as a UNION of ACTIVADO with
-     * the other seven). CAIDA and ADR are deliberately outside it, since a
-     * fallen case is not settled, and they are not a rounding error: CAIDA is
-     * 399 of the 2,006 production rows. BOLSA and SALIDAANTICIPADA are declared
-     * by that legacy query but appear in no row; they stay so the allowlist is
-     * the one legacy states rather than one inferred from current stock.
+     * A validated case can be settled from these estados. CAIDA and ADR are
+     * excluded because a fallen case is not settled.
      */
     public const ESTADOS_LIQUIDABLES = [
         'ACTIVADO',
@@ -126,14 +105,7 @@ class NcMovil extends Model
         'LIQUIDADO',
     ];
 
-    /**
-     * The settlement outcome the liquidador records, written to `observacion`.
-     *
-     * This is not the estado vocabulary and must not be reused as one. Legacy's
-     * list screen offered exactly these strings as estado filter values, which
-     * no row can match (estado is never any of them in 2,006 production rows),
-     * so six of that dropdown's seven options returned nothing by construction.
-     */
+    /** The settlement outcome the liquidador records in `observacion`. It is not an estado vocabulary. */
     public const OBSERVACIONES = ['DEUDA', 'BAJA', 'BAJA PARCIAL', 'PORT OUT', 'SUSPENSION', 'ACUERDO COMERCIAL'];
 
     public const MODALIDADES = ['ALTA', 'PORTABILIDAD', 'BAM'];
@@ -149,11 +121,7 @@ class NcMovil extends Model
         'F5-DEFINICION',
     ];
 
-    /**
-     * Probability of closing, as a percentage. Legacy's dropdown offered these
-     * four plus CAIDA, which is an estado and not a probability; no row carries
-     * it and the back office owns estado, so the option is gone.
-     */
+    /** Probability of closing, as a percentage. */
     public const NIVELES_NEGOCIACION = ['25', '50', '75', '100'];
 
     public $timestamps = false;
@@ -163,15 +131,11 @@ class NcMovil extends Model
     protected $primaryKey = 'id_cargo';
 
     /**
-     * Every column a screen may write, across all four stages.
-     *
      * The per-stage boundary is the form request, not this list: each screen
-     * fills from its own validated() payload. This list only keeps unvalidated
-     * input out, so the columns no screen writes (both estados, the identity and
-     * date stamps) stay off it and are assigned by name.
+     * fills from its own validated() payload. Columns no screen writes (both
+     * estados, the identity and date stamps) stay off it and are assigned by name.
      */
     protected $fillable = [
-        // Registro.
         'id_cliente',
         'zonal',
         'q_lineas',
@@ -186,13 +150,11 @@ class NcMovil extends Model
         'etapa',
         'oportunidad',
         'comentario_ejecutivo',
-        // Back.
         'comentario_back',
         'nodo',
         'casofwa',
         'ciclo',
         'cuenta_financiera',
-        // Liquidación.
         'comision',
         'observacion',
         'descuento',
@@ -219,9 +181,8 @@ class NcMovil extends Model
     }
 
     /**
-     * The región the case is for, not the ejecutivo's own tienda. The two differ
-     * in 1,390 of the 2,006 production rows, so naming this `tienda` would
-     * assert something the data denies. Tienda is the región catalog.
+     * The región the case is for, not the ejecutivo's own tienda. Tienda is the
+     * región catalog.
      *
      * @return BelongsTo<Tienda, $this>
      */
@@ -231,8 +192,7 @@ class NcMovil extends Model
     }
 
     /**
-     * The carrier account executive the case is attributed to. Optional:
-     * id_cartera stays 0 until the registro or back screen picks one.
+     * Optional: id_cartera stays 0 until the registro or back screen picks one.
      *
      * @return BelongsTo<Cartera, $this>
      */

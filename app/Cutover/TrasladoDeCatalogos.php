@@ -4,14 +4,6 @@ namespace App\Cutover;
 
 use Illuminate\Support\Facades\DB;
 
-/**
- * Production data, so these are copied rather than seeded: the seeders build
- * invented rows for a dev database, and the real ones (7 stores, 15 supervisors,
- * 22 executives, 86 products) are not something to retype.
- *
- * `respuesta` is seeded instead: its catalog is fixed, the app owns the SI/NO to
- * boolean normalisation, and the seeder already carries legacy's ids.
- */
 final class TrasladoDeCatalogos implements Traslado
 {
     public function ejecutar(): array
@@ -40,9 +32,8 @@ final class TrasladoDeCatalogos implements Traslado
     }
 
     /**
-     * The table has no key of its own, so a row naming a deleted account is
-     * invisible junk rather than a broken link, and 23 of the 631 rows are
-     * exactly that.
+     * The table has no key of its own, so a row naming a deleted account would
+     * be invisible junk rather than a broken link.
      *
      * @return array<string, int>
      */
@@ -65,8 +56,7 @@ final class TrasladoDeCatalogos implements Traslado
             $asignaciones->agregar([
                 'id_tienda' => (int) $fila->id_tienda,
                 'id_usuario' => $idUsuario,
-                // 0 is the active assignment here, the opposite polarity to
-                // cartera.estado below. Both are legacy's and both are kept.
+                // 0 is the active assignment, the opposite of cartera.estado below.
                 'estado' => (int) $fila->estado,
             ]);
         }

@@ -12,14 +12,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
- * One customer on one campaign list: the unit of work behind GESTION MOVIL and
- * GESTION FIJA. The business calls these "datos", and a single one "un dato".
- *
- * Deliberately not called Cliente: a customer is a person, this is a job. The
- * same customer delivered by two campaigns is two rows here and one in `cliente`,
- * which is what lets a campaign be reloaded without disturbing the customer or
- * the agent working them.
- *
  * @property int $id_dato
  * @property int $id_cliente
  * @property string $origen
@@ -43,15 +35,12 @@ class Dato extends Model
     /** @use HasFactory<DatoFactory> */
     use HasFactory;
 
-    // 0 = still to be worked, 1 = already gestionado.
     public const ESTADO_PENDIENTE = 0;
 
     public const ESTADO_GESTIONADO = 1;
 
-    // Every segment a record can belong to. This column decides which queue
-    // works it, so it holds only segments that have a screen. It is not the
-    // place to record where a customer came from: `origen` does that, and
-    // conflating the two is what stranded the legacy CONVERGENTE rows.
+    // Holds only segments that have a screen, because it decides which queue works
+    // the record. Where a customer came from goes in `origen`.
     public const TIPOS_DATA = ['MOVIL', 'FIJA'];
 
     public $timestamps = false;
@@ -60,10 +49,8 @@ class Dato extends Model
 
     protected $primaryKey = 'id_dato';
 
-    // No $fillable, so nothing here is mass-assignable. Every column is either
-    // campaign data written by the importer or by AltaDeClientes, or progress
-    // written by registrarGestion(). None of it is ever request input, and the
-    // line counts an agent submits are recorded on the llamada instead.
+    // No $fillable: no column is ever request input. The line counts an agent
+    // submits are recorded on the llamada instead.
 
     protected function casts(): array
     {
@@ -77,19 +64,14 @@ class Dato extends Model
     }
 
     /**
-     * Write owner of "logging a contact advances the record's state". The
-     * llamada insert and the estado change must stay in one transaction: split
-     * them and a failure leaves a logged call on a record that never leaves the
-     * queue.
+     * The llamada insert and the estado change stay in one transaction, so a
+     * failure cannot leave a logged call on a record that never leaves the queue.
      *
      * @param  array{id_respuesta: int, ...<string, int|string|null>}  $contacto  validated payload from StoreGestionRequest
      */
     public function registrarGestion(int $idAgente, array $contacto): Llamada
     {
         return $this->getConnection()->transaction(function () use ($idAgente, $contacto): Llamada {
-            // $fillable guards the agent-supplied half. The rest is server
-            // state. The channel comes from the chosen respuesta, never from the
-            // request, so a VISITA outcome cannot be filed against a LLAMADA.
             $llamada = new Llamada($contacto);
             $llamada->forceFill([
                 'id_dato' => $this->id_dato,
@@ -101,9 +83,8 @@ class Dato extends Model
                 'fecha' => now(),
             ])->save();
 
-            // The contact is also the freshest read on the customer's line mix.
-            // It is recorded on the call, not written back over what the file
-            // delivered, so a load and a person never share a mutable field.
+            // The line mix is recorded on the call, never written back over what the
+            // file delivered, so a load and a person never share a mutable field.
             $this->forceFill(['estado' => self::ESTADO_GESTIONADO])->save();
 
             return $llamada;
@@ -111,10 +92,6 @@ class Dato extends Model
     }
 
     /**
-     * The agent's outstanding queue for one segment, scoped to their active
-     * tienda. A record assigned under a tienda the agent no longer holds is
-     * intentionally invisible here.
-     *
      * @param  Builder<Dato>  $query
      * @return Builder<Dato>
      */
@@ -138,9 +115,7 @@ class Dato extends Model
     }
 
     /**
-     * The agent currently holding this record, if any. At most one row can
-     * match: the unique index on (id_dato, activa) makes that a constraint
-     * rather than an expectation.
+     * At most one row matches: the unique index on (id_dato, activa) enforces it.
      *
      * @return HasOne<AsignacionDato, $this>
      */

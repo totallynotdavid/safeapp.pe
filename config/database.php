@@ -30,15 +30,9 @@ return [
      */
 
     'connections' => [
-        // The pre-rewrite production database, restored into a scratch schema so
-        // `cutover:transform` can read it. Read-only by convention: nothing in
-        // the app opens this connection, only the Artisan command does, and the
-        // account it uses only needs SELECT.
-        //
-        // It is a separate connection rather than a separate database name on
-        // the app's own because the two schemas share table names and disagree
-        // about what the columns mean. Keeping them apart is what stops a query
-        // written for one from silently answering from the other.
+        // Read-only by convention: only `cutover:transform` opens it, and its
+        // account only needs SELECT. A separate connection because the two
+        // schemas share table names but disagree about what the columns mean.
         'legacy' => [
             'driver' => 'mysql',
             'host' => env('LEGACY_DB_HOST', env('DB_HOST', '127.0.0.1')),
@@ -51,9 +45,8 @@ return [
             'collation' => 'utf8mb4_unicode_ci',
             'prefix' => '',
             'prefix_indexes' => true,
-            // Not strict: the legacy tables are full of '0000-00-00' dates and
-            // over-long text, which is exactly what the transform is there to
-            // clean up. Strict mode would refuse to read them.
+            // Not strict: the export holds '0000-00-00' dates and over-long text,
+            // which strict mode would refuse to read.
             'strict' => false,
         ],
 

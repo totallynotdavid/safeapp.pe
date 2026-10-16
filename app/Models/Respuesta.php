@@ -15,12 +15,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property bool|null $volverllamar
  * @property-read EloquentCollection<int, Llamada> $llamadas
  */
-// The fixed catalog of contact dispositions, seeded as reference data in every
-// environment because the gestión form cannot be used without it.
 class Respuesta extends Model
 {
-    // Every channel a disposition can belong to. A disposition carries its
-    // channel, which is why logging a contact never asks for one.
     public const CANALES = ['LLAMADA', 'VISITA'];
 
     public $timestamps = false;

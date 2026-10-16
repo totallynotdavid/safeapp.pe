@@ -21,10 +21,7 @@ class NcFijaFactory extends Factory
         $cierre = fake()->dateTimeBetween($ingreso, 'now');
 
         return [
-            // A validated, completed case: the state most of the pipeline ends
-            // in (COMPLETADO is 3,481 of 5,970 production rows) and the one the
-            // back queue lists. registrada() winds it back to a freshly filed
-            // case and rechazada() flips the validación gate.
+            // A validated, completed case, which the back queue lists.
             'estado' => 'COMPLETADO',
             'validacion' => NcFija::VALIDACION_PROCEDE,
 
@@ -49,9 +46,7 @@ class NcFijaFactory extends Factory
             'fecha_validacion' => $cierre,
             'comentario_validador' => 'VALIDACION OK',
 
-            // A COMPLETADO case carries both: fecha_actualizacion is when the
-            // back office last acted and fecha_liquidacion is the month it
-            // settled, which is the column the back queue windows it by.
+            // The back queue windows a COMPLETADO case by fecha_liquidacion.
             'fecha_actualizacion' => $cierre,
             'fecha_liquidacion' => $cierre,
             'id_back' => 0,
@@ -71,10 +66,7 @@ class NcFijaFactory extends Factory
         return $this->state(['estado' => $estado]);
     }
 
-    // A case as the ejecutivo just filed it: nobody has ruled on it and the back
-    // office has not touched it, so it is XINGRESAR and PENDIENTE and every
-    // stamp downstream is empty. This is what the registro and validación
-    // screens work with.
+    // A case as the ejecutivo just filed it: every stamp downstream is empty.
     public function registrada(): static
     {
         return $this->state([
@@ -93,8 +85,7 @@ class NcFijaFactory extends Factory
         ]);
     }
 
-    // A case for a client with a known ruc. Every screen shows the client's ruc,
-    // so that is what identifies a row on the page.
+    // Every screen shows the client's ruc, so it identifies a row on the page.
     public function deRuc(string $ruc): static
     {
         return $this->state(['id_cliente' => Cliente::factory()->create(['ruc' => $ruc])]);
@@ -106,12 +97,9 @@ class NcFijaFactory extends Factory
         return $this->state(['validacion' => NcFija::VALIDACION_RECHAZADO]);
     }
 
-    /**
-     * A case that settled this month, which is what puts it on the current back
-     * queue. All three dates have to move together: a COMPLETADO case is
-     * windowed by fecha_liquidacion, so pinning only fecha_ingreso leaves the
-     * fixture outside the period the screen defaults to.
-     */
+    // All three dates move together: a COMPLETADO case is windowed by
+    // fecha_liquidacion, so pinning only fecha_ingreso would miss the default
+    // period.
     public function liquidadaEsteMes(): static
     {
         return $this->state([

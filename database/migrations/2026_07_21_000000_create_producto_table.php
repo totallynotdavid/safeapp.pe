@@ -8,11 +8,8 @@ use Illuminate\Support\Facades\Schema;
 // agent picks a subtipo, then a descripción within it, and the monthly charge
 // comes from the matching row.
 //
-// `tipo` is kept even though only FIJA is read today: production holds 65 FIJA
-// rows and 21 MOVIL, and dropping the column would make the cutover silently
-// discard the MOVIL half. AVANZADO is a third tipo the legacy code queries and
-// the table has never had a row for, which is half of why that screen was
-// dropped: its product dropdowns came up empty.
+// `tipo` is kept even though only FIJA is read: the cutover carries MOVIL rows
+// too.
 return new class extends Migration {
     public function up(): void
     {
@@ -21,12 +18,9 @@ return new class extends Migration {
             $table->string('tipo', 30)->index();
             $table->string('subtipo', 100);
             $table->string('descripcion', 100);
-            // Legacy called this `cf`. It is the same quantity as
-            // nc_fija.cargo_fijo and now carries the same name.
             $table->decimal('cargo_fijo', 10, 2)->default(0);
-            // 1 = offerable. All 65 FIJA rows are 1; the column exists so a
-            // retired product stops appearing without losing the cases sold
-            // under it.
+            // 1 = offerable. A retired product stops appearing without losing
+            // the cases sold under it.
             $table->unsignedTinyInteger('estado')->default(1);
         });
     }

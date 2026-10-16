@@ -2,10 +2,6 @@
 
 namespace App\Cockpit;
 
-/**
- * An import is all or nothing (see ImportacionDeClientes), so a result carries
- * either counts or errores, never both.
- */
 final readonly class ResultadoImportacion
 {
     /** @param  list<string>  $errores */

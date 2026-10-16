@@ -43,7 +43,6 @@ class MenuSeeder extends Seeder
             [37, 'LIQUIDACION',          'fa fa-money',      0,  null],
             [38, 'LIQUIDACION',          'fa fa-money',      37, 'liquidacion.gestionar'],
 
-            // ID 39 is new; existing menu IDs remain unchanged.
             [39, 'ROLES Y PERMISOS',     'fa fa-key',        5,  'roles.manage'],
         ];
 

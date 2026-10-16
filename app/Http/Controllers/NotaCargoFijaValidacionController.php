@@ -13,9 +13,6 @@ use Illuminate\Support\Collection;
 
 // Nota de cargo fija, VALIDACIÓN: a validador passes or rejects the cases
 // ejecutivos have filed. Nothing else on the case is theirs to change.
-//
-// One global queue. The per-tienda variant filtered on the case's región rather
-// than the reviewer's store, so a Lima validador saw none of the Piura cases.
 class NotaCargoFijaValidacionController extends Controller
 {
     public function index(Request $request): View
@@ -45,9 +42,8 @@ class NotaCargoFijaValidacionController extends Controller
         #[CurrentUser]
         Usuario $agente,
     ): RedirectResponse {
-        // A case already ruled on is not re-ruled. Legacy loaded and overwrote
-        // whatever id the form posted, so a second validador could silently
-        // replace the first one's decision.
+        // A case already ruled on is not re-ruled, so a second validador cannot
+        // silently replace the first one's decision.
         abort_unless($ncFija->esEditable(), 403);
 
         $ncFija->validacion = $request->string('validacion')->toString();

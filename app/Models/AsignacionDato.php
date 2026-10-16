@@ -7,13 +7,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
- * An agent's hold on one campaign record, open while they are working it and
- * closed when they release it.
- *
- * Rows are kept after release. Legacy overwrote the three assignment columns on
- * the work row, so a released record forgot it had ever been held: an agent
- * could draw a batch, never call any of it, hand it back, and leave no trace.
- *
  * @property int $id_asignacion
  * @property int $id_dato
  * @property int $id_usuario
@@ -27,9 +20,8 @@ use Illuminate\Support\Carbon;
  */
 class AsignacionDato extends Model
 {
-    // Written while the hold is open, NULL once released. Only ever this value;
-    // it exists so the unique index on (id_dato, activa) can enforce one holder
-    // at a time, because a unique index ignores NULLs.
+    // NULL once released. The unique index on (id_dato, activa) enforces one
+    // holder at a time because a unique index ignores NULLs.
     public const ACTIVA = 1;
 
     public $timestamps = false;
@@ -38,8 +30,6 @@ class AsignacionDato extends Model
 
     protected $primaryKey = 'id_asignacion';
 
-    // Every column is server state decided by DistribucionDeDatos or
-    // AltaDeClientes; none of it is ever agent input.
     protected $fillable = [
         'id_dato',
         'id_usuario',

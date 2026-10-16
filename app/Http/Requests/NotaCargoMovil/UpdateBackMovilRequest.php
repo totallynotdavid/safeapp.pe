@@ -17,10 +17,7 @@ class UpdateBackMovilRequest extends Solicitud
             'estado' => ['required', Rule::in(NcMovil::ESTADOS)],
             'fecha_actualizacion' => ['required', 'date'],
             'comentario_back' => ['required', 'string'],
-            // Back may correct the región the ejecutivo chose. Legacy wrote the
-            // correction to a second column (zonal_telefonica) instead, leaving
-            // two región columns that disagreed in 46 of the 1,202 rows where
-            // both were set; there is one column now and this writes it.
+            // Back may correct the región the ejecutivo chose.
             'zonal' => ['required', Rule::exists('tienda', 'id_tienda')],
             'id_cartera' => ['nullable', Rule::exists('cartera', 'id_cartera')],
             'etapa' => ['required', Rule::in(NcMovil::ETAPAS)],

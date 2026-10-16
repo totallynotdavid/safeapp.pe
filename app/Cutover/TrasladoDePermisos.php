@@ -5,26 +5,12 @@ namespace App\Cutover;
 use App\Models\Menu;
 use Illuminate\Support\Facades\DB;
 
-/**
- * `menu` is not copied. It is reference data the app owns now, seeded with
- * legacy's own ids so every surviving grant still points at the right screen,
- * and with `permiso` keys in place of the `url` legacy filtered on.
- *
- * Runs after TrasladoDeCuentas, whose users it filters against.
- */
+/** Runs after TrasladoDeCuentas, whose users it filters against. */
 final class TrasladoDePermisos implements Traslado
 {
-    /**
-     * The leaf whose holders administer the system. Legacy's mantUsuario.php,
-     * held by 8 people, all of them ADMINISTRADOR or SISTEMAS.
-     */
     private const PERMISO_ADMINISTRADOR = 'usuarios.manage';
 
-    /**
-     * Screens the rewrite added, which have no legacy grant to carry over.
-     * Without this the cutover ships two administration screens nobody in the
-     * system can reach.
-     */
+    // Screens the rewrite added have no legacy grant, so their administrators get them.
     private const PERMISOS_NUEVOS = ['roles.manage', 'asignacion.gestionar'];
 
     public function ejecutar(): array
@@ -42,13 +28,6 @@ final class TrasladoDePermisos implements Traslado
     }
 
     /**
-     * Three kinds of grant are dropped. Ones naming a user that no longer
-     * exists (237 of 8,475) are leftovers from deleted accounts. Ones naming
-     * menu -1 or 0 (32) never pointed at a screen. Ones naming a retired leaf
-     * point at a screen the rewrite removed; for every retired leaf, zero holders
-     * lack the surviving global equivalent, so dropping them costs nobody
-     * access.
-     *
      * @param  array<int, true>  $menus  existing menu ids
      * @return array<string, int>
      */

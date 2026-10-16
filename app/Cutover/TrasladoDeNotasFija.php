@@ -6,22 +6,10 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use stdClass;
 
-/**
- * Six legacy columns are not carried: `tipo` ('FIJA' in every row), `q_lineas`
- * (1 in every row), `agenda` (empty in every row), `id_cartera` (0 in every
- * row), `ejecutivo_telefonica` (set in one), and `zonal_telefonica`, which is
- * folded into `zonal` below. The reasoning for each is in the migration.
- */
 final class TrasladoDeNotasFija implements Traslado
 {
-    /**
-     * Three technologies spelled 28 ways, listed rather than pattern-matched:
-     * the data is fixed forever, a reviewer can check every line against the
-     * export, and a rule clever enough to read FFTTHH as FTTH would read
-     * something else wrong. FIBRA maps to FTTH, an inference from local usage
-     * rather than something the rows state. 'HFC/GPON' names two and is left
-     * unset, as are the three GPS coordinates and the rows holding '1' or 'TV'.
-     */
+    // Listed rather than pattern-matched, so each spelling can be checked against
+    // the export. FIBRA is read as FTTH, an inference from the spelling.
     private const TECNOLOGIAS = [
         'FTTH' => 'FTTH',
         'FFTH' => 'FTTH',
@@ -95,12 +83,7 @@ final class TrasladoDeNotasFija implements Traslado
                             'direccion' => Saneamiento::texto($fila->direccion),
                             'coordenadas' => Saneamiento::texto($fila->coordenadas, 100),
                             'tecnologia' => $tecnologia,
-                            // Back's correction wins. Legacy wrote it to a second
-                            // column and left the ejecutivo's original standing, and
-                            // the two disagree in 1,835 rows. That zonal_telefonica
-                            // is back's is not a guess: it is set in none of the 806
-                            // cases the back office never touched and in 4,478 of
-                            // the 5,164 it did.
+                            // Back's correction wins.
                             'zonal' =>
                                 Saneamiento::idEnTexto($fila->zonal_telefonica) ?? Saneamiento::idEnTexto($fila->zonal),
                             'comentario' => Saneamiento::texto($fila->comentario),

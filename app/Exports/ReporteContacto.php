@@ -7,10 +7,6 @@ use App\Models\Llamada;
 use Illuminate\Database\Eloquent\Builder;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-/**
- * Shared by both call-log reports, histórico (the agent's own contacts) and
- * seguimiento (a supervisor's team), which differ only in who is in scope.
- */
 final class ReporteContacto
 {
     private const ENCABEZADOS = [

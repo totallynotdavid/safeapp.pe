@@ -31,12 +31,6 @@ use Illuminate\Support\Carbon;
  * @property-read Cliente|null $cliente
  * @property-read Dato|null $dato
  */
-// One contact an agent logged against a customer. Append-only: rows are never
-// edited, and the accumulated history is what the client screen and the
-// seguimiento reports read. Dato::registrarGestion owns the write.
-//
-// Points at the customer, not at the campaign record that prompted the call, so
-// a contact survives the campaign.
 class Llamada extends Model
 {
     /** @use HasFactory<LlamadaFactory> */
@@ -48,8 +42,8 @@ class Llamada extends Model
 
     protected $primaryKey = 'id_llamada';
 
-    // The guard on what a request can set: exactly the agent-supplied payload.
-    // Everything else is server state and is force-filled by the write owner.
+    // Exactly the agent-supplied payload. Everything else is force-filled by
+    // Dato::registrarGestion.
     protected $fillable = [
         'id_respuesta',
         'telefono',

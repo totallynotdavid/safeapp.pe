@@ -7,28 +7,15 @@ use Illuminate\Support\Facades\DB;
 use stdClass;
 
 /**
- * Legacy had no customer table. Identity lived on the campaign row, so a
- * customer existed only while some list still carried them, and the other four
- * tables referred to them by copying the RUC and the name as free text. The
- * union of those five sources is therefore the real customer list, and it is
- * much larger than the campaign table: 146,736 of the 206,121 RUCs appear only
- * in `llamada`, meaning legacy had contacted them and then dropped every trace
- * of who they were when the list was replaced.
- *
  * Ids are assigned here rather than read back after insert. The table is empty
- * when this runs, so nothing else can be competing for them, and holding the
- * map in hand is what lets the later traslados resolve without a query per row.
+ * when this runs, and holding the map is what lets later traslados resolve a RUC
+ * without a query per row.
  */
 final class MapaDeClientes
 {
     private const LOTE = 2_000;
 
-    /**
-     * Listed from least to most trusted, because the last write wins the name.
-     * `llamada` outranks the case tables: an agent who just spoke to the customer
-     * corrects the name. `datos` is last, being the closest thing legacy had to a
-     * customer record.
-     */
+    // Least to most trusted, because the last write wins the name.
     private const FUENTES = [
         ['tabla' => 'quiebre', 'orden' => 'id_quiebre'],
         ['tabla' => 'nc_fija', 'orden' => 'id_cargo'],
@@ -68,10 +55,7 @@ final class MapaDeClientes
         return ['clientes' => $id, 'rucs_descartados' => $this->descartados];
     }
 
-    /**
-     * Callers drop the row on null rather than inventing a customer: a row whose
-     * RUC is junk has no subject, and the transform reports how many it dropped.
-     */
+    /** Null for a junk RUC. The caller drops the row and reports it. */
     public function resolver(mixed $ruc): ?int
     {
         $ruc = self::normalizar($ruc);
@@ -101,9 +85,8 @@ final class MapaDeClientes
                                 continue;
                             }
 
-                            // A blank RUC is a row nobody filled in; a non-blank one
-                            // that is not digits is the imported header row. Only
-                            // the second is worth reporting.
+                            // A blank RUC is an empty row. Only a non-blank one that is
+                            // not digits is worth reporting.
                             if (trim((string) $fila->ruc) !== '') {
                                 $this->descartados++;
                             }
@@ -115,15 +98,7 @@ final class MapaDeClientes
         return $nombres;
     }
 
-    /**
-     * The export holds exactly one value that is not digits: `?ruc`, carrying
-     * the razón social "razon_social", which is a CSV header row that was
-     * imported as data. Nothing references it and it names no customer.
-     *
-     * The one 9-digit value (940891060, a mobile number an agent typed into the
-     * RUC field) is kept: it is wrong, but it consistently identifies a real
-     * customer with a real logged contact, which is all this key has to do.
-     */
+    /** A key only has to identify a customer consistently, so any all-digit value is kept, whatever its length. */
     private static function normalizar(mixed $ruc): ?string
     {
         $ruc = trim((string) $ruc);

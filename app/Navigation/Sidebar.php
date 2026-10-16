@@ -6,10 +6,6 @@ use App\Models\Usuario;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
-/**
- * Legacy menu tables store grants. Navigation structure and presentation live
- * here.
- */
 class Sidebar
 {
     private const OPERATIONAL = [
@@ -201,10 +197,6 @@ class Sidebar
         return route('configuracion.index');
     }
 
-    /**
-     * Authenticated entry goes to the first permitted operational task, or to
-     * Configuración when the user has no operational access.
-     */
     public static function startUrlForUser(Usuario $user): ?string
     {
         foreach (self::forUser($user) as $section) {

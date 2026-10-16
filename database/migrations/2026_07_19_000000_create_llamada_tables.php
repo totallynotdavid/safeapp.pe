@@ -4,13 +4,9 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-// Baseline schema for contact logging. `respuesta` is the fixed catalog of
-// dispositions an agent can choose. `llamada` is the append-only log of every
-// contact recorded against a customer, joined by id_cliente.
-//
-// Types are normalized from the legacy all-text DDL: ids to integers, SI/NO
-// flags to booleans, fecha to datetime. Like the other baselines these CREATEs
-// only run against fresh databases, never the prod dump.
+// `respuesta` is the fixed catalog of dispositions an agent can choose.
+// `llamada` is the append-only log of every contact recorded against a
+// customer, joined by id_cliente.
 return new class extends Migration {
     public function up(): void
     {
@@ -20,8 +16,7 @@ return new class extends Migration {
             // The channel this disposition belongs to, LLAMADA or VISITA. It is
             // the source of llamada.gestion, which is why the form never asks.
             $table->string('tipo', 20);
-            // Outcome flags legacy stored as SI/NO/NULL text. Nullable because
-            // some dispositions genuinely leave an outcome unstated.
+            // Nullable because some dispositions leave an outcome unstated.
             $table->boolean('contactabilidad')->nullable();
             $table->boolean('negociacion')->nullable();
             $table->boolean('volverllamar')->nullable();
@@ -55,7 +50,6 @@ return new class extends Migration {
 
             // Lines the client held with each carrier at contact time. One
             // column per carrier, with ownership derived rather than stored.
-            // The cutover maps the legacy q_lineas column into q_movistar.
             $table->unsignedInteger('q_movistar')->default(0);
             $table->unsignedInteger('q_entel')->default(0);
             $table->unsignedInteger('q_claro')->default(0);

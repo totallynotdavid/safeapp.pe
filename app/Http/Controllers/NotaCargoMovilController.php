@@ -100,12 +100,9 @@ class NotaCargoMovilController extends Controller
     }
 
     /**
-     * One ejecutivo's own cases for a period. Rejected cases are left out: the
-     * ejecutivo cannot act on them and legacy excluded them from every branch.
-     *
-     * Returned unresolved so the screen and the export run the same filter,
-     * including the scoping to the signed-in ejecutivo. Legacy's equivalent
-     * export took the user id from a hidden form field instead.
+     * Rejected cases are left out: the ejecutivo cannot act on them. Returned
+     * unresolved so the screen and the export run the same filter, including the
+     * scoping to the signed-in ejecutivo.
      *
      * @return NcMovilBuilder<NcMovil>
      */

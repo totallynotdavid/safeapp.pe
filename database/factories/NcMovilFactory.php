@@ -23,10 +23,8 @@ class NcMovilFactory extends Factory
         $actualizacion = fake()->dateTimeBetween($ingreso, 'now');
 
         return [
-            // A validated, activated case: the state most of the pipeline is in
-            // (ACTIVADO is 1,218 of 2,006 production rows) and the one both the
-            // back and liquidación queues list. registrada() winds it back to a
-            // freshly filed case, and rechazada()/caida() flip each gate.
+            // A validated, activated case, which both the back and liquidación
+            // queues list.
             'estado' => 'ACTIVADO',
             'validacion' => NcMovil::VALIDACION_PROCEDE,
 
@@ -43,8 +41,7 @@ class NcMovilFactory extends Factory
             'comentario_ejecutivo' => fake()->sentence(),
             'zonal' => Tienda::factory(),
 
-            // Most production cases are attributed to nobody (1,430 of 2,006),
-            // so unattributed is the default and atribuida() opts in.
+            // Unattributed by default. atribuida() opts in.
             'id_cartera' => 0,
             'oportunidad' => fake()->word(),
             'nivel_negociacion' => fake()->randomElement(NcMovil::NIVELES_NEGOCIACION),
@@ -78,10 +75,7 @@ class NcMovilFactory extends Factory
         return $this->state(['estado' => $estado]);
     }
 
-    // A case as the ejecutivo just filed it: nobody has ruled on it and the back
-    // office has not touched it, so both estados are PENDIENTE and every stamp
-    // downstream is empty. This is what the registro and validación screens work
-    // with.
+    // A case as the ejecutivo just filed it: every stamp downstream is empty.
     public function registrada(): static
     {
         return $this->state([
@@ -96,15 +90,12 @@ class NcMovilFactory extends Factory
         ]);
     }
 
-    // A case for a client with a known ruc. Every screen shows the client's ruc,
-    // so that is what identifies a row on the page.
+    // Every screen shows the client's ruc, so it identifies a row on the page.
     public function deRuc(string $ruc): static
     {
         return $this->state(['id_cliente' => Cliente::factory()->create(['ruc' => $ruc])]);
     }
 
-    // A case attributed to a carrier account executive and a supervisor, which
-    // is what the liquidación screen displays as context.
     public function atribuida(Cartera $cartera, Supervisor $supervisor): static
     {
         return $this->state([
@@ -113,14 +104,12 @@ class NcMovilFactory extends Factory
         ]);
     }
 
-    // A case the validator rejected: it must never appear in the queue.
     public function rechazada(): static
     {
         return $this->state(['validacion' => NcMovil::VALIDACION_RECHAZADO]);
     }
 
-    // A validated case that later fell through. It is not settleable, so it
-    // must not appear in the queue either.
+    // Validated but fallen through, so not settleable.
     public function caida(): static
     {
         return $this->state(['estado' => 'CAIDA']);

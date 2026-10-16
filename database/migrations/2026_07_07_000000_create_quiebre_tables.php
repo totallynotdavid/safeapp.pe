@@ -4,13 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-// Baseline schema for the averías/quiebre cluster and the assignment lookup the
-// validation screen scopes on.
-//
 // Most quiebre columns are nullable while StoreQuiebreRegistroRequest requires
-// them, so the schema is looser than the app. Tightening it waits until after the
-// cutover: the 10 production rows are carried across by cutover:transform, and a
-// NOT NULL added now would only change what the transform has to backfill.
+// them, so the schema is looser than the app.
 return new class extends Migration {
     public function up(): void
     {
@@ -19,9 +14,7 @@ return new class extends Migration {
             $table->string('nombre', 50);
         });
 
-        // User -> tienda assignment. estado 0 means the active assignment; the
-        // screens that scope on a tienda read it from here. AsignacionController
-        // owns the write side.
+        // estado 0 means the active assignment.
         Schema::create('asignacion_tienda', static function (Blueprint $table) {
             $table->unsignedInteger('id_tienda');
             $table->unsignedInteger('id_usuario');
@@ -42,18 +35,10 @@ return new class extends Migration {
             // Registration-owned columns, written by QuiebreRegistroController.
             $table->unsignedInteger('id_usuario');
             $table->unsignedInteger('id_supervisor')->default(0);
-            // Legacy stored this as text holding an id_tienda; it is a tienda FK,
-            // so it is modeled as an integer here (the cutover transform casts it).
+            // An id_tienda.
             $table->unsignedInteger('zonal_telefonica')->nullable();
-            // The client the avería is reported for. Legacy stored the ruc and
-            // razon_social as free text on this row: it prefilled them from a
-            // RUC lookup and then let the modal edit both, so the same RUC could
-            // carry different names across quiebres and a quiebre could exist
-            // for a RUC no client row matches (7 of the 10 production rows).
             // A quiebre is an open workflow item, not a historical record like
-            // llamada, so it references the client and joins for the name. The
-            // cutover transform resolves the legacy ruc and registers a client
-            // for the orphans, whose razon_social the legacy row still carries.
+            // llamada, so it references the client and joins for the name.
             $table->unsignedInteger('id_cliente')->index();
             $table->string('servicio', 100)->nullable();
             $table->string('numero_problema', 50)->nullable();
@@ -75,8 +60,7 @@ return new class extends Migration {
             $table->text('comentario_ejecutivo')->nullable();
             $table->string('back', 50)->nullable();
             $table->date('fecha_registro')->nullable();
-            // Legacy free-text column left unused by both the registration and
-            // validation flows; kept so the schema still maps the real table.
+            // Written by neither the registration nor the validation flow.
             $table->string('validacion', 50)->nullable();
         });
     }

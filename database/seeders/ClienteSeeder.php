@@ -10,8 +10,8 @@ use Illuminate\Database\Seeder;
 // admin, plus an unassigned pool to draw batches from.
 class ClienteSeeder extends Seeder
 {
-    // Few origenes with deep stock behind each, matching the production shape.
-    // A pool spread thin across many origenes makes batch assignment untestable.
+    // Few origenes with deep stock behind each: a pool spread thin across many
+    // origenes makes batch assignment untestable.
     private const ORIGENES = ['DB_RUC20_INF', 'BASE_SAFE-1704', 'DISTRICT-ATMIRSBO'];
 
     public function run(): void

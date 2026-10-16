@@ -53,10 +53,8 @@ class LiquidacionController extends Controller
     }
 
     /**
-     * Legacy filters by fecha_actualizacion because that is the date shown in
-     * the liquidation list.
-     *
-     * A case must still be in a settleable state after passing validation;
+     * The window is fecha_actualizacion, the date the list shows. A case must
+     * It must still be in a settleable state after passing validation.
      * PROCEDE cases can later become CAIDA.
      *
      * @return Collection<int, NcMovil>

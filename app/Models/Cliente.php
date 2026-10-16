@@ -50,9 +50,6 @@ class Cliente extends Model
         );
     }
 
-    /**
-     * Creates only the customer identity, without campaign or workflow state.
-     */
     public static function resolver(string $ruc, ?string $razonSocial = null): self
     {
         $cliente = self::query()
@@ -61,7 +58,6 @@ class Cliente extends Model
                 ['razon_social' => $razonSocial],
             );
 
-        // Fill a missing name without overwriting an existing one.
         if ($razonSocial !== null && $cliente->razon_social === null) {
             $cliente->update(['razon_social' => $razonSocial]);
         }

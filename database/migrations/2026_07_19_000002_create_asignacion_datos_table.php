@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\Schema;
 //
 // A release closes a row rather than erasing it, so an agent who draws a batch,
 // never calls any of it and releases it leaves a trace.
-//
-// Named `asignacion_datos` to sit beside `asignacion_tienda` (agent to store):
-// the two are named for what they assign.
 return new class extends Migration {
     public function up(): void
     {

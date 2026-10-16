@@ -44,8 +44,8 @@ class NotaCargoMovilSeeder extends Seeder
                 ->atribuida($cartera, $supervisor)
                 ->create($caso + $cliente);
 
-            // The unattributed twin of each estado. Most production cases have no
-            // ejecutivo TDP, so the screen has to read well without one.
+            // The unattributed twin of each estado: a case may have no ejecutivo
+            // TDP, and the screen has to read well without one.
             NcMovil::factory()
                 ->estado($estado)
                 ->create($caso + $cliente);

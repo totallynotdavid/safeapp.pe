@@ -4,11 +4,6 @@ namespace App\Cockpit;
 
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * A customer's lines per carrier have two independent sources: what the campaign
- * file claimed at load, and what an agent confirmed on a call. Both are kept, and
- * this is the one shape a screen renders.
- */
 final readonly class MezclaDeLineas
 {
     /** @param  array<string, int>  $porOperador  keyed by carrier name */

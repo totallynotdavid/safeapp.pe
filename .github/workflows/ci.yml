@@ -21,10 +21,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # mise.toml is the only place a tool version is written. The same
-      # prebuilt PHP, Composer, Mago and Bun that `make setup` installs run
-      # here, and tests/Unit/ToolchainPinsTest.php rejects a workflow that pins
-      # a version of its own.
+      # mise.toml is the only place a tool version is written. Do not pin one
+      # in this workflow.
       - uses: jdx/mise-action@v5
 
       - uses: actions/cache@v6

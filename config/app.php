@@ -59,14 +59,8 @@ return [
      |--------------------------------------------------------------------------
      |
      | The business runs in Peru and every date in the schema is a local business
-     | date, not an instant: legacy calls date_default_timezone_set('America/Lima')
-     | at the top of each write, so the production rows are already Lima dates.
-     | Leaving this on Laravel's UTC default meant now() and the hand-stamped
-     | Carbon::now('America/Lima') disagreed for the five hours between 19:00 Lima
-     | and midnight UTC, which is long enough to file a case under tomorrow and
-     | to hide today's contacts from a report whose range was built in Lima.
-     | Setting it here makes now() the one clock and removes the per-call-site
-     | timezone argument that was the workaround.
+     | date, not an instant. now() is the one clock. Under UTC it would file a
+     | case under tomorrow between 19:00 Lima and midnight.
      |
      */
 
@@ -87,11 +81,9 @@ return [
     // each environment has to remember to set.
     'locale' => env('APP_LOCALE', 'es'),
 
-    // Deliberately not from the environment. The fallback is the safety net that
-    // keeps an untranslated key from reaching a user, and pointing it at `es`
-    // (which is what the .env used to do) disables it: the framework ships only
-    // `en`, so every rule lang/es/validation.php does not cover rendered as the
-    // raw "validation.<rule>" string on screen.
+    // Deliberately not from the environment. The framework ships only `en`, so
+    // a fallback of `es` would show the raw "validation.<rule>" string for every
+    // rule lang/es/validation.php does not cover.
     'fallback_locale' => 'en',
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),

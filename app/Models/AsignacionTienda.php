@@ -13,9 +13,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $estado
  * @property-read Tienda|null $tienda
  */
-// User -> tienda assignment. estado 0 is the active assignment. The asignacion
-// module owns the write side; operational screens read it to scope their rows
-// to the operator's tienda via Usuario::tiendaAsignada().
 class AsignacionTienda extends Model
 {
     /** @use HasFactory<AsignacionTiendaFactory> */
@@ -25,8 +22,7 @@ class AsignacionTienda extends Model
 
     protected $table = 'asignacion_tienda';
 
-    // The table has no natural primary key; reads go through the
-    // (id_usuario, estado) index, never by row id.
+    // No natural primary key: reads go through the (id_usuario, estado) index.
     protected $primaryKey = null;
 
     public $incrementing = false;

@@ -82,7 +82,7 @@ class Quiebre extends Model
         'OTROS' => 'OTROS',
     ];
 
-    // Services active for at least this many days require a ticket.
+    // Services active for at least this many days require a ticket, judged at registration time.
     public const DIAS_PARA_TICKET = 90;
 
     public $timestamps = false;
@@ -135,7 +135,6 @@ class Quiebre extends Model
         return in_array($this->estado, self::ESTADOS_EDITABLES, true);
     }
 
-    // Ticket requirement is based on service age at registration time.
     public static function requiereTicket(?Carbon $fechaActivacion): bool
     {
         return $fechaActivacion !== null && $fechaActivacion->diffInDays(now()) >= self::DIAS_PARA_TICKET;

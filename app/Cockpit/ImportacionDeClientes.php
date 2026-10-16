@@ -7,20 +7,12 @@ use App\Support\LectorXlsx;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-/**
- * The file is validated completely before anything is written, so a failed
- * import can be corrected and retried as an idempotent upsert.
- */
 final class ImportacionDeClientes
 {
     private const POR_LOTE = 500;
 
     private const MAX_ERRORES = 50;
 
-    /**
-     * Validation and loading each stream the file, so an import stays
-     * all-or-nothing without holding every row in memory.
-     */
     public static function desdeArchivo(string $ruta, string $extension): ResultadoImportacion
     {
         try {

@@ -20,12 +20,6 @@ use Illuminate\Console\Command;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Support\Facades\DB;
 
-/**
- * Only transfers data; the migrations own the destination schema.
- * The destination must be migrated and empty. The transfer is one transaction,
- * so a run leaves it empty or full and a rerun refuses. Production never drops
- * anything, so `--fresh` is for rehearsals outside it.
- */
 class CutoverTransform extends Command
 {
     protected $signature = 'cutover:transform
@@ -97,8 +91,8 @@ class CutoverTransform extends Command
     /** @return array<string, int> */
     private function trasladar(): array
     {
-        // These seeders preserve the legacy identifiers used by copied rows.
-        // Production db:seed asks for confirmation unless --force is present.
+        // Seeded rather than copied: the seeders keep the ids that copied rows
+        // point at. --force skips the production confirmation.
         $this->call('db:seed', [
             '--class' => MenuSeeder::class,
             '--force' => true,

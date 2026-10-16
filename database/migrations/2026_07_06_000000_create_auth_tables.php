@@ -4,10 +4,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-// Auth and RBAC: accounts, roles, the menu tree, and the two grant tables.
-// Column names and the id-based menu tree are inherited from the pre-rewrite
-// schema so the cutover stays a column-for-column copy, but this migration is
-// the definition of them, not a description of a table loaded from elsewhere.
 return new class extends Migration {
     public function up(): void
     {
@@ -32,17 +28,16 @@ return new class extends Migration {
             $table->increments('id_usuario');
             $table->string('usuario', 50);
             // Null means the account has no password and cannot sign in until
-            // one is set. The cutover leaves every migrated account this way.
+            // one is set.
             $table->string('clave', 255)->nullable();
             $table->integer('id_rol');
             $table->string('personal', 50);
             // 1 means active here (opposite of menu.estado).
             $table->integer('estado');
             $table->string('sexo', 1);
-            // 0 until the assignment module lands and makes this a real
-            // supervisor FK. User creation does not pick a supervisor yet.
+            // 0 means no supervisor assigned.
             $table->integer('id_supervisor')->default(0);
-            // Filled by the separate "datos personal" flow, not at creation.
+            // Filled by the "datos personal" flow, not at creation.
             $table->date('fecha_nacimiento')->nullable();
             $table->text('telefono')->nullable();
             $table->text('correo')->nullable();

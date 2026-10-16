@@ -17,8 +17,6 @@ class DatoFactory extends Factory
     public function definition(): array
     {
         return [
-            // Every campaign record is about someone, so the factory makes the
-            // customer unless the caller supplies one.
             'id_cliente' => Cliente::factory(),
             'estado' => Dato::ESTADO_PENDIENTE,
             'origen' => fake()->bothify('DB_????##'),
@@ -33,12 +31,8 @@ class DatoFactory extends Factory
     }
 
     /**
-     * Lets a fixture name its subject by RUC instead of wiring a Cliente by
-     * hand, resolving it exactly as AltaDeClientes and the importer do.
-     *
-     * `ruc` and `razon_social` are facts about the record's subject, so a test
-     * that cares about a specific RUC states it here instead of creating the
-     * customer, keeping the id and passing it down.
+     * Lets a fixture name its subject by `ruc` or `razon_social`, resolving the
+     * Cliente as AltaDeClientes and the importer do.
      *
      * @param  array<string, mixed>  $attributes
      */
@@ -57,10 +51,7 @@ class DatoFactory extends Factory
         return parent::newModel($attributes);
     }
 
-    /**
-     * Puts the record in one agent's queue by opening a hold on it, which is the
-     * only way a record is held. Unassigned is simply the absence of one.
-     */
+    // A hold is the only way a record is assigned. Unassigned is the absence of one.
     public function asignadoA(int $idUsuario, ?int $idTienda): static
     {
         return $this->afterCreating(static function (Dato $dato) use ($idUsuario, $idTienda): void {

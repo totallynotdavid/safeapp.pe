@@ -18,9 +18,6 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 // Nota de cargo fija, BACK: the back office moves validated cases through the
 // lifecycle. `estado` is this stage's column and no other screen writes it. Fija
 // has no liquidación stage, so closing a case as COMPLETADO happens here too.
-//
-// One global queue. The per-tienda variant filtered the case's región against the
-// reviewer's own store, and everyone who held it also held the unfiltered one.
 class NotaCargoFijaBackController extends Controller
 {
     public function index(Request $request): View
@@ -60,17 +57,14 @@ class NotaCargoFijaBackController extends Controller
         #[CurrentUser]
         Usuario $agente,
     ): RedirectResponse {
-        // Only a validated case has anything to fulfil, and the queue only lists
-        // those. Legacy trusted the posted id, so a rejected case could be moved
-        // through the lifecycle anyway.
+        // The queue only lists validated cases, but the posted id is not trusted.
         abort_unless($ncFija->esValidado(), 403);
 
         $ncFija->fill($request->atributos(['estado', 'fecha_liquidacion']));
         $ncFija->estado = $request->string('estado')->toString();
         $ncFija->fecha_liquidacion = $request->date('fecha_liquidacion');
-        // Stamped rather than posted, which makes it exactly "when the back
-        // office last acted" and is what every queue windows a cancelled case
-        // by. Legacy stamped it server-side here too.
+        // Stamped rather than posted: it is when the back office last acted,
+        // which every queue windows a cancelled case by.
         $ncFija->fecha_actualizacion = now()->toDateString();
         $ncFija->id_back = $agente->id_usuario;
         $ncFija->save();

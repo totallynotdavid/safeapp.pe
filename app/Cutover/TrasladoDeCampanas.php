@@ -10,15 +10,7 @@ use stdClass;
 
 final class TrasladoDeCampanas implements Traslado
 {
-    /**
-     * Legacy's agregarcliente wrote 'CONVERGENTE' into tipo_data, which is the
-     * column the queue filters on, so all 2,677 of those rows became
-     * unreachable. They are all estado 1 (already worked), so the segment is now
-     * only a historical label, but it still has to be one of the two segments
-     * that exist. What the agent did next is the best evidence there is: 1,600
-     * of them went on to a móvil charge note against 138 to a fija one, so a
-     * case decides it and the majority decides the rest.
-     */
+    // For a record whose customer opened no case of either kind.
     private const SEGMENTO_POR_DEFECTO = 'MOVIL';
 
     private const ORIGEN_INHOUSE = 'INHOUSE';
@@ -69,10 +61,9 @@ final class TrasladoDeCampanas implements Traslado
                         $this->trasladar($fila);
                     }
 
-                    // Records before the holds that point at them. Both tables are
-                    // narrow enough that 5,000 rows stay under the placeholder
-                    // ceiling, so this boundary is the only place either is written
-                    // and this order is the order they reach the database in.
+                    // Records before the holds that point at them. 5,000 rows of
+                    // either table stay under the placeholder ceiling, so this is
+                    // the only place either is written.
                     $this->datos->vaciar();
                     $this->asignaciones->vaciar();
                 },
@@ -100,11 +91,7 @@ final class TrasladoDeCampanas implements Traslado
         $origen = Saneamiento::texto($fila->origen, 100) ?? self::ORIGEN_INHOUSE;
         $tipoData = $this->segmento($fila->tipo_data, $idCliente);
 
-        // The natural key the new schema enforces. Legacy had no such index and
-        // 28 groups of rows collide on it: 59 excess rows, every one an
-        // agregarcliente double submit, identical to its twin apart from the
-        // id. Lowest id wins because that is the one the agent's later work
-        // referred to.
+        // The natural key the new schema enforces. The first row wins.
         $clave = $idCliente.'|'.$origen.'|'.$tipoData;
 
         if (array_key_exists($clave, $this->vistos)) {
@@ -146,23 +133,15 @@ final class TrasladoDeCampanas implements Traslado
             'id_dato' => $this->idDato,
             'id_usuario' => (int) $fila->id_usuario,
             'id_tienda' => (int) $fila->id_tienda,
-            // Legacy only began writing fecha_asignacion in May 2026, so 22,288
-            // of the 24,106 open holds have no date. They are dated at the
-            // cutover rather than left null, because a hold without a start
-            // date is not a state the new schema should be able to represent.
-            // It reads as "held since the cutover", which errs towards leaving
-            // agents the records they have.
+            // A hold without a start date is not a state the schema represents, so
+            // an undated one reads as held since the cutover.
             'fecha_asignacion' => $fecha ?? $this->fechaDeCorte,
             'fecha_liberacion' => null,
             'activa' => AsignacionDato::ACTIVA,
         ]);
     }
 
-    /**
-     * Anything legacy already filed under a real segment keeps it; everything
-     * else is one of the INHOUSE rows and is placed by the case the agent went on
-     * to open.
-     */
+    /** A real segment is kept. Anything else is placed by the case the agent went on to open. */
     private function segmento(mixed $tipoData, int $idCliente): string
     {
         $tipoData = mb_strtoupper(trim((string) $tipoData));

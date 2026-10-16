@@ -55,7 +55,6 @@ use Illuminate\Support\Carbon;
  *
  * @method static NcFijaBuilder<NcFija> query()
  */
-// Registro, validación and back office own separate parts of the row.
 class NcFija extends Model
 {
     /** @use HasFactory<NcFijaFactory> */
@@ -76,7 +75,7 @@ class NcFija extends Model
         'CANCELADO',
     ];
 
-    // In-flight cases stay visible regardless of age.
+    /** Dated by fecha_ingreso with no month bound, so an in-flight case never ages out of the queue. */
     public const ESTADOS_EN_CURSO = [
         'XINGRESAR',
         'PENDIENTE',
@@ -102,7 +101,6 @@ class NcFija extends Model
 
     protected $primaryKey = 'id_cargo';
 
-    // Each screen fills only from its own validated payload.
     protected $fillable = [
         'id_cliente',
         'subtipo',
@@ -156,7 +154,7 @@ class NcFija extends Model
     }
 
     /**
-     * Supervisor recorded when the case was registered.
+     * The supervisor on record when the case was registered.
      *
      * @return BelongsTo<Supervisor, $this>
      */

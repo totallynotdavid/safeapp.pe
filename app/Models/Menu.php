@@ -33,10 +33,8 @@ class Menu extends Model
 
     protected $primaryKey = 'id_menu';
 
-    // estado is inverted from usuario.estado: 0 means visible/active here,
-    // not disabled. Verified against vista/menu.php's sidebar query, which
-    // filters on `estado = 0`. Left uncast (not boolean) to avoid implying
-    // the usual true/false-means-enabled reading.
+    // estado is inverted from usuario.estado: 0 means visible here. Left uncast
+    // so it does not read as true-means-enabled.
     protected $fillable = ['descripcion', 'icono', 'estado', 'id_ref', 'permiso'];
 
     /** @return BelongsTo<Menu, $this> */

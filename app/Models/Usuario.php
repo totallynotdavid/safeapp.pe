@@ -48,7 +48,7 @@ class Usuario extends Authenticatable
 
     protected $authPasswordName = 'clave';
 
-    // The legacy table has no remember_token column.
+    // The table has no remember_token column.
     protected $rememberTokenName = '';
 
     protected $fillable = [
@@ -134,8 +134,6 @@ class Usuario extends Authenticatable
     }
 
     /**
-     * Replaces the user's assignments, leaving at most one active.
-     *
      * @param  list<int>  $idTiendas
      */
     public function sincronizarAsignaciones(array $idTiendas, ?int $idActiva): void
@@ -152,11 +150,7 @@ class Usuario extends Authenticatable
         });
     }
 
-    /**
-     * Activates one of the user's existing assignments.
-     *
-     * Returns false if the tienda is not assigned to the user.
-     */
+    /** Returns false if the tienda is not assigned to the user. */
     public function activarTienda(int $idTienda): bool
     {
         return $this->getConnection()->transaction(function () use ($idTienda): bool {
@@ -173,7 +167,7 @@ class Usuario extends Authenticatable
 
     public function hasPermiso(string $permiso): bool
     {
-        // Collection::contains($key, $value) compares loosely.
+        // A closure, because Collection::contains($key, $value) compares loosely.
         return $this->menus->contains(
             static fn (Menu $menu): bool => $menu->permiso === $permiso,
         );

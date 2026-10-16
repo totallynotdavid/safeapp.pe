@@ -16,7 +16,7 @@ class CarteraFactory extends Factory
     public function definition(): array
     {
         return [
-            // Portfolio codes follow SC-000NN_CIUDAD in production.
+            // Portfolio codes follow SC-000NN_CIUDAD.
             'nombre' => mb_strtoupper(fake()->numerify('SC-000##_').fake()->city()),
             'propietario' => mb_strtoupper(fake()->name()),
             'id_tienda' => Tienda::factory(),

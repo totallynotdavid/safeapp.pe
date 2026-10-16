@@ -18,9 +18,6 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 // Nota de cargo móvil, BACK: the back office moves validated cases through the
 // lifecycle. `estado` is this stage's column and no other screen writes it.
-//
-// One global queue. The per-tienda variant filtered the case's región against the
-// reviewer's own store, and everyone who held it also held the unfiltered one.
 class NotaCargoMovilBackController extends Controller
 {
     public function index(Request $request): View
@@ -61,9 +58,7 @@ class NotaCargoMovilBackController extends Controller
         #[CurrentUser]
         Usuario $agente,
     ): RedirectResponse {
-        // Only a validated case has anything to fulfil, and the queue only lists
-        // those. Legacy trusted the posted id, so a rejected case could be moved
-        // through the lifecycle anyway.
+        // The queue only lists validated cases, but the posted id is not trusted.
         abort_unless($ncMovil->esValidado(), 403);
 
         $ncMovil->fill($request->atributos(['estado', 'fecha_actualizacion', 'id_cartera']));

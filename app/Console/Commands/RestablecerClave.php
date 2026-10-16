@@ -6,10 +6,6 @@ use App\Models\Usuario;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
-/**
- * Sets a password for accounts that cannot use the Usuarios screen, including
- * the first administrator.
- */
 class RestablecerClave extends Command
 {
     protected $signature = 'usuario:restablecer-clave {usuario : The account name to sign in with}';

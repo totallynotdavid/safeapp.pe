@@ -51,9 +51,8 @@ Route::middleware('can:historico.ver')->group(function () {
 });
 
 // The same call log widened from one agent to a supervisor's whole team. Its own
-// permiso rather than a mode on histórico: the 599 users legacy granted it are a
-// strict subset of histórico's 602, so folding the two would hand three people a
-// view of other people's work that they do not have today.
+// permiso rather than a mode on histórico, so seeing other people's work is a
+// separate grant.
 Route::middleware('can:seguimiento.equipo')->group(function () {
     Route::get('/seguimiento', [SeguimientoController::class, 'index'])->name('seguimiento.index');
     Route::get('/seguimiento/exportar', [SeguimientoController::class, 'exportar'])->name('seguimiento.exportar');

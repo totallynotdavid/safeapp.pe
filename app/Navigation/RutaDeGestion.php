@@ -3,12 +3,9 @@
 namespace App\Navigation;
 
 /**
- * Every gestión route is named after the channel a Dato carries in tipo_data,
- * so 'MOVIL' reaches gestion.movil and its children.
- *
- * This lives apart from GestionController because the sidebar needs the same
- * mapping to decide which nav item a detail page belongs under, and a view has
- * no business reaching into a controller to ask.
+ * Every gestión route is named after the tipo_data of its Dato, so 'MOVIL'
+ * reaches gestion.movil and its children. The sidebar needs the same mapping,
+ * so it lives outside GestionController.
  */
 class RutaDeGestion
 {

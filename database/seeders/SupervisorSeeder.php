@@ -6,9 +6,9 @@ use App\Models\Supervisor;
 use App\Models\Usuario;
 use Illuminate\Database\Seeder;
 
-// Dev-only. Assignment of a supervisor to a user has no ported screen yet, so
-// this seeds a couple of supervisors and points the seeded users at one, giving
-// the personnel screen real names to show instead of a column of dashes.
+// Dev-only. No screen assigns a supervisor to a user, so this seeds a couple of
+// supervisors and points the seeded users at one, giving the personnel screen
+// real names to show instead of a column of dashes.
 class SupervisorSeeder extends Seeder
 {
     public function run(): void

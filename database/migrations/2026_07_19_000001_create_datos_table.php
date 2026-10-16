@@ -13,10 +13,6 @@ use Illuminate\Support\Facades\Schema;
 // That split makes "an import never overwrites what a person recorded" a shape
 // rather than a rule: a load inserts campaign rows and cannot reach identity,
 // ownership or progress, because they are not here.
-//
-// Two legacy columns are intentionally absent. `cliente_movistar` and
-// `q_competencia` were confirmed unpopulated across the full production dump
-// before being dropped. Reintroduce either one only with a writer for it.
 return new class extends Migration {
     public function up(): void
     {
@@ -26,17 +22,11 @@ return new class extends Migration {
 
             // Provenance: the campaign that delivered this customer, or
             // AltaDeClientes::ORIGEN when an agent registered them by hand.
-            // Production carries 17 distinct values, the longest 25 characters.
             $table->string('origen', 100);
 
             // Routing: which queue works the record, limited to Dato::TIPOS_DATA.
-            //
-            // Legacy conflated this with provenance. Client creation wrote
-            // 'CONVERGENTE' here (while also writing 'INHOUSE' into origen,
-            // correctly), and since the queue filters on this column, all 2,677
-            // clients created that way became unreachable. Keeping the two
-            // columns apart is what stops that recurring; requiring both at
-            // import time is what stops it arriving from a file.
+            // Distinct from origen: the queue filters on this column, so a
+            // campaign name here would make the record unreachable.
             $table->string('tipo_data', 30);
 
             // 0 = still to be worked, 1 = already gestionado. A property of the

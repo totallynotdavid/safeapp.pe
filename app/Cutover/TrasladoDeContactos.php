@@ -38,15 +38,11 @@ final class TrasladoDeContactos implements Traslado
                         $llamadas->agregar([
                             'id_llamada' => (int) $fila->id_llamada,
                             'id_cliente' => $idCliente,
-                            // Left null for historical contacts. The column is
-                            // nullable because a contact outlives the campaign that
-                            // prompted it, and no screen reads it for history.
+                            // A contact outlives the campaign that prompted it.
                             'id_dato' => null,
                             'id_usuario' => (int) $fila->id_usuario,
-                            // 203 contacts carry id_respuesta 0: legacy let the form
-                            // submit without choosing a disposition. Kept as 0, and
-                            // the history panel already renders an absent respuesta
-                            // as a dash.
+                            // 0 means no disposition was chosen. The history panel
+                            // renders it as a dash.
                             'id_respuesta' => (int) $fila->id_respuesta,
                             'fecha' => $fila->fecha,
                             'razon_social' => Saneamiento::texto($fila->razon_social, 255),
@@ -56,8 +52,6 @@ final class TrasladoDeContactos implements Traslado
                             'comentario' => Saneamiento::texto($fila->comentario),
                             'gestion' => Saneamiento::texto($fila->gestion, 100),
                             'tipo_data' => Saneamiento::texto($fila->tipo_data, 30),
-                            // The single legacy count column was the carrier the
-                            // business traded as at the time.
                             'q_movistar' => Saneamiento::conteo($fila->q_lineas),
                             'q_entel' => Saneamiento::conteo($fila->q_entel),
                             'q_claro' => Saneamiento::conteo($fila->q_claro),

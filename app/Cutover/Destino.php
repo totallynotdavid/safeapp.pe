@@ -6,11 +6,6 @@ use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * What the destination must look like before the transfer writes to it: the
- * current schema, no application rows, no legacy views. The way out of a
- * refusal is `--fresh` outside production and an empty database in production.
- */
 final class Destino
 {
     private const TABLAS = [

@@ -5,9 +5,8 @@ namespace Database\Seeders;
 use App\Models\Respuesta;
 use Illuminate\Database\Seeder;
 
-// The fixed contact-disposition catalog. Reference data, seeded in every
-// environment. The legacy SI/NO/NULL flag text is normalized to booleans here,
-// keeping null where the outcome is genuinely unstated.
+// Reference data, seeded in every environment. A null flag means the outcome
+// is unstated.
 class RespuestaSeeder extends Seeder
 {
     // id, descripcion, tipo, contactabilidad, negociacion, volverllamar.

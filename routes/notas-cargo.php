@@ -9,12 +9,8 @@ use App\Http\Controllers\NotaCargoMovilController;
 use App\Http\Controllers\NotaCargoMovilValidacionController;
 use Illuminate\Support\Facades\Route;
 
-// Legacy shipped validación and back twice, once filtered to the reviewer's tienda
-// and once not. The filtered copies are gone; see the controllers for the evidence.
-//
 // Each export sits inside its screen's permiso group and runs the screen's own
-// query, so it needs no leaf of its own: legacy's four REPORTE BACK leaves were the
-// back screen again with an Excel button bolted on.
+// query, so it needs no permiso of its own.
 Route::middleware('can:notacargo.movil.registrar')->group(function () {
     Route::get('/notas-cargo/movil', [NotaCargoMovilController::class, 'index'])
         ->name('notas-cargo.movil.index');
