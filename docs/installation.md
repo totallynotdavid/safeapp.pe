@@ -13,14 +13,15 @@ The setup also uses `curl`, `tar`, `sha256sum`, and `openssl`.
 
 ## Get started
 
-Run the setup:
+Install the toolchain and run the setup:
 
 ```sh
-make setup
+mise install
+mise run setup
 ```
 
-It installs the toolchain with mise, runs `composer install` and
-`bun install --frozen-lockfile`, builds the assets, creates `.env`, starts
+`mise run setup` runs the `install` task (`composer install` and
+`bun install --frozen-lockfile`), builds the assets, creates `.env`, starts
 MariaDB, and builds the development database.
 
 A new `.env` is a copy of `.env.example` with a random `DB_PASSWORD` and a
@@ -35,11 +36,18 @@ The seeders create an administrator account with username `admin` and password
 Start Laravel:
 
 ```sh
-make dev
+mise run dev
 ```
 
 Laravel serves the application at `http://127.0.0.1:8000` by default. Run
-`make help` to list the available maintenance commands.
+`mise tasks` to list the available maintenance commands.
+
+`mise run dev` serves the assets built by `setup`. To edit CSS or JavaScript
+with hot reload, run the Vite dev server in a second terminal:
+
+```sh
+mise run dev:assets
+```
 
 ## Next steps
 

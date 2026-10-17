@@ -1,33 +1,37 @@
 # Contributing
 
-[Install](../docs/installation.md) the toolchain and run `make setup` first. The
-[architecture](../docs/architecture.md) maps the code.
+[Install](../docs/installation.md) the toolchain and run `mise run setup` first.
+The [architecture](../docs/architecture.md) maps the code.
 
 ## Checks
 
-CI runs these in [`ci.yml`](workflows/ci.yml). Run them before you push:
+CI runs [`ci.yml`](workflows/ci.yml): `mise run install`, then `mise run check`.
+Run the same before you push:
 
 ```sh
-make fmt-check
-make lint
-make analyze
-make test
-bun run build
+mise run install
+mise run check
 ```
 
-Both jobs install PHP, Composer, Bun and Mago from [`mise.toml`](../mise.toml),
-the same pins `make setup` uses. Change a tool version there only. The `php` job
-runs the four `make` targets. The `assets` job runs
-`bun install --frozen-lockfile` and `bun run build`.
+`mise.toml` pins PHP, Composer, Bun, Mago and gitleaks, and CI installs them
+from it. Change a tool version there only. `check` runs these tasks without
+writing any tracked file:
 
-`make fmt` formats the PHP code with Mago. `make lint` and `make analyze` run
-Mago's linter and static analysis.
+| Task        | Runs                                             |
+| ----------- | ------------------------------------------------ |
+| `lint`      | Mago format and lint, oxlint, oxfmt and gitleaks |
+| `typecheck` | Mago static analysis                             |
+| `test`      | The PHPUnit suite                                |
+| `build`     | The Vite asset build                             |
+
+`mise run fix` applies the safe lint fixes and formats PHP, JavaScript,
+Markdown, JSON and YAML.
 
 ## Tests
 
 The suite uses an in-memory SQLite database (see
 [`phpunit.xml`](../phpunit.xml)), so it does not need the local MariaDB server.
-Run it with `make test`. Run one file or test with the artisan runner:
+Run it with `mise run test`. Run one file or test with the artisan runner:
 
 ```sh
 mise exec -- php artisan test tests/Feature/Cutover

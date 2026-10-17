@@ -13,8 +13,8 @@ destination refuses.
 
 ## Take the export
 
-Take the export with `mariadb-dump --no-create-db`. `make db-legacy` refuses a
-file that has a `CREATE DATABASE`, `DROP DATABASE`, `ALTER DATABASE` or `USE`
+Take the export with `mariadb-dump --no-create-db`. `mise run db:legacy` refuses
+a file that has a `CREATE DATABASE`, `DROP DATABASE`, `ALTER DATABASE` or `USE`
 statement at the start of a line, because those would write into the
 application's own database.
 
@@ -45,22 +45,24 @@ moved.
 
 ## Rehearse on the dev server
 
-`make db-legacy` and `make cutover` are for the local development database.
-`scripts/db.sh` starts a local MariaDB and never touches a production server.
+`mise run db:legacy` and `mise run cutover` are for the local development
+database. `scripts/db.sh` starts a local MariaDB and never touches a production
+server.
 
 ```sh
-make cutover FILE=/path/to/export.sql
+mise run cutover /path/to/export.sql
 ```
 
 It runs these steps in order:
 
-1. `make db-legacy` restores the export into the `safeapp_legacy` database on
-   the local server and grants the application account read-only access to it.
+1. `mise run db:legacy` restores the export into the `safeapp_legacy` database
+   on the local server and grants the application account read-only access to
+   it.
 2. `php artisan cutover:transform --fresh` drops every table and view in the
    development database, migrates it again, and copies the data across.
 
-Rerun the same command to start over. `make db-legacy FILE=...` restores the
-export on its own.
+Rerun the same command to start over. `mise run db:legacy /path/to/export.sql`
+restores the export on its own.
 
 ## Accounts
 

@@ -18,16 +18,17 @@ Local development needs Linux or WSL on x86-64 and
 [mise](https://mise.jdx.dev/getting-started.html). Then:
 
 ```sh
-make setup
-make dev
+mise install
+mise run setup
+mise run dev
 ```
 
-`make setup` installs the toolchain and dependencies, creates `.env`, builds the
-assets, and starts a local MariaDB with seeded data.
+`mise run setup` installs the dependencies, creates `.env`, builds the assets,
+and starts a local MariaDB with seeded data.
 [Installation](docs/installation.md) lists what it does.
 
 Open `http://127.0.0.1:8000` and sign in as `admin` with password `admin`. The
-seeders create that account for local use only. `make help` lists every
+seeders create that account for local use only. `mise tasks` lists every
 maintenance command.
 
 ## Features
