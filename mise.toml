@@ -1,5 +1,6 @@
 [tools]
 bun = "1.4.2"
+gitleaks = "8.30.1"
 mago = "1.49.0"
 
 # A prebuilt static PHP, so no compiler or -dev libraries are needed. The
@@ -14,3 +15,110 @@ version = "2.10.3"
 url = "https://getcomposer.org/download/{{version}}/composer.phar"
 checksum = "sha256:7a2d379d5b8ffdaa028580ef26494c36d2feef4b178d3dd1473a4dbc5e17c8d6"
 bin = "composer"
+
+[tasks.install]
+description = "Install PHP and JS dependencies from composer.lock and bun.lock"
+run = [
+    "composer install --no-interaction --no-progress --prefer-dist",
+    "bun install --frozen-lockfile",
+]
+
+[tasks.lint]
+description = "Check formatting, lint rules and secrets without writing"
+depends = ["lint:*"]
+
+[tasks."lint:php"]
+description = "Check PHP formatting and Mago lint rules"
+run = ["mago format --check", "mago lint"]
+
+[tasks."lint:js"]
+description = "Lint the JavaScript with oxlint, warnings included"
+run = "bun x oxlint --deny-warnings resources vite.config.js"
+
+[tasks."lint:fmt"]
+description = "Check Markdown, JSON, YAML and JS formatting with oxfmt"
+run = "bun x oxfmt --check ."
+
+[tasks."lint:secrets"]
+description = "Scan the working tree for committed secrets with gitleaks"
+run = "gitleaks dir . --no-banner --redact"
+
+[tasks.fix]
+description = "Apply safe lint fixes and format PHP, JS, Markdown, JSON and YAML"
+run = [
+    "mago lint --fix --format-after-fix",
+    "mago format",
+    "bun x oxlint --fix resources vite.config.js",
+    "bun x oxfmt .",
+]
+
+[tasks.typecheck]
+description = "Run Mago's static analysis on the PHP code"
+run = "mago analyze"
+
+[tasks.test]
+description = "Run the PHPUnit suite on in-memory SQLite"
+run = "php artisan test"
+
+[tasks.build]
+description = "Build the CSS and JavaScript assets with Vite"
+run = "bun x vite build"
+
+[tasks.check]
+description = "Run every check CI runs, without writing tracked files"
+depends = ["lint", "typecheck", "test", "build"]
+
+[tasks.setup]
+description = "Install deps, create .env, build assets and a fresh dev database"
+depends = ["install"]
+run = [
+    "mise run build",
+    "scripts/setup-env.sh",
+    "mise run db:up",
+    "php artisan migrate --seed --ansi",
+]
+
+[tasks.dev]
+description = "Start the local database and the Laravel dev server"
+depends = ["db:up"]
+run = "php artisan serve"
+
+[tasks."dev:assets"]
+description = "Start the Vite dev server with hot reload"
+run = "bun x vite"
+
+[tasks."db:up"]
+description = "Start the local MariaDB (installs and initializes it on first run)"
+run = "scripts/db.sh start"
+
+[tasks."db:down"]
+description = "Stop the local MariaDB"
+run = "scripts/db.sh stop"
+
+[tasks."db:status"]
+description = "Show whether the local MariaDB is running"
+run = "scripts/db.sh status"
+
+[tasks."db:dump"]
+description = "Snapshot the local database to a .sql file (default dev-dump.sql)"
+usage = 'arg "[file]" help="Path of the dump file"'
+run = 'scripts/db.sh dump "${usage_file:-}"'
+
+[tasks."db:reset"]
+description = "Wipe the dev database and rebuild it from migrations and seeders"
+depends = ["db:up"]
+run = "php artisan migrate:fresh --seed --ansi"
+
+[tasks."db:legacy"]
+description = "Restore a production export into the cutover source database"
+depends = ["db:up"]
+usage = 'arg "<file>" help="Path of the production export"'
+run = 'scripts/db.sh restore-legacy "${usage_file}"'
+
+[tasks.cutover]
+description = "Rehearse the cutover: restore an export, rebuild the schema, transform"
+usage = 'arg "<file>" help="Path of the production export"'
+run = [
+    'mise run db:legacy "${usage_file}"',
+    "php artisan cutover:transform --fresh --ansi",
+]
