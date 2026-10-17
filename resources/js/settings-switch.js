@@ -26,7 +26,9 @@ for (const form of document.querySelectorAll("[data-preference-form]")) {
                 if (!response.ok) throw new Error(SAVE_ERROR);
             } catch (error) {
                 input.checked = previousChecked;
-                window.alert(error instanceof Error ? error.message : SAVE_ERROR);
+                window.alert(
+                    error instanceof Error ? error.message : SAVE_ERROR,
+                );
             } finally {
                 input.disabled = false;
                 switchElement?.removeAttribute("data-loading");

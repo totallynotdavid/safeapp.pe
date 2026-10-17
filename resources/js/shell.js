@@ -5,7 +5,9 @@ for (const field of document.querySelectorAll("[data-selector]")) {
     const carrier = field.querySelector('input[type="hidden"]');
     const listboxId = trigger?.getAttribute("aria-controls");
     const listbox = listboxId ? document.getElementById(listboxId) : null;
-    const options = Array.from(listbox?.querySelectorAll('[role="option"]') ?? []);
+    const options = Array.from(
+        listbox?.querySelectorAll('[role="option"]') ?? [],
+    );
     let highlightedIndex = options.findIndex(
         (option) => option.getAttribute("aria-selected") === "true",
     );
@@ -24,7 +26,9 @@ for (const field of document.querySelectorAll("[data-selector]")) {
 
     const enabledIndexes = () =>
         options
-            .map((option, index) => (option.getAttribute("aria-disabled") === "true" ? -1 : index))
+            .map((option, index) =>
+                option.getAttribute("aria-disabled") === "true" ? -1 : index,
+            )
             .filter((index) => index >= 0);
 
     const highlight = (index) => {
@@ -32,7 +36,10 @@ for (const field of document.querySelectorAll("[data-selector]")) {
             option.removeAttribute("data-highlighted");
         }
 
-        if (index < 0 || options[index]?.getAttribute("aria-disabled") === "true") {
+        if (
+            index < 0 ||
+            options[index]?.getAttribute("aria-disabled") === "true"
+        ) {
             highlightedIndex = -1;
             trigger.removeAttribute("aria-activedescendant");
             return;
@@ -70,17 +77,25 @@ for (const field of document.querySelectorAll("[data-selector]")) {
     };
 
     const select = (option) => {
-        if (!(option instanceof HTMLElement) || option.getAttribute("aria-disabled") === "true") {
+        if (
+            !(option instanceof HTMLElement) ||
+            option.getAttribute("aria-disabled") === "true"
+        ) {
             return;
         }
 
         for (const candidate of options) {
-            candidate.setAttribute("aria-selected", String(candidate === option));
+            candidate.setAttribute(
+                "aria-selected",
+                String(candidate === option),
+            );
         }
 
         carrier.value = option.dataset.value ?? "";
         label.textContent =
-            option.querySelector(".selector__option-content")?.textContent?.trim() ?? "";
+            option
+                .querySelector(".selector__option-content")
+                ?.textContent?.trim() ?? "";
         container.setAttribute("data-placeholder", "false");
         carrier.dispatchEvent(new Event("change", { bubbles: true }));
 
@@ -98,7 +113,9 @@ for (const field of document.querySelectorAll("[data-selector]")) {
 
     listbox.addEventListener("click", (event) => {
         const option =
-            event.target instanceof Element ? event.target.closest('[role="option"]') : null;
+            event.target instanceof Element
+                ? event.target.closest('[role="option"]')
+                : null;
 
         if (option && listbox.contains(option)) {
             select(option);
@@ -121,7 +138,10 @@ for (const field of document.querySelectorAll("[data-selector]")) {
                 open();
                 highlight(indexes[0] ?? -1);
             } else {
-                const nextPosition = Math.min(currentPosition + 1, indexes.length - 1);
+                const nextPosition = Math.min(
+                    currentPosition + 1,
+                    indexes.length - 1,
+                );
                 highlight(indexes[nextPosition] ?? highlightedIndex);
             }
         } else if (event.key === "ArrowUp") {
@@ -138,7 +158,11 @@ for (const field of document.querySelectorAll("[data-selector]")) {
             event.preventDefault();
 
             if (isOpen) {
-                highlight(event.key === "Home" ? (indexes[0] ?? -1) : (indexes.at(-1) ?? -1));
+                highlight(
+                    event.key === "Home"
+                        ? (indexes[0] ?? -1)
+                        : (indexes.at(-1) ?? -1),
+                );
             }
         } else if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
@@ -198,8 +222,12 @@ for (const field of document.querySelectorAll("[data-selector]")) {
 }
 
 for (const form of document.querySelectorAll("[data-store-assignment]")) {
-    const assignmentCheckboxes = Array.from(form.querySelectorAll("[data-store-checkbox]"));
-    const activeRadios = Array.from(form.querySelectorAll('input[type="radio"][name="activa"]'));
+    const assignmentCheckboxes = Array.from(
+        form.querySelectorAll("[data-store-checkbox]"),
+    );
+    const activeRadios = Array.from(
+        form.querySelectorAll('input[type="radio"][name="activa"]'),
+    );
 
     const syncActiveStores = () => {
         const assigned = new Set(
@@ -248,13 +276,20 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
     let dragStartWidth = width;
     let dragStartX = 0;
 
-    const sectionTriggers = Array.from(nav.querySelectorAll("[data-side-nav-toggle]"));
+    const sectionTriggers = Array.from(
+        nav.querySelectorAll("[data-side-nav-toggle]"),
+    );
 
     const closeCollapsedPopovers = () => {
         for (const trigger of sectionTriggers) {
-            const group = document.getElementById(trigger.getAttribute("aria-controls") ?? "");
+            const group = document.getElementById(
+                trigger.getAttribute("aria-controls") ?? "",
+            );
 
-            if (group instanceof HTMLElement && group.matches(":popover-open")) {
+            if (
+                group instanceof HTMLElement &&
+                group.matches(":popover-open")
+            ) {
                 group.hidePopover();
             }
         }
@@ -264,15 +299,21 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
         const effectiveCollapsed = isCollapsed && !mobileSideNavQuery.matches;
 
         for (const [index, trigger] of sectionTriggers.entries()) {
-            const group = document.getElementById(trigger.getAttribute("aria-controls") ?? "");
+            const group = document.getElementById(
+                trigger.getAttribute("aria-controls") ?? "",
+            );
 
-            if (!(trigger instanceof HTMLElement) || !(group instanceof HTMLElement)) {
+            if (
+                !(trigger instanceof HTMLElement) ||
+                !(group instanceof HTMLElement)
+            ) {
                 continue;
             }
 
             if (effectiveCollapsed) {
                 if (!group.hasAttribute("popover")) {
-                    group.dataset.inlineExpanded = trigger.getAttribute("aria-expanded") ?? "false";
+                    group.dataset.inlineExpanded =
+                        trigger.getAttribute("aria-expanded") ?? "false";
                     group.setAttribute("popover", "auto");
                 }
 
@@ -282,7 +323,10 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
                 group.style.positionAnchor = anchorName;
                 group.setAttribute("aria-hidden", "false");
                 group.removeAttribute("inert");
-                trigger.setAttribute("aria-expanded", String(group.matches(":popover-open")));
+                trigger.setAttribute(
+                    "aria-expanded",
+                    String(group.matches(":popover-open")),
+                );
                 continue;
             }
 
@@ -317,11 +361,19 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
         }
 
         nav.style.width = effectiveCollapsed ? "" : `${width}px`;
-        handle.setAttribute("aria-valuenow", String(effectiveCollapsed ? 0 : width));
-        collapseButton.setAttribute("aria-expanded", String(!effectiveCollapsed));
+        handle.setAttribute(
+            "aria-valuenow",
+            String(effectiveCollapsed ? 0 : width),
+        );
+        collapseButton.setAttribute(
+            "aria-expanded",
+            String(!effectiveCollapsed),
+        );
         collapseButton.setAttribute(
             "aria-label",
-            effectiveCollapsed ? "Expandir barra lateral" : "Contraer barra lateral",
+            effectiveCollapsed
+                ? "Expandir barra lateral"
+                : "Contraer barra lateral",
         );
 
         if (!effectiveCollapsed) {
@@ -341,7 +393,10 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
         if (collapsed) {
             preCollapseWidth = width;
         } else {
-            width = Math.min(maxWidth, Math.max(minWidth, preCollapseWidth || defaultWidth));
+            width = Math.min(
+                maxWidth,
+                Math.max(minWidth, preCollapseWidth || defaultWidth),
+            );
         }
 
         isCollapsed = collapsed;
@@ -371,7 +426,8 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
         window.removeEventListener("pointercancel", stopDragging);
     };
 
-    const onPointerMove = (event) => resizeFrom(dragStartWidth + (event.clientX - dragStartX));
+    const onPointerMove = (event) =>
+        resizeFrom(dragStartWidth + (event.clientX - dragStartX));
 
     handle.addEventListener("pointerdown", (event) => {
         event.preventDefault();
@@ -418,7 +474,9 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
     });
 
     for (const trigger of sectionTriggers) {
-        const group = document.getElementById(trigger.getAttribute("aria-controls") ?? "");
+        const group = document.getElementById(
+            trigger.getAttribute("aria-controls") ?? "",
+        );
 
         if (!(group instanceof HTMLElement)) {
             continue;
@@ -426,7 +484,10 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
 
         group.addEventListener("toggle", () => {
             if (group.hasAttribute("popover")) {
-                trigger.setAttribute("aria-expanded", String(group.matches(":popover-open")));
+                trigger.setAttribute(
+                    "aria-expanded",
+                    String(group.matches(":popover-open")),
+                );
             }
         });
 
@@ -448,7 +509,9 @@ for (const region of document.querySelectorAll("[data-side-nav-resizable]")) {
 for (const nav of document.querySelectorAll("[data-side-nav]")) {
     nav.addEventListener("click", (event) => {
         const toggle =
-            event.target instanceof Element ? event.target.closest("[data-side-nav-toggle]") : null;
+            event.target instanceof Element
+                ? event.target.closest("[data-side-nav-toggle]")
+                : null;
 
         if (!(toggle instanceof HTMLButtonElement) || !nav.contains(toggle)) {
             return;
@@ -499,7 +562,9 @@ for (const dismiss of document.querySelectorAll("[data-toast-dismiss]")) {
 
         window.setTimeout(
             () => wrapper.remove(),
-            window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 10 : 125,
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches
+                ? 10
+                : 125,
         );
     });
 }
@@ -587,8 +652,14 @@ for (const dialog of document.querySelectorAll("[data-dialog]")) {
             const dy = rect.top + rect.height / 2 - window.innerHeight / 2;
             const distance = Math.sqrt(dx * dx + dy * dy) || 1;
 
-            dialog.style.setProperty("--dialog-dir-x", `${Math.round((dx / distance) * 16)}px`);
-            dialog.style.setProperty("--dialog-dir-y", `${Math.round((dy / distance) * 16)}px`);
+            dialog.style.setProperty(
+                "--dialog-dir-x",
+                `${Math.round((dx / distance) * 16)}px`,
+            );
+            dialog.style.setProperty(
+                "--dialog-dir-y",
+                `${Math.round((dy / distance) * 16)}px`,
+            );
         }
 
         dialog.showModal();
@@ -600,7 +671,9 @@ for (const dialog of document.querySelectorAll("[data-dialog]")) {
         }
     };
 
-    for (const trigger of document.querySelectorAll(`[data-dialog-open="${dialog.id}"]`)) {
+    for (const trigger of document.querySelectorAll(
+        `[data-dialog-open="${dialog.id}"]`,
+    )) {
         trigger.addEventListener("click", () => open(trigger));
     }
 
@@ -661,7 +734,11 @@ const finishClose = () => {
 };
 
 const closeMobileNav = () => {
-    if (!(dialog instanceof HTMLDialogElement) || !dialog.open || closeTimer !== null) {
+    if (
+        !(dialog instanceof HTMLDialogElement) ||
+        !dialog.open ||
+        closeTimer !== null
+    ) {
         return;
     }
 

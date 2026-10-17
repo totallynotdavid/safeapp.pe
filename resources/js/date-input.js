@@ -25,7 +25,7 @@ const formatInput = (date) =>
 
 const parseInput = (value) => {
     const trimmed = value.trim();
-    const match = trimmed.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+    const match = trimmed.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
 
     if (!match) {
         return fromISO(trimmed);
@@ -79,8 +79,7 @@ for (const root of document.querySelectorAll("[data-date-input]")) {
     const initial = selected ?? new Date();
     let visibleMonth = new Date(initial.getFullYear(), initial.getMonth(), 1);
 
-    const isDisabled = (date) =>
-        (min && date < min) || (max && date > max);
+    const isDisabled = (date) => (min && date < min) || (max && date > max);
 
     const canNavigate = (delta) => {
         const target = new Date(
@@ -139,10 +138,7 @@ for (const root of document.querySelectorAll("[data-date-input]")) {
         } else if (boundary === "end") {
             index = buttons.length - 1;
         } else {
-            index = Math.max(
-                0,
-                Math.min(buttons.length - 1, index + offset),
-            );
+            index = Math.max(0, Math.min(buttons.length - 1, index + offset));
         }
 
         buttons[index]?.focus();
@@ -160,8 +156,7 @@ for (const root of document.querySelectorAll("[data-date-input]")) {
         previous.dataset.size = "sm";
         previous.setAttribute("aria-label", "Mes anterior");
         previous.disabled = !canNavigate(-1);
-        previous.innerHTML =
-            `<span class="button__content"><span class="button__icon" aria-hidden="true">${chevron("left")}</span></span>`;
+        previous.innerHTML = `<span class="button__content"><span class="button__icon" aria-hidden="true">${chevron("left")}</span></span>`;
 
         const label = document.createElement("span");
         label.className = "calendar__month-label";
@@ -175,8 +170,7 @@ for (const root of document.querySelectorAll("[data-date-input]")) {
         next.dataset.size = "sm";
         next.setAttribute("aria-label", "Mes siguiente");
         next.disabled = !canNavigate(1);
-        next.innerHTML =
-            `<span class="button__content"><span class="button__icon" aria-hidden="true">${chevron("right")}</span></span>`;
+        next.innerHTML = `<span class="button__content"><span class="button__icon" aria-hidden="true">${chevron("right")}</span></span>`;
 
         header.append(previous, label, next);
 
@@ -247,8 +241,7 @@ for (const root of document.querySelectorAll("[data-date-input]")) {
 
                 const isInitialFocus =
                     !seeded &&
-                    (iso === selectedISO ||
-                        (!selectedISO && iso === todayISO));
+                    (iso === selectedISO || (!selectedISO && iso === todayISO));
 
                 button.tabIndex = isInitialFocus ? 0 : -1;
 
@@ -353,16 +346,13 @@ for (const root of document.querySelectorAll("[data-date-input]")) {
 
                 visibleMonth = new Date(
                     visibleMonth.getFullYear(),
-                    visibleMonth.getMonth() +
-                        (event.key === "PageUp" ? -1 : 1),
+                    visibleMonth.getMonth() + (event.key === "PageUp" ? -1 : 1),
                     1,
                 );
 
                 render();
 
-                calendar
-                    .querySelector('.calendar__day[tabindex="0"]')
-                    ?.focus();
+                calendar.querySelector('.calendar__day[tabindex="0"]')?.focus();
             }
         });
     };
@@ -403,11 +393,7 @@ for (const root of document.querySelectorAll("[data-date-input]")) {
         if (parsed && !isDisabled(parsed)) {
             selected = parsed;
             carrier.value = toISO(parsed);
-            visibleMonth = new Date(
-                parsed.getFullYear(),
-                parsed.getMonth(),
-                1,
-            );
+            visibleMonth = new Date(parsed.getFullYear(), parsed.getMonth(), 1);
         } else if (empty) {
             carrier.value = "";
         }
