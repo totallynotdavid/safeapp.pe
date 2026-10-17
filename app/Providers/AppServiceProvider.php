@@ -7,6 +7,7 @@ use App\View\Composers\NavegacionDeConfiguracion;
 use App\View\Composers\NavegacionPrincipal;
 use App\View\Composers\SelectorDeTienda;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\DevCommands;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
@@ -27,6 +28,10 @@ class AppServiceProvider extends ServiceProvider
 
         // Null lets the model policy decide when the user lacks the permission.
         Gate::before(static fn (Usuario $user, string $ability): ?bool => $user->hasPermiso($ability) ? true : null);
+
+        // artisan dev starts Vite through package.json's dev script by default.
+        // The commands live in mise tasks, so run Vite directly.
+        DevCommands::nodeExec('vite', 'vite');
 
         // Each navigation partial is composed where it is included, not on the
         // layout around it. settings-nav renders both inside Configuración's
