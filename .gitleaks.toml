@@ -1,0 +1,12 @@
+[extend]
+useDefault = true
+
+# Exclude dependencies and build output. Their data tables trip the generic key
+# rule and are not repository source.
+[[allowlists]]
+paths = [
+    '''^vendor/''',
+    '''^node_modules/''',
+    '''^public/build/''',
+    '''^\.mariadb/''',
+]
