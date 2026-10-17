@@ -1,0 +1,5 @@
+{
+    "printWidth": 80,
+    "proseWrap": "always",
+    "ignorePatterns": ["composer.lock", "bun.lock", "*.toml", "*.css"]
+}
