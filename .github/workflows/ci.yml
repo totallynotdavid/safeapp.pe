@@ -14,8 +14,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  php:
-    name: Format, lint, analyze, tests
+  check:
+    name: Check
     runs-on: ubuntu-latest
 
     steps:
@@ -34,6 +34,10 @@ jobs:
 
       - run: composer install --no-interaction --no-progress --prefer-dist
 
+      # --frozen-lockfile is bun's npm ci: it fails rather than resolving when
+      # bun.lock and package.json disagree.
+      - run: bun install --frozen-lockfile
+
       # artisan boots before any test runs, and it needs an APP_KEY to do it.
       # The database settings in .env.example are unused: phpunit.xml points
       # the suite at an in-memory SQLite connection.
@@ -42,21 +46,4 @@ jobs:
           cp .env.example .env
           php artisan key:generate
 
-      - run: make fmt-check
-      - run: make lint
-      - run: make analyze
-      - run: make test
-
-  assets:
-    name: Build assets
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: jdx/mise-action@v5
-
-      # --frozen-lockfile is bun's npm ci: it fails rather than resolving when
-      # bun.lock and package.json disagree.
-      - run: bun install --frozen-lockfile
-      - run: bun run build
+      - run: bun run check

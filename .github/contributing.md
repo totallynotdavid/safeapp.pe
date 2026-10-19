@@ -5,23 +5,21 @@
 
 ## Checks
 
-CI runs these in [`ci.yml`](workflows/ci.yml). Run them before you push:
+CI runs the same checks with `bun run check` in [`ci.yml`](workflows/ci.yml).
+Run them before you push:
 
 ```sh
-make fmt-check
-make lint
-make analyze
-make test
-bun run build
+bun run check
 ```
 
-Both jobs install PHP, Composer, Bun and Mago from [`mise.toml`](../mise.toml),
-the same pins `make setup` uses. Change a tool version there only. The `php` job
-runs the four `make` targets. The `assets` job runs
-`bun install --frozen-lockfile` and `bun run build`.
+The check job installs PHP, Composer, Bun and Mago from
+[`mise.toml`](../mise.toml), using the same pins as `make setup`. Change a tool
+version there only. It installs the Composer and Bun dependencies, prepares the
+Laravel environment, then runs `bun run check`.
 
-`make fmt` formats the PHP code with Mago. `make lint` and `make analyze` run
-Mago's linter and static analysis.
+`bun run fix` formats the PHP code with Mago. `bun run lint` checks formatting,
+runs Mago's linter, and runs static analysis. `bun run test` runs the Laravel
+test suite.
 
 ## Tests
 
