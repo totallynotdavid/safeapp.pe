@@ -1,6 +1,6 @@
 [tools]
-bun = "1.4.2"
-mago = "1.57.0"
+bun = "1.4.3"
+mago = "1.58.1"
 
 # A prebuilt static PHP, so no compiler or -dev libraries are needed. The
 # "common" build carries every extension the app and its tests use.
