@@ -1,32 +1,41 @@
 version: 2
-
-# Grouping is the point here. Ungrouped, a weekly run on three ecosystems opens
-# a dozen PRs that all say the same thing. Patch and minor releases arrive as one
-# PR per ecosystem, which CI either passes or does not. Majors stay separate
-# because each one needs its upgrade guide read.
 updates:
-  - package-ecosystem: composer
-    directory: /
-    schedule:
-      interval: weekly
-    open-pull-requests-limit: 5
-    groups:
-      php-menores:
-        update-types: [minor, patch]
-
   - package-ecosystem: bun
-    directory: /
+    directories:
+      - /
     schedule:
       interval: weekly
-    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
     groups:
-      js-menores:
-        update-types: [minor, patch]
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: composer
+    directories:
+      - /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
 
   - package-ecosystem: github-actions
-    directory: /
+    directories:
+      - /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
     groups:
-      acciones:
-        patterns: ["*"]
+      all:
+        update-types:
+          - major
+          - minor
+          - patch
