@@ -183,6 +183,7 @@ final class TrasladoDeCampanas implements Traslado
                 },
             );
 
+        /** @var array<int, true> $clientes */
         return $clientes;
     }
 }
