@@ -68,6 +68,17 @@ class LoginTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_an_account_disabled_while_signed_in_is_signed_out_on_its_next_request(): void
+    {
+        $usuario = Usuario::factory()->createOne();
+        $this->actingAs($usuario)->get(route('configuracion.perfil'))->assertOk();
+
+        $usuario->forceFill(['estado' => false])->save();
+
+        $this->get(route('configuracion.perfil'))->assertRedirect(route('login'));
+        $this->assertGuest();
+    }
+
     public function test_an_account_without_a_password_cannot_sign_in(): void
     {
         Usuario::factory()->sinClave()->create(['usuario' => 'migrado']);
