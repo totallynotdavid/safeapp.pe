@@ -61,6 +61,38 @@ class PersonalManagementTest extends TestCase
         $this->assertNull($fresh->fecha_nacimiento);
     }
 
+    /** @return array<string, array{string|null, bool}> */
+    public static function correoChanges(): array
+    {
+        return [
+            'a different address' => ['nuevo@example.com', false],
+            'the address removed' => [null, false],
+            'the same address' => ['viejo@example.com', true],
+        ];
+    }
+
+    #[DataProvider('correoChanges')]
+    public function test_a_changed_correo_loses_its_verification(?string $correo, bool $sigueVerificado): void
+    {
+        $usuario = Usuario::factory()->create([
+            'correo' => 'viejo@example.com',
+            'correo_verificado_en' => now(),
+        ]);
+
+        $this
+            ->actingAs($this->gestor())
+            ->put(
+                route('personal.update', $usuario),
+                array_filter([
+                    'personal' => 'NOMBRE',
+                    'correo' => $correo,
+                ]),
+            )
+            ->assertRedirect(route('equipo.show', $usuario));
+
+        $this->assertSame($sigueVerificado, $usuario->fresh()->correo_verificado_en !== null);
+    }
+
     /** @return array<string, array{array<string, string>, string}> */
     public static function rejectedInput(): array
     {

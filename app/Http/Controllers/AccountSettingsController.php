@@ -58,10 +58,6 @@ class AccountSettingsController extends Controller
                 $emailChanged = $email !== $usuario->correo;
                 $usuario->correo = $email;
 
-                if ($emailChanged) {
-                    $usuario->correo_verificado_en = null;
-                }
-
                 break;
         }
 

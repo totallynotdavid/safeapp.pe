@@ -65,6 +65,15 @@ class Usuario extends Authenticatable
 
     protected $hidden = ['clave'];
 
+    protected static function booted(): void
+    {
+        static::saving(static function (self $usuario): void {
+            if ($usuario->exists && $usuario->isDirty('correo')) {
+                $usuario->correo_verificado_en = null;
+            }
+        });
+    }
+
     protected function casts(): array
     {
         return [
