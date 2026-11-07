@@ -10,6 +10,7 @@ use App\Models\Menu;
 use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class ImportacionCargaTest extends TestCase
@@ -83,6 +84,42 @@ class ImportacionCargaTest extends TestCase
 
         $this->assertSame(5, $dato->fresh()->q_movistar);
         $this->assertSame(7, $dato->cliente->llamadas()->sole()->q_movistar);
+    }
+
+    /** @return array<string, array{string, string|null}> */
+    public static function razonSocialEnElArchivo(): array
+    {
+        return [
+            'a new name replaces the stored one' => [
+                '20123456789;NUEVA SAC;MOVIL;CAMPAÑA AGOSTO;LIMA;;0;0;0;0',
+                'NUEVA SAC',
+            ],
+            'a blank name keeps the stored one' => ['20123456789;;MOVIL;CAMPAÑA AGOSTO;LIMA;;0;0;0;0', 'ACME SAC'],
+        ];
+    }
+
+    #[DataProvider('razonSocialEnElArchivo')]
+    public function test_a_load_only_overwrites_the_razon_social_it_supplies(string $fila, ?string $esperada): void
+    {
+        Cliente::factory()->create(['ruc' => '20123456789', 'razon_social' => 'ACME SAC']);
+
+        $this->actingAs($this->cargador())->post(route('clientes.importar.store'), [
+            'archivo' => $this->csv(self::ENCABEZADO."\n".$fila),
+        ]);
+
+        $this->assertSame($esperada, Cliente::porRuc('20123456789')?->razon_social);
+    }
+
+    public function test_a_blank_razon_social_still_creates_an_unknown_client(): void
+    {
+        $this->actingAs($this->cargador())->post(route('clientes.importar.store'), [
+            'archivo' => $this->csv(self::ENCABEZADO."\n20555555555;;MOVIL;CAMPAÑA AGOSTO;LIMA;;0;0;0;0"),
+        ]);
+
+        $cliente = Cliente::porRuc('20555555555');
+        $this->assertNotNull($cliente);
+        $this->assertNull($cliente->razon_social);
+        $this->assertSame(1, $cliente->datos()->count());
     }
 
     public function test_a_second_campaign_adds_a_record_rather_than_replacing_one(): void

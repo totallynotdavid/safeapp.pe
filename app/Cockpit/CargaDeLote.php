@@ -71,12 +71,12 @@ final class CargaDeLote
      */
     private static function registrosDeCampana(array $lote): array
     {
-        // The import file is authoritative for razon_social.
-        Cliente::query()->upsert(
-            array_map(FormatoDeImportacion::valoresIdentidad(...), $lote),
-            ['ruc'],
-            ['razon_social'],
-        );
+        $identidades = array_map(FormatoDeImportacion::valoresIdentidad(...), $lote);
+        $conNombre = array_filter($identidades, static fn (array $fila): bool => $fila['razon_social'] !== null);
+        $sinNombre = array_filter($identidades, static fn (array $fila): bool => $fila['razon_social'] === null);
+
+        Cliente::query()->insertOrIgnore(array_values($sinNombre));
+        Cliente::query()->upsert(array_values($conNombre), ['ruc'], ['razon_social']);
 
         $ids = Cliente::query()
             ->whereIn('ruc', array_column($lote, 'ruc'))
