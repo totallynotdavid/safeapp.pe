@@ -212,6 +212,11 @@ class NcMovil extends Model
         return $this->belongsTo(Supervisor::class, 'id_supervisor', 'id_supervisor');
     }
 
+    public function esLiquidable(): bool
+    {
+        return $this->esValidado() && in_array($this->estado, self::ESTADOS_LIQUIDABLES, true);
+    }
+
     /**
      * @return NcMovilBuilder<self>
      */

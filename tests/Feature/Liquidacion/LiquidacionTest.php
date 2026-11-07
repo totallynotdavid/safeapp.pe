@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Liquidacion;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+
 class LiquidacionTest extends LiquidacionTestCase
 {
     public function test_settles_a_case(): void
@@ -46,5 +48,41 @@ class LiquidacionTest extends LiquidacionTestCase
             ->actingAs($this->liquidador())
             ->put(route('liquidaciones.update', $cargo), [])
             ->assertSessionHasErrors(['comision', 'observacion', 'descuento', 'fecha_liquidacion']);
+    }
+
+    /**
+     * The queue lists only validated, settleable cases, but the id in the URL
+     * is not trusted: a case outside the queue is refused on both verbs.
+     *
+     * @return array<string, array{array<string, mixed>}>
+     */
+    public static function casesOutsideTheQueue(): array
+    {
+        return [
+            'pending validation' => [['validacion' => 'PENDIENTE']],
+            'rejected validation' => [['validacion' => 'RECHAZADO']],
+            'fallen' => [['estado' => 'CAIDA']],
+            'adr' => [['estado' => 'ADR']],
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $overrides
+     */
+    #[DataProvider('casesOutsideTheQueue')]
+    public function test_refuses_a_case_outside_the_queue(array $overrides): void
+    {
+        $cargo = $this->enCola(null, $overrides);
+        $user = $this->liquidador();
+
+        $this->actingAs($user)->get(route('liquidaciones.edit', $cargo))->assertForbidden();
+        $this->actingAs($user)->put(route('liquidaciones.update', $cargo), [
+            'comision' => '150.00',
+            'observacion' => 'DEUDA',
+            'descuento' => '20',
+            'fecha_liquidacion' => now()->toDateString(),
+        ])->assertForbidden();
+
+        $this->assertNull($cargo->fresh()->comision);
     }
 }

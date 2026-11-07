@@ -28,6 +28,8 @@ class LiquidacionController extends Controller
 
     public function edit(NcMovil $ncMovil): View
     {
+        abort_unless($ncMovil->esLiquidable(), 403);
+
         return view('liquidaciones.edit', [
             'cargo' => $ncMovil->load(
                 'cliente',
@@ -45,6 +47,8 @@ class LiquidacionController extends Controller
         UpdateLiquidacionRequest $request,
         NcMovil $ncMovil,
     ): RedirectResponse {
+        abort_unless($ncMovil->esLiquidable(), 403);
+
         $ncMovil->fill($request->atributos())->save();
 
         return redirect()
